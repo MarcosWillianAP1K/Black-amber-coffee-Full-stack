@@ -1,0 +1,9 @@
+{
+  "name": "ui-shared",
+  "private": true,
+  "version": "1.0.0",
+  "exports": {
+    "./index.css": "./index.css",
+    "./*": "./*"
+  }
+}

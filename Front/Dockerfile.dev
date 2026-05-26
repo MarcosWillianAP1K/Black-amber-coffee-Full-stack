@@ -1,0 +1,21 @@
+FROM node:22-alpine
+
+# Define a pasta de trabalho
+WORKDIR /app
+
+# Copia apenas os arquivos de dependência primeiro
+COPY package*.json ./
+COPY app/admin/package*.json ./app/admin/
+COPY app/client/package*.json ./app/client/
+COPY packages/ui-shared/package*.json ./packages/ui-shared/
+COPY packages/utils/package*.json ./packages/utils/
+
+# Instala as dependências
+RUN npm install
+
+# Libera a porta do Vite
+EXPOSE 5173
+EXPOSE 5174
+
+# Roda o servidor de desenvolvimento do Vite
+CMD ["npm", "run", "dev:all"]

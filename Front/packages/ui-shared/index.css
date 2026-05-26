@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* Isso manda o Tailwind rastrear as pastas para gerar os estilos! */
+@source "./"; /* Lê os componentes compartilhados (NavItem, etc) */
+@source "../../app/admin/src"; /* Lê as telas do seu painel Admin */
+
+
+
+@theme "dark" {
+
+    /* Cores */
+    --Primary: #FFBF00;
+    --Primary-selected: #FFCB2F;
+    --Primary-off: #FFDFA0;
+    --Primary-20: #D7A30A;
+
+
+    --Text-gray: #E5E2E1;
+    --Text-dark: #261A00;
+    --Text-primary-off: #D4C5AB;
+
+
+    --Page-background: #131313;
+    --Widget-background: #1C1B1B;
+    --Button-background: #353534;
+    --Nav-bar-background: #131313;
+    --Select-background: #2A2A2A;
+    --Note-background: #0E0E0E;
+
+
+    --Border: #504532;
+    --Border2: #FFE2AB;
+
+
+    --Negacion: #970909;
+    --Negacion-off: #93000A;
+    --Neutral-30: #131313;
+    --Afirmation: #00B637;
+
+
+    --White: #FFFFFF;
+    --Gradient: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 100%);
+
+
+
+    /* amílias de Fonte */
+  --font-primary: 'Manrope', sans-serif;
+  --font-secondary: 'Inter', sans-serif;
+}
+
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scrollbar styling */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--Border) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--Border);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--Primary-20);
+}
+

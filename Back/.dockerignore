@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Dependencies
+node_modules
+npm-debug.log
+
+# Build
+dist
+build
+
+# Development
+.env
+.env.local
+.env.*.local
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Tests
+coverage
+.nyc_output
+
+# Documentation
+README.md
+doc/
+LICENSE
+
+# Docker
+docker-compose.yml
+.dockerignore
