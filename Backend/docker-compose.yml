@@ -1,0 +1,30 @@
+services:
+  # back-amber-bd:
+  #   image: postgres:latest
+  #   container_name: black-amber-bd
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_DB: ${DB_NAME}
+  #   ports:
+  #     - "5432:5432"
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+
+
+  black-amber-coffee-api:
+    container_name: black-amber-coffee-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:8000"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
