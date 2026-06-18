@@ -15,6 +15,7 @@ export const orderItemSchema = z.object({
 // --- Request Schemas ---
 
 export const CreateOrderRequestSchema = z.object({
+  clientPublicId: z.string().optional(),
   items: z
     .array(
       z.object({

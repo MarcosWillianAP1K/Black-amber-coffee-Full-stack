@@ -104,6 +104,80 @@ export default class OrderService {
     });
   }
 
+  async createForWorker(
+    workerPublicId: string,
+    data: CreateOrderRequest,
+  ): Promise<CreateOrderResponse> {
+    const worker = await this.workerRepository.getByPublicId(workerPublicId);
+    if (!worker) throw new Error("WORKER_NOT_FOUND");
+    if (!worker.isActive) throw new Error("WORKER_INACTIVE");
+
+    let clientId: number | null = null;
+    if (data.clientPublicId) {
+      const client = await this.userRepository.getByPublicId(data.clientPublicId);
+      if (!client) throw new Error("CLIENT_NOT_FOUND");
+      clientId = client.id;
+    }
+
+    let total = 0;
+    const itemsWithPrice: Array<{
+      productId: number;
+      quantity: number;
+      unitPrice: string;
+      observation?: string | null;
+    }> = [];
+
+    for (const it of data.items) {
+      const product = await this.productRepository.getById(it.productId);
+      if (!product) throw new Error("PRODUCT_NOT_FOUND");
+      if (!product.isActive) throw new Error("PRODUCT_INACTIVE");
+      const unitPrice = String(product.price);
+      total += Number(product.price) * it.quantity;
+      itemsWithPrice.push({
+        productId: it.productId,
+        quantity: it.quantity,
+        unitPrice,
+        observation: it.observation ?? null,
+      });
+    }
+
+    const publicId = generateId();
+    const code = generateOrderCode();
+
+    const created = await this.orderRepository.create(
+      clientId,
+      publicId,
+      code,
+      String(total),
+      OrderStatus.PENDING,
+      data.observation ?? null,
+      itemsWithPrice,
+      data.paymentMethod ?? null,
+    );
+
+    await this.orderHistoryRepository.add(
+      created.id,
+      workerPublicId,
+      OrderStatus.PENDING,
+      OrderStatus.PENDING,
+    );
+
+    return CreateOrderResponseSchema.parse({
+      data: {
+        id: created.id,
+        publicId: created.publicId,
+        code: created.code,
+        status: created.status,
+        totalPrice: created.totalPrice,
+        paymentMethod: created.paymentMethod,
+        itens: created.itens,
+        observation: created.observation,
+        createdAt: created.createdAt,
+        updatedAt: created.updatedAt,
+      },
+    });
+  }
+
   async cancelOrder(publicId: string): Promise<OrderModel | null> {
     const order = await this.orderRepository.getbyPublicId(publicId);
     if (!order) throw new Error("ORDER_NOT_FOUND");

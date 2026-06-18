@@ -29,9 +29,9 @@ export const API = {
         DeleteById: (id: string) => `${API_BASE}/admin/workers/${id}`,
     },
     AdminOrders: {
-        List: `${API_BASE}/admin/orders`,
-        FindById: (id: string) => `${API_BASE}/admin/orders/${id}`,
-        CancelById: (id: string) => `${API_BASE}/admin/orders/${id}/cancel`,
+        List: `${API_BASE}/worker/orders`,
+        FindById: (id: string) => `${API_BASE}/worker/orders/${id}`,
+        CancelById: (id: string) => `${API_BASE}/worker/orders/${id}/cancel`,
     },
     OrdersWorker: {
         List: `${API_BASE}/worker/orders`,

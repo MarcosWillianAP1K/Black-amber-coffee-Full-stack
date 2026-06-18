@@ -13,7 +13,7 @@ export default class OrderController {
     this.orderService = orderService;
   }
 
-  async create(
+  async createForUser(
     req: Request,
     res: Response,
     next: NextFunction,
@@ -30,6 +30,29 @@ export default class OrderController {
           userPublicId,
           req.body,
         );
+
+      res.status(201).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createForWorker(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const workerPublicId = req.user?.publicId;
+
+      if (!workerPublicId) {
+        throw new Error("UNAUTHORIZED");
+      }
+
+      const response = await this.orderService.createForWorker(
+        workerPublicId,
+        req.body,
+      );
 
       res.status(201).json(response);
     } catch (error) {

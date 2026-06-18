@@ -144,7 +144,7 @@ export default class OrderRepository {
   }
 
   async create(
-    clientId: number,
+    clientId: number | null,
     publicId: string,
     code: string,
     totalAmount: string,

@@ -240,37 +240,5 @@ export default class AdminService {
   }
 
   // ============================================================
-  // Order Management
-  // ============================================================
 
-  async getAllOrders() {
-    return this.orderRepository.getAll();
-  }
-
-  async getOrderByPublicId(publicId: string) {
-    const order = await this.orderRepository.getbyPublicId(publicId);
-    if (!order) throw new Error("ORDER_NOT_FOUND");
-    return order;
-  }
-
-  async cancelOrder(publicId: string) {
-    const order = await this.orderRepository.getbyPublicId(publicId);
-    if (!order) throw new Error("ORDER_NOT_FOUND");
-
-    if (order.status === OrderStatus.CANCELLED) {
-      throw new Error("ORDER_ALREADY_CANCELLED");
-    }
-
-    const updated = await this.orderRepository.cancelOrder(publicId);
-    if (updated) {
-      await this.orderHistoryRepository.add(
-        updated.id,
-        "ADMIN",
-        order.status,
-        OrderStatus.CANCELLED,
-      );
-    }
-
-    return updated;
-  }
 }

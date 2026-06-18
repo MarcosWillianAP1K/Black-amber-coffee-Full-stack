@@ -89,7 +89,6 @@ export const orders = pgTable("orders", {
   publicId: text("public_id").notNull().unique(),
   code: text("code").notNull().unique(), // PED-20260607-0001
   clientId: integer("client_id")
-    .notNull()
     .references(() => clients.id),
   updatedBy: integer("updated_by").references(() => workers.id),
   totalAmount: numeric("total_amount", {
