@@ -15,16 +15,15 @@ services:
   #     timeout: 5s
   #     retries: 5
 
-
   black-amber-coffee-api:
     container_name: black-amber-coffee-api
+    restart: unless-stopped
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     env_file:
       - .env
     ports:
-      - "8080:8000"
+      - "${PORT:-3000}:${PORT:-3000}"
     environment:
-      - NODE_ENV=development
-      - PORT=8080
+      - NODE_ENV=production
