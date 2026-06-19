@@ -10,6 +10,18 @@ export default class UserRepository {
     this.db = db;
   }
 
+  async getAll(): Promise<UserModel[]> {
+    const result = await this.db
+      .select()
+      .from(clients)
+      .leftJoin(profiles, eq(clients.id, profiles.clientId))
+      .orderBy(clients.createdAt);
+
+    return result.map(({ clients: clientRow, profiles: profileRow }) =>
+      UserModel.fromDatabase(clientRow, profileRow),
+    );
+  }
+
   async getByPublicId(publicId: string): Promise<UserModel | null> {
     const result = await this.db
       .select()

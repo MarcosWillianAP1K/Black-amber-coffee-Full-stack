@@ -95,14 +95,13 @@ export default class authService {
       throw new Error("INVALID_CREDENTIALS");
     }
 
-    if (authEntity.type !== "user") {
-      throw new Error("INVALID_CREDENTIALS");
-    }
+    const isWorker = authEntity.type === "worker";
 
     const accessToken = this.jwtService.generateToken({
       id: authEntity.user.id,
       email: authEntity.user.email,
       publicId: authEntity.user.publicId,
+      ...(isWorker && { role: authEntity.role, isAdmin: authEntity.isAdmin }),
     });
 
     const refreshToken = this.jwtService.generateRefreshToken(
@@ -116,12 +115,14 @@ export default class authService {
         user: {
           publicId: authEntity.user.publicId,
           email: authEntity.user.email,
-          userType: "user",
+          userType: isWorker ? "worker" : "user",
+          role: isWorker ? authEntity.role : null,
           profile: {
             fullName: authEntity.user.name,
             phone: authEntity.user.phone ?? null,
             avatarImage: null,
             createdAt: authEntity.user.createdAt,
+            updatedAt: authEntity.user.updatedAt,
           },
         },
       },
@@ -143,10 +144,13 @@ export default class authService {
       throw new Error("USER_NOT_FOUND");
     }
 
+    const isWorker = authEntity.type === "worker";
+
     const accessToken = this.jwtService.generateToken({
       id: authEntity.user.id,
       email: authEntity.user.email,
       publicId: authEntity.user.publicId,
+      ...(isWorker && { role: authEntity.role, isAdmin: authEntity.isAdmin }),
     });
 
     const refreshToken = this.jwtService.generateRefreshToken(

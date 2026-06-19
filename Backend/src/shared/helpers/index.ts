@@ -78,6 +78,10 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 404,
     message: "Produto não encontrado.",
   },
+  PRODUCT_INACTIVE: {
+    status: 400,
+    message: "Produto inativo.",
+  },
 
   // Profile Errors
   PROFILE_NOT_FOUND: {

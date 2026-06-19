@@ -21,7 +21,29 @@ import {
   Worker,
   workerResponseSchema,
 } from "./admin.shemas";
+import UserRepository from "@/modules/user/user.repository";
+import UserModel from "@/modules/user/user.model";
 import { OrderStatus } from "@/core/enuns/orederStatus";
+import * as z from "zod";
+
+// Client response schema
+const clientProfileSchema = z.object({
+  fullName: z.string(),
+  phone: z.string().nullable(),
+  avatarImage: z.string().nullable(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+const clientResponseSchema = z.object({
+  publicId: z.string(),
+  email: z.email(),
+  profile: clientProfileSchema,
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type ClientAdmin = z.infer<typeof clientResponseSchema>;
 
 export default class AdminService {
   private workerRepository: WorkerRepository;
@@ -29,6 +51,7 @@ export default class AdminService {
   private orderHistoryRepository: OrderHistoryRepository;
   private productRepository: ProductRepository;
   private authRepo: authRepository;
+  private userRepository: UserRepository;
 
   constructor(
     workerRepository: WorkerRepository,
@@ -36,12 +59,14 @@ export default class AdminService {
     orderHistoryRepository: OrderHistoryRepository,
     productRepository: ProductRepository,
     authRepo: authRepository,
+    userRepository?: UserRepository,
   ) {
     this.workerRepository = workerRepository;
     this.orderRepository = orderRepository;
     this.orderHistoryRepository = orderHistoryRepository;
     this.productRepository = productRepository;
     this.authRepo = authRepo;
+    this.userRepository = userRepository ?? new UserRepository(db);
   }
 
   // ============================================================
@@ -240,5 +265,89 @@ export default class AdminService {
   }
 
   // ============================================================
+  // Client Management (Admin)
+  // ============================================================
 
+  async getAllClients(): Promise<ClientAdmin[]> {
+    const clients = await this.userRepository.getAll();
+    return clients.map((client) =>
+      clientResponseSchema.parse({
+        publicId: client.publicId,
+        email: client.email,
+        profile: {
+          fullName: client.profile.fullName,
+          phone: client.profile.phone,
+          avatarImage: client.profile.avatarImage,
+          createdAt: client.profile.createdAt,
+          updatedAt: client.profile.updatedAt,
+        },
+        createdAt: client.createdAt,
+        updatedAt: client.updatedAt,
+      }),
+    );
+  }
+
+  async getClient(publicId: string): Promise<ClientAdmin> {
+    const client = await this.userRepository.getByPublicId(publicId);
+    if (!client) throw new Error("CLIENT_NOT_FOUND");
+
+    return clientResponseSchema.parse({
+      publicId: client.publicId,
+      email: client.email,
+      profile: {
+        fullName: client.profile.fullName,
+        phone: client.profile.phone,
+        avatarImage: client.profile.avatarImage,
+        createdAt: client.profile.createdAt,
+        updatedAt: client.profile.updatedAt,
+      },
+      createdAt: client.createdAt,
+      updatedAt: client.updatedAt,
+    });
+  }
+
+  async updateClient(
+    publicId: string,
+    data: { fullName?: string; phone?: string },
+  ): Promise<ClientAdmin> {
+    const client = await this.userRepository.getByPublicId(publicId);
+    if (!client) throw new Error("CLIENT_NOT_FOUND");
+
+    const updatedClient = new UserModel(
+      client.id,
+      client.publicId,
+      client.email,
+      client.createdAt,
+      new Date().toISOString(),
+      {
+        fullName: data.fullName ?? client.profile.fullName,
+        phone: data.phone ?? client.profile.phone,
+        avatarImage: client.profile.avatarImage,
+        createdAt: client.profile.createdAt,
+        updatedAt: new Date().toISOString(),
+      },
+    );
+
+    const result = await this.userRepository.update(updatedClient);
+
+    return clientResponseSchema.parse({
+      publicId: result.publicId,
+      email: result.email,
+      profile: {
+        fullName: result.profile.fullName,
+        phone: result.profile.phone,
+        avatarImage: result.profile.avatarImage,
+        createdAt: result.profile.createdAt,
+        updatedAt: result.profile.updatedAt,
+      },
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
+    });
+  }
+
+  async deleteClient(publicId: string): Promise<void> {
+    const client = await this.userRepository.getByPublicId(publicId);
+    if (!client) throw new Error("CLIENT_NOT_FOUND");
+    await this.userRepository.deleteByPublicId(publicId);
+  }
 }

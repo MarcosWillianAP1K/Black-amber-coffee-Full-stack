@@ -101,7 +101,77 @@ export default class AdminController {
   }
 
   // ============================================================
-  // Order Management
+  // Client Management (Admin)
   // ============================================================
 
+  /**
+   * GET /admin/clients
+   * List all clients
+   */
+  async getAllClients(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const clients = await this.adminService.getAllClients();
+      res.status(200).json({ data: clients });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /admin/clients/:publicId
+   * Get a client by public ID
+   */
+  async getClient(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const publicId = req.params.publicId as string;
+      const client = await this.adminService.getClient(publicId);
+      res.status(200).json({ data: client });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * PUT /admin/clients/:publicId
+   * Update a client
+   */
+  async updateClient(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const publicId = req.params.publicId as string;
+      const result = await this.adminService.updateClient(publicId, req.body);
+      res.status(200).json({ data: result, message: "Client updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /admin/clients/:publicId
+   * Delete a client
+   */
+  async deleteClient(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const publicId = req.params.publicId as string;
+      await this.adminService.deleteClient(publicId);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  }
 }

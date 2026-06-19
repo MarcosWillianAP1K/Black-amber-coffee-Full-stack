@@ -9,6 +9,7 @@ import {
   orderItems,
   payments,
   orderHistory,
+  stocks,
 } from "../db/schema";
 import SecurityUtils from "../core/security";
 import { generateId } from "../core/gereteId";
@@ -67,6 +68,9 @@ export async function seed() {
         await tx
           .delete(orders)
           .where(eq(orders.id, orders.id));
+        await tx
+          .delete(stocks)
+          .where(eq(stocks.id, stocks.id));
         await tx
           .delete(products)
           .where(eq(products.id, products.id));
@@ -288,7 +292,7 @@ export async function seed() {
 
     if (existingProducts.length === 0) {
       console.log("☕ Criando produtos...");
-      await db.insert(products).values(
+      const insertedProducts = await db.insert(products).values(
         productSeedData.map((product) => ({
           publicId: generateId(),
           name: product.name,
@@ -297,9 +301,39 @@ export async function seed() {
           price: product.price,
           category: product.category,
           isActive: true,
+          img: null,
           createdAt: now,
           updatedAt: now,
         })),
+      ).returning();
+
+      // ============================================================
+      // Stocks seed
+      // ============================================================
+      console.log("📦 Criando estoque para os produtos...");
+      const stockData = [
+        { name: "Café Expresso", quantity: 50, minQuantity: 10 },
+        { name: "Café Latte", quantity: 40, minQuantity: 10 },
+        { name: "Cappuccino", quantity: 30, minQuantity: 8 },
+        { name: "Mocha", quantity: 20, minQuantity: 5 },
+        { name: "Suco de Laranja", quantity: 25, minQuantity: 5 },
+        { name: "Água Mineral", quantity: 60, minQuantity: 15 },
+        { name: "Croissant", quantity: 15, minQuantity: 5 },
+        { name: "Bolo de Cenoura", quantity: 8, minQuantity: 3 },
+        { name: "Sanduíche Natural", quantity: 12, minQuantity: 4 },
+      ];
+
+      await db.insert(stocks).values(
+        stockData.map((s) => {
+          const product = insertedProducts.find((p) => p.name === s.name)!;
+          return {
+            productId: product.id,
+            quantity: s.quantity,
+            minQuantity: s.minQuantity,
+            createdAt: now,
+            updatedAt: now,
+          };
+        }),
       );
     } else {
       console.log("☕ Produtos já existem, verificando ausentes...");
@@ -311,7 +345,7 @@ export async function seed() {
           .limit(1);
 
         if (!found.length) {
-          await db.insert(products).values({
+          const [inserted] = await db.insert(products).values({
             publicId: generateId(),
             name: seed.name,
             description: seed.description,
@@ -319,11 +353,88 @@ export async function seed() {
             price: seed.price,
             category: seed.category,
             isActive: true,
+            img: null,
+            createdAt: now,
+            updatedAt: now,
+          }).returning();
+          console.log(`+ Inserido produto ${seed.name}`);
+
+          // Create stock for the new product
+          const defaultStock = { quantity: 20, minQuantity: 5 };
+          await db.insert(stocks).values({
+            productId: inserted.id,
+            quantity: defaultStock.quantity,
+            minQuantity: defaultStock.minQuantity,
             createdAt: now,
             updatedAt: now,
           });
-          console.log(`+ Inserido produto ${seed.name}`);
         }
+      }
+
+      // Ensure stocks exist for existing products that might not have them
+      const allProds = await db.select().from(products);
+      for (const prod of allProds) {
+        const existingStock = await db
+          .select()
+          .from(stocks)
+          .where(eq(stocks.productId, prod.id))
+          .limit(1);
+
+        if (!existingStock.length) {
+          await db.insert(stocks).values({
+            productId: prod.id,
+            quantity: 20,
+            minQuantity: 5,
+            createdAt: now,
+            updatedAt: now,
+          });
+          console.log(`+ Criado estoque para ${prod.name}`);
+        }
+      }
+    }
+
+    // ============================================================
+    // Orders seed
+    // ============================================================
+    // ============================================================
+    // Additional clients seed
+    // ============================================================
+    const additionalClients = [
+      { email: "maria@email.com", name: "Maria Silva", phone: "11911111111" },
+      { email: "joao@email.com", name: "João Pereira", phone: "11922222222" },
+      { email: "ana@email.com", name: "Ana Costa", phone: "11933333333" },
+    ];
+
+    for (const c of additionalClients) {
+      const exists = await db
+        .select()
+        .from(clients)
+        .where(eq(clients.email, c.email))
+        .limit(1);
+
+      if (!exists.length) {
+        await db.transaction(async (tx) => {
+          const [client] = await tx
+            .insert(clients)
+            .values({
+              publicId: generateId(),
+              email: c.email,
+              password: hashedPassword,
+              createdAt: now,
+              updatedAt: now,
+            })
+            .returning();
+
+          await tx.insert(profiles).values({
+            clientId: client.id,
+            fullName: c.name,
+            phone: c.phone,
+            avatarImage: null,
+            createdAt: now,
+            updatedAt: now,
+          });
+        });
+        console.log(`+ Cliente ${c.email}`);
       }
     }
 
@@ -333,16 +444,14 @@ export async function seed() {
     const existingOrders = await db.select().from(orders).limit(1);
 
     if (existingOrders.length === 0) {
-      const clientRecord = await db
-        .select()
-        .from(clients)
-        .where(eq(clients.email, "cliente@teste.com"))
-        .limit(1);
-
+      const allClients = await db.select().from(clients);
       const allProducts = await db.select().from(products);
 
-      if (clientRecord.length > 0 && allProducts.length > 0) {
-        const testClientId = clientRecord[0].id;
+      if (allClients.length > 0 && allProducts.length > 0) {
+        const testClientId = allClients.find((c) => c.email === "cliente@teste.com")!.id;
+        const otherClientIds = allClients
+          .filter((c) => c.email !== "cliente@teste.com")
+          .map((c) => c.id);
 
         // Helper to find a product by name
         const findProduct = (name: string) =>
@@ -350,93 +459,123 @@ export async function seed() {
 
         console.log("📦 Criando pedidos de exemplo...");
 
+        // Helper to get a date relative to now
+        const daysAgo = (days: number) => {
+          const d = new Date(now);
+          d.setDate(d.getDate() - days);
+          return d;
+        };
+
         const orderSeeds: Array<{
-          status: (typeof OrderStatus.VALUES)[number];
-          paymentMethod: string | null;
-          observation: string | null;
-          items: Array<{ productId: number; quantity: number; unitPrice: string }>;
-        }> = [
-          {
-            status: OrderStatus.PENDING,
-            paymentMethod: "PIX",
-            observation: "Cliente solicita canela extra",
-            items: [
-              {
-                productId: findProduct("Café Latte").id,
-                quantity: 2,
-                unitPrice: findProduct("Café Latte").price,
-              },
-              {
-                productId: findProduct("Croissant").id,
-                quantity: 1,
-                unitPrice: findProduct("Croissant").price,
-              },
-            ],
-          },
-          {
-            status: OrderStatus.IN_PROGRESS,
-            paymentMethod: "CARD",
-            observation: null,
-            items: [
-              {
-                productId: findProduct("Cappuccino").id,
-                quantity: 1,
-                unitPrice: findProduct("Cappuccino").price,
-              },
-            ],
-          },
-          {
-            status: OrderStatus.COMPLETED,
-            paymentMethod: "CASH",
-            observation: "Mesa 5",
-            items: [
-              {
-                productId: findProduct("Café Expresso").id,
-                quantity: 3,
-                unitPrice: findProduct("Café Expresso").price,
-              },
-              {
-                productId: findProduct("Bolo de Cenoura").id,
-                quantity: 2,
-                unitPrice: findProduct("Bolo de Cenoura").price,
-              },
-              {
-                productId: findProduct("Suco de Laranja").id,
-                quantity: 1,
-                unitPrice: findProduct("Suco de Laranja").price,
-              },
-            ],
-          },
-          {
-            status: OrderStatus.LATE,
-            paymentMethod: "PIX",
-            observation: "Pedido atrasado - cliente aguardando",
-            items: [
-              {
-                productId: findProduct("Sanduíche Natural").id,
-                quantity: 1,
-                unitPrice: findProduct("Sanduíche Natural").price,
-              },
-              {
-                productId: findProduct("Suco de Laranja").id,
-                quantity: 1,
-                unitPrice: findProduct("Suco de Laranja").price,
-              },
-            ],
-          },
-          {
-            status: OrderStatus.CANCELLED,
-            paymentMethod: null,
-            observation: "Cliente desistiu",
-            items: [
-              {
-                productId: findProduct("Mocha").id,
-                quantity: 1,
-                unitPrice: findProduct("Mocha").price,
-              },
-            ],
-          },
-        ];
+            status: (typeof OrderStatus.VALUES)[number];
+            paymentMethod: string | null;
+            observation: string | null;
+            clientId: number;
+            createdAt: Date;
+            items: Array<{ productId: number; quantity: number; unitPrice: string }>;
+          }> = [
+            // Today's orders
+            {
+              status: OrderStatus.PENDING,
+              paymentMethod: "PIX",
+              observation: "Cliente solicita canela extra",
+              clientId: testClientId,
+              createdAt: now,
+              items: [
+                { productId: findProduct("Café Latte").id, quantity: 2, unitPrice: findProduct("Café Latte").price },
+                { productId: findProduct("Croissant").id, quantity: 1, unitPrice: findProduct("Croissant").price },
+              ],
+            },
+            {
+              status: OrderStatus.IN_PROGRESS,
+              paymentMethod: "CARD",
+              observation: null,
+              clientId: testClientId,
+              createdAt: now,
+              items: [
+                { productId: findProduct("Cappuccino").id, quantity: 1, unitPrice: findProduct("Cappuccino").price },
+              ],
+            },
+            {
+              status: OrderStatus.COMPLETED,
+              paymentMethod: "CASH",
+              observation: "Mesa 5",
+              clientId: otherClientIds[0],
+              createdAt: now,
+              items: [
+                { productId: findProduct("Café Expresso").id, quantity: 3, unitPrice: findProduct("Café Expresso").price },
+                { productId: findProduct("Bolo de Cenoura").id, quantity: 2, unitPrice: findProduct("Bolo de Cenoura").price },
+                { productId: findProduct("Suco de Laranja").id, quantity: 1, unitPrice: findProduct("Suco de Laranja").price },
+              ],
+            },
+            {
+              status: OrderStatus.LATE,
+              paymentMethod: "PIX",
+              observation: "Pedido atrasado - cliente aguardando",
+              clientId: otherClientIds[1],
+              createdAt: now,
+              items: [
+                { productId: findProduct("Sanduíche Natural").id, quantity: 1, unitPrice: findProduct("Sanduíche Natural").price },
+                { productId: findProduct("Suco de Laranja").id, quantity: 1, unitPrice: findProduct("Suco de Laranja").price },
+              ],
+            },
+            {
+              status: OrderStatus.CANCELLED,
+              paymentMethod: null,
+              observation: "Cliente desistiu",
+              clientId: testClientId,
+              createdAt: now,
+              items: [
+                { productId: findProduct("Mocha").id, quantity: 1, unitPrice: findProduct("Mocha").price },
+              ],
+            },
+            // Yesterday's orders (for analytics comparison)
+            {
+              status: OrderStatus.COMPLETED,
+              paymentMethod: "PIX",
+              observation: null,
+              clientId: testClientId,
+              createdAt: daysAgo(1),
+              items: [
+                { productId: findProduct("Café Expresso").id, quantity: 5, unitPrice: findProduct("Café Expresso").price },
+                { productId: findProduct("Croissant").id, quantity: 3, unitPrice: findProduct("Croissant").price },
+              ],
+            },
+            {
+              status: OrderStatus.COMPLETED,
+              paymentMethod: "CARD",
+              observation: "Mesa 2",
+              clientId: otherClientIds[2],
+              createdAt: daysAgo(1),
+              items: [
+                { productId: findProduct("Mocha").id, quantity: 2, unitPrice: findProduct("Mocha").price },
+                { productId: findProduct("Bolo de Cenoura").id, quantity: 1, unitPrice: findProduct("Bolo de Cenoura").price },
+              ],
+            },
+            {
+              status: OrderStatus.COMPLETED,
+              paymentMethod: "CASH",
+              observation: null,
+              clientId: otherClientIds[0],
+              createdAt: daysAgo(2),
+              items: [
+                { productId: findProduct("Cappuccino").id, quantity: 4, unitPrice: findProduct("Cappuccino").price },
+                { productId: findProduct("Sanduíche Natural").id, quantity: 2, unitPrice: findProduct("Sanduíche Natural").price },
+                { productId: findProduct("Água Mineral").id, quantity: 3, unitPrice: findProduct("Água Mineral").price },
+              ],
+            },
+            {
+              status: OrderStatus.COMPLETED,
+              paymentMethod: "PIX",
+              observation: null,
+              clientId: testClientId,
+              createdAt: daysAgo(3),
+              items: [
+                { productId: findProduct("Café Latte").id, quantity: 2, unitPrice: findProduct("Café Latte").price },
+                { productId: findProduct("Bolo de Cenoura").id, quantity: 1, unitPrice: findProduct("Bolo de Cenoura").price },
+              ],
+            },
+          ];
 
         for (const seed of orderSeeds) {
           const orderPublicId = generateId();
@@ -456,12 +595,12 @@ export async function seed() {
               .values({
                 publicId: orderPublicId,
                 code: orderCode,
-                clientId: testClientId,
+                clientId: seed.clientId,
                 totalAmount,
                 status: seed.status as any,
                 observation: seed.observation,
-                createdAt: now,
-                updatedAt: now,
+                createdAt: seed.createdAt,
+                updatedAt: seed.createdAt,
               })
               .returning();
 

@@ -8,6 +8,7 @@ declare global {
         id: number;
         email: string;
         publicId?: string;
+        role?: string;
         isAdmin?: boolean;
       };
     }
