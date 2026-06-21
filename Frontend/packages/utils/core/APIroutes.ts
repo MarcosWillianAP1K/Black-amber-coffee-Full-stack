@@ -2,7 +2,7 @@
 // Fill in missing routes as backend expands.
 
 
-const API_BASE = "http://localhost:3000/v1/api";
+const API_BASE = "http://localhost:3001/v1/api";
 
 
 
@@ -22,51 +22,51 @@ export const API = {
         ResetPassword: `${API_BASE}/auth/forgotpassword/reset`,
     },
     AdminWorkers: {    
-        Register: `${API_BASE}/admin/workers`,
-        List: `${API_BASE}/admin/workers`,
-        FindById: (id: string) => `${API_BASE}/admin/workers/${id}`,
-        UpdateById: (id: string) => `${API_BASE}/admin/workers/${id}`,
-        DeleteById: (id: string) => `${API_BASE}/admin/workers/${id}`,
+        Register: `${API_BASE}/workers`,
+        List: `${API_BASE}/workers`,
+        FindById: (id: string) => `${API_BASE}/workers/${id}`,
+        UpdateById: (id: string) => `${API_BASE}/workers/${id}`,
+        DeleteById: (id: string) => `${API_BASE}/workers/${id}`,
     },
     AdminOrders: {
-        List: `${API_BASE}/worker/orders`,
-        FindById: (id: string) => `${API_BASE}/worker/orders/${id}`,
-        CancelById: (id: string) => `${API_BASE}/worker/orders/${id}/cancel`,
+        List: `${API_BASE}/orders`,
+        FindById: (id: string) => `${API_BASE}/orders/${id}`,
+        CancelById: (id: string) => `${API_BASE}/orders/${id}/cancel`,
     },
     OrdersWorker: {
-        List: `${API_BASE}/worker/orders`,
-        FindById: (id: string) => `${API_BASE}/worker/orders/${id}`,
-        UpdateStatus: (id: string) => `${API_BASE}/worker/orders/${id}/status`,
+        List: `${API_BASE}/orders`,
+        FindById: (id: string) => `${API_BASE}/orders/${id}`,
+        UpdateStatus: (id: string) => `${API_BASE}/orders/${id}/status`,
     },
     Products: {
         List: `${API_BASE}/products`,
         ListCategories: `${API_BASE}/products/categories`,
     },
     OrdersUser: {
-        Create: `${API_BASE}/user/orders`,
-        List: `${API_BASE}/user/orders`,
-        Cancel: (id: string) => `${API_BASE}/user/orders/${id}/cancel`,
+        Create: `${API_BASE}/orders`,
+        List: `${API_BASE}/orders`,
+        Cancel: (id: string) => `${API_BASE}/orders/${id}/cancel`,
     },
     AdminProducts: {
-        Create: `${API_BASE}/admin/products`,
-        UpdateById: (id: string) => `${API_BASE}/admin/products/${id}`,
-        DeleteById: (id: string) => `${API_BASE}/admin/products/${id}`,
-        UploadImageById: (id: string) => `${API_BASE}/admin/products/${id}/image`,
-        ActiveProductsByID: (id: string) => `${API_BASE}/admin/products/${id}/activate`,
-        DesactiveProductsByID: (id: string) => `${API_BASE}/admin/products/${id}/deactivate`,
-        GetProductsById: (id: string) => `${API_BASE}/admin/products/${id}/stock`,
-        UpdateProductsById: (id: string) => `${API_BASE}/admin/products/${id}/stock`,
+        Create: `${API_BASE}/products`,
+        UpdateById: (id: string) => `${API_BASE}/products/${id}`,
+        DeleteById: (id: string) => `${API_BASE}/products/${id}`,
+        UploadImageById: (id: string) => `${API_BASE}/products/${id}/image`,
+        ActiveProductsByID: (id: string) => `${API_BASE}/products/${id}/activate`,
+        DesactiveProductsByID: (id: string) => `${API_BASE}/products/${id}/deactivate`,
+        GetProductsById: (id: string) => `${API_BASE}/products/${id}/stock`,
+        UpdateProductsById: (id: string) => `${API_BASE}/products/${id}/stock`,
     },
     Users: {
-        Base: `${API_BASE}/user`,
-        GetMe: `${API_BASE}/user/me`,
-        UptadeMe: `${API_BASE}/user/me`,
-        DeleteMe: `${API_BASE}/user/me`,
+        Base: `${API_BASE}/users`,
+        GetMe: `${API_BASE}/users/me`,
+        UptadeMe: `${API_BASE}/users/me`,
+        DeleteMe: `${API_BASE}/users/me`,
     },
     Workers: {
-        GetMe: `${API_BASE}/worker/get/me`,
-        Login: `${API_BASE}/worker/login`,
-        UptadeMe: `${API_BASE}/worker/update/me`,
-        // DeleteMe: `${API_BASE}/worker/delete/me`,
+        GetMe: `${API_BASE}/workers/me`,
+        Login: `${API_BASE}/auth/login`,
+        UptadeMe: `${API_BASE}/workers/me`,
+        // DeleteMe: `${API_BASE}/workers/me`,
     },
 } as const;

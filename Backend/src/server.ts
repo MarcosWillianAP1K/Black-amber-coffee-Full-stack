@@ -34,8 +34,9 @@ app.use((_req, _res, next) => {
 app.use(sharedHandlers.error);
 
 app.listen(PORT, async () => {
-  console.log(`🚀 Server running on PORT ${PORT}`);
-  console.log(`📚 Docs v1 available at http://localhost:${PORT}/v1/docs`);
+  const publicPort = process.env.PUBLIC_PORT || PORT;
+  console.log(`🚀 Server running internally on PORT ${PORT}`);
+  console.log(`📚 Docs v1 available at http://localhost:${publicPort}/v1/docs`);
 
   if (process.env.NODE_ENV !== "production") {
     try {

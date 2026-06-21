@@ -295,10 +295,13 @@ export default class authService {
       hashedPassword,
     );
 
+    const isWorker = authEntity.type === "worker";
+
     const accessToken = this.jwtService.generateToken({
       id: authEntity.user.id,
       email: authEntity.user.email,
       publicId: authEntity.user.publicId,
+      ...(isWorker && { role: authEntity.role, isAdmin: authEntity.isAdmin }),
     });
 
     const refreshToken = this.jwtService.generateRefreshToken(

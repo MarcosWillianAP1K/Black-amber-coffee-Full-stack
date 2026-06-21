@@ -27,3 +27,4 @@ services:
       - "3001:${PORT:-3000}"
     environment:
       - NODE_ENV=production
+      - PUBLIC_PORT=3001
