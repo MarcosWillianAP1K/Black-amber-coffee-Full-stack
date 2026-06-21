@@ -34,8 +34,10 @@ const ACTION_STATUS_MAP: Record<string, OrderStatus> = {
 // ──────────────────────────────────────────────
 
 export interface NewOrderData {
+    clientPublicId?: string;
     observation?: string | null;
     totalPrice: number;
+    paymentMethod?: string;
     itens?: Array<{ productId: number; quantity: number; unitPrice: number; name?: string }>;
 }
 
@@ -156,6 +158,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         async (data: NewOrderData) => {
             try {
                 const created = await orderService.createOrder({
+                    clientPublicId: data.clientPublicId,
                     items:
                         data.itens?.map((item) => ({
                             productId: item.productId,
@@ -165,7 +168,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                             observation: null,
                         })) ?? [],
                     totalPrice: data.totalPrice,
-                    paymentMethod: "CASH",
+                    paymentMethod: data.paymentMethod ?? "CASH",
                     observation: data.observation ?? null,
                 });
 

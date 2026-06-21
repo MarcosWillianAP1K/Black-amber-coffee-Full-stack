@@ -39,6 +39,23 @@ export default class OrderService {
     this.productRepository = productRepository;
   }
 
+  private serializeOrder(order: OrderModel) {
+    return {
+      id: order.id,
+      publicId: order.publicId,
+      code: order.code,
+      clientId: order.clientId,
+      updatedBy: order.updatedBy,
+      status: order.status,
+      totalPrice: order.totalPrice,
+      paymentMethod: order.paymentMethod,
+      itens: order.itens,
+      observation: order.observation,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+    };
+  }
+
   async createForUser(
     userPublicId: string,
     data: CreateOrderRequest,
@@ -89,18 +106,7 @@ export default class OrderService {
     );
 
     return CreateOrderResponseSchema.parse({
-      data: {
-        id: created.id,
-        publicId: created.publicId,
-        code: created.code,
-        status: created.status,
-        totalPrice: created.totalPrice,
-        paymentMethod: created.paymentMethod,
-        itens: created.itens,
-        observation: created.observation,
-        createdAt: created.createdAt,
-        updatedAt: created.updatedAt,
-      },
+      data: this.serializeOrder(created),
     });
   }
 
@@ -163,18 +169,7 @@ export default class OrderService {
     );
 
     return CreateOrderResponseSchema.parse({
-      data: {
-        id: created.id,
-        publicId: created.publicId,
-        code: created.code,
-        status: created.status,
-        totalPrice: created.totalPrice,
-        paymentMethod: created.paymentMethod,
-        itens: created.itens,
-        observation: created.observation,
-        createdAt: created.createdAt,
-        updatedAt: created.updatedAt,
-      },
+      data: this.serializeOrder(created),
     });
   }
 
@@ -204,18 +199,7 @@ export default class OrderService {
     const orders = await this.orderRepository.getbyStatus(data.status);
 
     return GetOrdersByStatusResponseSchema.parse({
-      data: orders.map((order) => ({
-        id: order.id,
-        publicId: order.publicId,
-        code: order.code,
-        status: order.status,
-        totalPrice: order.totalPrice,
-        paymentMethod: order.paymentMethod,
-        itens: order.itens,
-        observation: order.observation,
-        createdAt: order.createdAt,
-        updatedAt: order.updatedAt,
-      })),
+      data: orders.map((order) => this.serializeOrder(order)),
     });
   }
 
@@ -231,6 +215,13 @@ export default class OrderService {
     if (!order) throw new Error("ORDER_NOT_FOUND");
 
     return order;
+  }
+
+  async getForUser(userPublicId: string): Promise<OrderModel[]> {
+    const user = await this.userRepository.getByPublicId(userPublicId);
+    if (!user) throw new Error("USER_NOT_FOUND");
+
+    return this.orderRepository.getByClientId(user.id);
   }
 
   async updateStatusByWorker(
@@ -263,7 +254,11 @@ export default class OrderService {
     if (!allowedTo.includes(newStatus))
       throw new Error("INVALID_STATUS_TRANSITION");
 
-    const updated = await this.orderRepository.updateStatus(publicId, newStatus);
+    const updated = await this.orderRepository.updateStatus(
+      publicId,
+      newStatus,
+      worker.id,
+    );
     if (updated) {
       await this.orderHistoryRepository.add(
         updated.id,
@@ -275,11 +270,19 @@ export default class OrderService {
 
     return updated;
   }
-  ///Get all by worker
+
+  /// Get all by worker
   async getAll(workerPublicId: string): Promise<OrderModel[]> {
     const user = await this.workerRepository.getByPublicId(workerPublicId);
     if (!user) throw new Error("WORKER_NOT_FOUND");
 
     return this.orderRepository.getAll();
+  }
+
+  async deleteOrder(publicId: string): Promise<void> {
+    const order = await this.orderRepository.getbyPublicId(publicId);
+    if (!order) throw new Error("ORDER_NOT_FOUND");
+
+    await this.orderRepository.deleteByPublicId(publicId);
   }
 }

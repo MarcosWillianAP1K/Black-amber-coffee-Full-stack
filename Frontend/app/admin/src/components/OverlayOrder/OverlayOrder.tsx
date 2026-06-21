@@ -5,9 +5,8 @@ import type { FormOrderData } from "./FormOrder";
 import type { NewOrderData } from "../../hooks/useOrders";
 import type { Product } from "shared-utils/types/product";
 
-
 interface OverlayOrderProps {
-    onSave: (data: NewOrderData) => void;
+    onSave: (data: NewOrderData) => Promise<void>;
     products: Product[];
 }
 
@@ -29,10 +28,12 @@ export function OverlayOrder({ onSave, products }: OverlayOrderProps) {
         }
     }, [isOrderOverlayOpen]);
 
-    const handleSave = (data: FormOrderData) => {
-        onSave({
+    const handleSave = async (data: FormOrderData) => {
+        await onSave({
+            clientPublicId: data.clientPublicId,
             observation: data.observation,
             totalPrice: data.totalPrice,
+            paymentMethod: data.paymentMethod,
             itens: data.items,
         });
     };

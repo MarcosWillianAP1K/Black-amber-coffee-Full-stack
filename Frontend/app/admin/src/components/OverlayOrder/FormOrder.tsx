@@ -1,22 +1,31 @@
 import { useMemo, useState } from "react";
 import type { Product } from "shared-utils/types/product";
 
+/** Payment methods accepted by the API */
+const PAYMENT_METHODS = ["CASH", "CARD", "PIX"] as const;
+type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
 /** Simplified form data for creating a new order via the overlay form */
 export interface FormOrderData {
+    clientPublicId?: string;
     observation: string;
     totalPrice: number;
+    paymentMethod: PaymentMethod;
     items: Array<{ productId: number; quantity: number; unitPrice: number; name?: string }>;
 }
 
 interface FormOrderProps {
     onClose: () => void;
-    onSave: (data: FormOrderData) => void;
+    onSave: (data: FormOrderData) => Promise<void>;
     /** Available products to select from */
     products: Product[];
 }
 
 interface FormOrderState {
+    clientPublicId: string;
+    isGuest: boolean;
     observation: string;
+    paymentMethod: PaymentMethod;
 }
 
 interface OrderItemRow {
@@ -26,7 +35,10 @@ interface OrderItemRow {
 }
 
 const EMPTY_FORM: FormOrderState = {
+    clientPublicId: "",
+    isGuest: false,
     observation: "",
+    paymentMethod: "CASH",
 };
 
 function createItemRow(): OrderItemRow {
@@ -47,6 +59,7 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
     const [form, setForm] = useState<FormOrderState>(EMPTY_FORM);
     const [items, setItems] = useState<OrderItemRow[]>([createItemRow()]);
     const [error, setError] = useState("");
+    const [isSaving, setIsSaving] = useState(false);
 
     const total = useMemo(() => {
         return items.reduce((sum, item) => {
@@ -78,7 +91,7 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
         );
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const cleanedItems = items.filter((item) => typeof item.productId === "number" && item.qty > 0);
@@ -88,6 +101,7 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
         }
 
         setError("");
+        setIsSaving(true);
 
         const orderItems = cleanedItems.map((row) => {
             const product = menuById.get(row.productId as number);
@@ -99,15 +113,24 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
             };
         });
 
-        onSave({
-            observation: form.observation,
-            totalPrice: total,
-            items: orderItems,
-        });
+        try {
+            await onSave({
+                clientPublicId: form.isGuest ? undefined : (form.clientPublicId || undefined),
+                observation: form.observation,
+                totalPrice: total,
+                paymentMethod: form.paymentMethod,
+                items: orderItems,
+            });
 
-        setForm(EMPTY_FORM);
-        setItems([createItemRow()]);
-        onClose();
+            setForm(EMPTY_FORM);
+            setItems([createItemRow()]);
+            onClose();
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Failed to create order";
+            setError(message);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -130,6 +153,32 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
             </div>
 
             <form onSubmit={handleSubmit} className="px-6 py-5 flex flex-col gap-4">
+
+                <div>
+                    <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
+                        Customer Code
+                    </label>
+                    <input
+                        type="text"
+                        value={form.clientPublicId}
+                        onChange={(e) => setForm((prev) => ({ ...prev, clientPublicId: e.target.value }))}
+                        disabled={form.isGuest}
+                        placeholder="Enter customer code"
+                        className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary focus:outline-none focus:border-(--Primary) transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <div className="mt-2 flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            id="isGuest"
+                            checked={form.isGuest}
+                            onChange={(e) => setForm((prev) => ({ ...prev, isGuest: e.target.checked, clientPublicId: e.target.checked ? "" : prev.clientPublicId }))}
+                            className="w-4 h-4 accent-(--Primary) bg-(--Page-background) border-(--Border) rounded"
+                        />
+                        <label htmlFor="isGuest" className="text-(--Text-gray) text-sm font-secondary cursor-pointer">
+                            No code (Guest)
+                        </label>
+                    </div>
+                </div>
 
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
@@ -201,6 +250,23 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
 
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
+                        Payment Method
+                    </label>
+                    <select
+                        value={form.paymentMethod}
+                        onChange={(e) => setForm((prev) => ({ ...prev, paymentMethod: e.target.value as PaymentMethod }))}
+                        className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary focus:outline-none focus:border-(--Primary) transition-colors"
+                    >
+                        {PAYMENT_METHODS.map((method) => (
+                            <option key={method} value={method}>
+                                {method}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
                         Total
                     </label>
                     <h1 className="text-(--Primary-off) text-[16px] font-secondary font-bold tracking-wider uppercase ">${total.toFixed(2)}</h1>
@@ -223,15 +289,17 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-4 py-2 rounded-md border border-(--Border) text-(--Text-primary-off) hover:text-(--Text-gray) transition-colors"
+                        disabled={isSaving}
+                        className="px-4 py-2 rounded-md border border-(--Border) text-(--Text-primary-off) hover:text-(--Text-gray) transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 rounded-md bg-(--Primary) text-(--Text-dark) font-primary font-semibold hover:bg-(--Primary-selected) transition-colors"
+                        disabled={isSaving}
+                        className="px-4 py-2 rounded-md bg-(--Primary) text-(--Text-dark) font-primary font-semibold hover:bg-(--Primary-selected) transition-colors disabled:opacity-50"
                     >
-                        Save Order
+                        {isSaving ? "Saving..." : "Save Order"}
                     </button>
                 </div>
             </form>

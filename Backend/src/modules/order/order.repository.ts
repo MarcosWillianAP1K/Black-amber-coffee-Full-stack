@@ -15,6 +15,7 @@ export default class OrderRepository {
     const itemsRows = await this.db
       .select({
         quantity: orderItems.quantity,
+        unitPrice: orderItems.unitPrice,
         productId: products.id,
         productName: products.name,
         productPrice: products.price,
@@ -26,7 +27,7 @@ export default class OrderRepository {
     return itemsRows.map((item) => ({
       id: item.productId ?? 0,
       name: item.productName ?? "",
-      price: Number(item.productPrice ?? 0),
+      price: Number(item.unitPrice ?? item.productPrice ?? 0),
       quantity: item.quantity,
       observation: null,
     }));
@@ -79,6 +80,16 @@ export default class OrderRepository {
     return Promise.all(rows.map((row) => this.enrichOrder(row)));
   }
 
+  async getByClientId(clientId: number): Promise<OrderModel[]> {
+    const rows = await this.db
+      .select()
+      .from(orders)
+      .where(eq(orders.clientId, clientId))
+      .orderBy(orders.createdAt);
+
+    return Promise.all(rows.map((row) => this.enrichOrder(row)));
+  }
+
   async paginate(page: number, pageSize: number): Promise<OrderModel[]> {
     const offset = (page - 1) * pageSize;
     const rows = await this.db
@@ -125,12 +136,22 @@ export default class OrderRepository {
   async updateStatus(
     publicId: string,
     status: OrderStatusType,
+    updatedByWorkerId?: number | null,
   ): Promise<OrderModel | null> {
     if (!OrderStatus.isValid(status)) return null;
 
+    const setData: Record<string, unknown> = {
+      status,
+      updatedAt: new Date(),
+    };
+
+    if (updatedByWorkerId !== undefined && updatedByWorkerId !== null) {
+      setData.updatedBy = updatedByWorkerId;
+    }
+
     const [updatedRow] = await this.db
       .update(orders)
-      .set({ status, updatedAt: new Date() })
+      .set(setData)
       .where(eq(orders.publicId, publicId))
       .returning();
 
@@ -193,10 +214,11 @@ export default class OrderRepository {
         });
       }
 
-      // Fetch items
+      // Fetch items with unitPrice (price at time of order)
       const itemsRows = await tx
         .select({
           quantity: orderItems.quantity,
+          unitPrice: orderItems.unitPrice,
           productId: products.id,
           productName: products.name,
           productPrice: products.price,
@@ -208,7 +230,7 @@ export default class OrderRepository {
       const itens = itemsRows.map((item) => ({
         id: item.productId ?? 0,
         name: item.productName ?? "",
-        price: Number(item.productPrice ?? 0),
+        price: Number(item.unitPrice ?? item.productPrice ?? 0),
         quantity: item.quantity,
         observation: null,
       }));

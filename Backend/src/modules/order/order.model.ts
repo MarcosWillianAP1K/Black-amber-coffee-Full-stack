@@ -12,6 +12,8 @@ export default class OrderModel {
   id: number;
   publicId: string;
   code: string;
+  clientId: number | null;
+  updatedBy: number | null;
   status: OrderStatusType;
   totalPrice: number;
   paymentMethod: PaymentMethodType | null;
@@ -24,6 +26,8 @@ export default class OrderModel {
     id: number,
     publicId: string,
     code: string,
+    clientId: number | null,
+    updatedBy: number | null,
     status: OrderStatusType,
     totalPrice: number,
     paymentMethod: PaymentMethodType | null,
@@ -35,6 +39,8 @@ export default class OrderModel {
     this.id = id;
     this.publicId = publicId;
     this.code = code;
+    this.clientId = clientId;
+    this.updatedBy = updatedBy;
     this.status = status;
     this.totalPrice = totalPrice;
     this.paymentMethod = paymentMethod;
@@ -49,6 +55,8 @@ export default class OrderModel {
       order.id,
       order.publicId,
       order.code,
+      order.clientId ?? null,
+      order.updatedBy ?? null,
       order.status,
       Number(order.totalAmount ?? order.totalPrice ?? 0),
       order.paymentMethod ?? null,

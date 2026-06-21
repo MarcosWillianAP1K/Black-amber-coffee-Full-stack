@@ -175,11 +175,13 @@ export const workersRelations = relations(workers, ({ one }) => ({
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   client: one(clients, { fields: [orders.clientId], references: [clients.id] }),
+  updatedByWorker: one(workers, { fields: [orders.updatedBy], references: [workers.id] }),
   items: many(orderItems),
   payment: one(payments, {
     fields: [orders.id],
     references: [payments.orderId],
   }),
+  history: many(orderHistory),
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
@@ -202,5 +204,12 @@ export const stocksRelations = relations(stocks, ({ one }) => ({
   product: one(products, {
     fields: [stocks.productId],
     references: [products.id],
+  }),
+}));
+
+export const orderHistoryRelations = relations(orderHistory, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderHistory.orderId],
+    references: [orders.id],
   }),
 }));

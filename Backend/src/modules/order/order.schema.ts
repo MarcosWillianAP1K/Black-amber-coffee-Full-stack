@@ -51,6 +51,8 @@ export const orderSchema = z.object({
   id: z.number(),
   publicId: z.string(),
   code: z.string(),
+  clientId: z.number().nullable(),
+  updatedBy: z.number().nullable(),
   status: z.enum(OrderStatus.VALUES, { message: "Invalid order status" }),
   totalPrice: z.number(),
   paymentMethod: z

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import OrderController from "../order.controller";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireWorker } from "@/shared/middlewares/permission.middleware";
+import { requireWorker, requireAdmin } from "@/shared/middlewares/permission.middleware";
 import validationMiddleware from "@/shared/middlewares/validation.middleware";
 import {
   CreateOrderRequestSchema,
@@ -23,10 +23,17 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    * @swagger
    * /api/orders:
    *   get:
-   *     summary: List orders (Workers get all, Users get by status)
+   *     summary: List orders (Workers get all, Users get their own)
    *     tags: [Orders]
    *     security:
    *       - bearerAuth: []
+   *     parameters:
+   *       - in: query
+   *         name: status
+   *         schema:
+   *           type: string
+   *           enum: [PENDING, IN PROGRESS, COMPLETED, LATE, CANCELLED]
+   *         description: Filter by status (worker/admin only)
    */
   router.get("/", (req, res, next) => {
     const role = req.user?.role;
@@ -38,9 +45,8 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
       }
       return orderCtrl.getallByWorker(req, res, next);
     } else {
-      // Replaces user get orders logic
-      req.query = req.query || {};
-      return orderCtrl.getByStatus(req, res, next);
+      // Client: list only their own orders
+      return orderCtrl.getForUser(req, res, next);
     }
   });
 
@@ -52,6 +58,37 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *     tags: [Orders]
    *     security:
    *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - items
+   *             properties:
+   *               clientPublicId:
+   *                 type: string
+   *                 description: Optional client ID (worker creating on behalf of client)
+   *               items:
+   *                 type: array
+   *                 items:
+   *                   type: object
+   *                   required:
+   *                     - productId
+   *                     - quantity
+   *                   properties:
+   *                     productId:
+   *                       type: integer
+   *                     quantity:
+   *                       type: integer
+   *                     observation:
+   *                       type: string
+   *               paymentMethod:
+   *                 type: string
+   *                 enum: [CASH, CARD, PIX]
+   *               observation:
+   *                 type: string
    */
   router.post(
     "/",
@@ -76,6 +113,12 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *     tags: [Orders]
    *     security:
    *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: publicId
+   *         required: true
+   *         schema:
+   *           type: string
    */
   router.get("/:publicId", requireWorker(), (req, res, next) =>
     orderCtrl.getByPublicId(req, res, next),
@@ -89,6 +132,24 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *     tags: [Orders]
    *     security:
    *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: publicId
+   *         required: true
+   *         schema:
+   *           type: string
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - status
+   *             properties:
+   *               status:
+   *                 type: string
+   *                 enum: [PENDING, IN PROGRESS, COMPLETED, LATE, CANCELLED]
    */
   router.patch(
     "/:publicId/status",
@@ -105,9 +166,36 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *     tags: [Orders]
    *     security:
    *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: publicId
+   *         required: true
+   *         schema:
+   *           type: string
    */
   router.post("/:publicId/cancel", (req, res, next) =>
     orderCtrl.cancelOrder(req, res, next),
+  );
+
+  /**
+   * @swagger
+   * /api/orders/{publicId}:
+   *   delete:
+   *     summary: Delete an order permanently (Admin only)
+   *     tags: [Orders]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: path
+   *         name: publicId
+   *         required: true
+   *         schema:
+   *           type: string
+   */
+  router.delete(
+    "/:publicId",
+    requireAdmin(),
+    (req, res, next) => orderCtrl.deleteOrder(req, res, next),
   );
 
   return router;

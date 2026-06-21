@@ -133,6 +133,25 @@ export default class OrderController {
     }
   }
 
+  async getForUser(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userPublicId = req.user?.publicId;
+      if (!userPublicId) {
+        throw new Error("UNAUTHORIZED");
+      }
+
+      const orders = await this.orderService.getForUser(userPublicId);
+
+      res.status(200).json({ data: orders });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateStatus(
     req: Request,
     res: Response,
@@ -154,6 +173,21 @@ export default class OrderController {
       );
 
       res.status(200).json({ data: updated });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteOrder(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const publicId = req.params.publicId as string;
+      await this.orderService.deleteOrder(publicId);
+
+      res.status(204).send();
     } catch (error) {
       next(error);
     }

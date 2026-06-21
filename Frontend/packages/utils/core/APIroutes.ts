@@ -30,8 +30,10 @@ export const API = {
     },
     AdminOrders: {
         List: `${API_BASE}/orders`,
+        Create: `${API_BASE}/orders`,
         FindById: (id: string) => `${API_BASE}/orders/${id}`,
         CancelById: (id: string) => `${API_BASE}/orders/${id}/cancel`,
+        DeleteById: (id: string) => `${API_BASE}/orders/${id}`,
     },
     OrdersWorker: {
         List: `${API_BASE}/orders`,
