@@ -25,7 +25,7 @@ export interface UserUpdateInput {
     email?: string;
     phone?: string;
     password?: string;
-    profile: UserProfile;
+    profile?: Partial<UserProfile>;
 }
 
 export interface GetUserResponse {

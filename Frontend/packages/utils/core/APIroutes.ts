@@ -1,9 +1,12 @@
 // Centralized API route registry.
 // Fill in missing routes as backend expands.
+//
+// API_BASE is resolved from the VITE_API_BASE_URL environment variable at
+// build time (Vite injects it via import.meta.env). Set it in the root .env:
+//   VITE_API_BASE_URL=http://localhost:3001/v1/api
 
-
-const API_BASE = "http://localhost:3001/v1/api";
-
+const _meta = typeof import.meta !== "undefined" ? (import.meta as unknown as { env?: Record<string, string> }) : null;
+const API_BASE: string = _meta?.env?.["VITE_API_BASE_URL"] ?? "http://localhost:3001/v1/api";
 
 
 

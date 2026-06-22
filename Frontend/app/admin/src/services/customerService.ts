@@ -97,7 +97,7 @@ export async function filterCustomers(
     return customers.filter((customer) => {
         return (
             customer.profile?.fullName?.toLowerCase().includes(q) ||
-            customer.email.toLowerCase().includes(q)
+            customer.email?.toLowerCase().includes(q)
         );
     });
 }

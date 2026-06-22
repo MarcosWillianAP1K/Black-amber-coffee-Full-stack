@@ -301,6 +301,7 @@ export async function loginService(email: string, password: string): Promise<Aut
         localStorage.setItem("refreshToken", data.refreshToken);
     }
     localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("userRole", data.user.role);
 
     return data;
 }
@@ -345,6 +346,7 @@ export function logoutService(): void {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("userRole");
 }
 
 export function getStoredUser(): Worker | null {

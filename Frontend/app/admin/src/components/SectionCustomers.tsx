@@ -7,8 +7,8 @@ import type { User as Customer } from "shared-utils/types/user";
 export interface SectionCustomersProps {
     customers: Customer[];
     title: string;
-    onDeleteCustomer: (publicId: string) => void;
-    onBlockCustomer: (publicId: string) => void;
+    onDeleteCustomer: (publicId: string) => Promise<void> | void;
+    onBlockCustomer: (publicId: string) => Promise<void> | void;
     onViewCustomer: (publicId: string) => void;
 }
 
@@ -22,7 +22,7 @@ export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCu
 
         if (query) {
             next = next.filter((customer) => {
-                const values = [customer.profile.fullName, customer.email];
+                const values = [customer.profile?.fullName ?? "", customer.email ?? ""];
                 return values.some((value) => value.toLowerCase().includes(query));
             });
         }

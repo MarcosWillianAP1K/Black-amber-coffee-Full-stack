@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ButtonPrimary } from "ui-shared/components/ui/ButtonPrimary";
 import { FormOrder } from "./FormOrder";
 import type { FormOrderData } from "./FormOrder";
@@ -13,20 +13,19 @@ interface OverlayOrderProps {
 export function OverlayOrder({ onSave, products }: OverlayOrderProps) {
     const [isOrderOverlayOpen, setIsOrderOverlayOpen] = useState(false);
 
-
-    const handleEscKey = (e: KeyboardEvent) => {
+    const handleEscKey = useCallback((e: KeyboardEvent) => {
         if (e.key === "Escape") {
             setIsOrderOverlayOpen(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        if (isOrderOverlayOpen) {
-            window.addEventListener("keydown", handleEscKey);
-        } else {
+        if (!isOrderOverlayOpen) return;
+        window.addEventListener("keydown", handleEscKey);
+        return () => {
             window.removeEventListener("keydown", handleEscKey);
-        }
-    }, [isOrderOverlayOpen]);
+        };
+    }, [isOrderOverlayOpen, handleEscKey]);
 
     const handleSave = async (data: FormOrderData) => {
         await onSave({
