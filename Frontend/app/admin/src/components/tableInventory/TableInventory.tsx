@@ -46,6 +46,10 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
         setPanelState({ mode: "edit", item });
     }, []);
 
+    const handleAddClick = useCallback(() => {
+        setPanelState({ mode: "add" });
+    }, []);
+
     const handleDeleteClick = useCallback(
         (id: string) => {
             handlers.onDelete(id);
@@ -57,10 +61,6 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
         },
         [handlers]
     );
-
-    const handleAddClick = useCallback(() => {
-        setPanelState({ mode: "add" });
-    }, []);
 
     const handlePanelCancel = useCallback(() => {
         setPanelState({ mode: "closed" });

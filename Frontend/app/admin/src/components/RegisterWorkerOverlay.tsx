@@ -54,7 +54,7 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
     const btnDisabled = "opacity-50 cursor-not-allowed";
 
     return (
-        <div className="w-[360px] min-w-[360px] bg-(--Widget-background) border-l border-(--Border) flex flex-col h-full animate-[slideIn_0.3s_ease-out]">
+        <div className="w-90 min-w-90 bg-(--Widget-background) border-l border-(--Border) flex flex-col h-full animate-[slideIn_0.3s_ease-out]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-(--Border)">
                 <h3 className="text-(--Text-gray) text-lg font-primary font-bold">

@@ -10,6 +10,7 @@ import {
   boolean,
   pgEnum,
   timestamp,
+  real,
 } from "drizzle-orm/pg-core";
 
 //  Enums
@@ -213,3 +214,17 @@ export const orderHistoryRelations = relations(orderHistory, ({ one }) => ({
     references: [orders.id],
   }),
 }));
+
+export const inventory = pgTable("Inventory", {
+  id: serial("id").primaryKey(),
+  publicId: text("public_id").notNull().unique(),
+  code: text("code").unique(),
+  name: text("name").default(""),
+  description: text("description").default(""),
+  category: text("category").default(""),
+  quantityType: text("quantity_type"),
+  quantity: real("quantity"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("update_at", { withTimezone: true }).defaultNow(),
+  img: text("img"),
+});

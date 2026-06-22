@@ -5,6 +5,7 @@ import { createOrderRoutes } from "@/modules/order/routes/order.routes";
 import { createProductRoutes } from "@/modules/product/routes/product.routes";
 import { createWorkerRoutes } from "@/modules/worker/routes/worker.routes";
 import { createUserRoutes } from "@/modules/user/routes/user.routes";
+import { createInventoryRoutes } from "@/modules/inventory/inventory.routes";
 import { createAnalyticsRoutes } from "@/modules/analytics/analytics.routes";
 import setupSwagger from "@/shared/swagger";
 
@@ -58,6 +59,9 @@ routes.use("/api/workers", createWorkerRoutes());
 
 // Unified User/Client Routes: /api/users/*
 routes.use("/api/users", createUserRoutes());
+
+// Unified Inventory Routes: /api/inventory/*
+routes.use("/api/inventory", createInventoryRoutes());
 
 // Analytics routes: /api/analytics/* (admin only)
 routes.use("/api", createAnalyticsRoutes());

@@ -5,6 +5,7 @@ import { OrderProvider } from "./context/OrderContext";
 import { MenuProvider } from "./context/MenuContext";
 import { EmployeeProvider } from "./context/EmployeeContext";
 import { CustomerProvider } from "./context/CustomerContext";
+import { InventoryProvider } from "./context/InventoryContext";
 
 export default function App() {
   return (
@@ -13,7 +14,9 @@ export default function App() {
         <MenuProvider>
           <EmployeeProvider>
             <CustomerProvider>
-              <RouterProvider router={router} />
+              <InventoryProvider>
+                <RouterProvider router={router} />
+              </InventoryProvider>
             </CustomerProvider>
           </EmployeeProvider>
         </MenuProvider>

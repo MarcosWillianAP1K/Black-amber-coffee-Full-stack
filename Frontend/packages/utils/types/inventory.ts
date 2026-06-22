@@ -22,6 +22,7 @@ export interface InventoryItem {
     id: string;
     name: string;
     code: string;
+    description?: string;
     amount: number;
     unit: InventoryUnit;
     status: StockStatus;
@@ -31,6 +32,7 @@ export interface InventoryItem {
 export interface InventoryAddStockData {
     name: string;
     code: string;
+    description?: string;
     amount: number;
     unit: InventoryUnit;
 }
@@ -39,6 +41,7 @@ export interface InventoryAddStockData {
 export interface InventoryEditData {
     name: string;
     code: string;
+    description?: string;
     amount: number;
     unit: InventoryUnit;
 }

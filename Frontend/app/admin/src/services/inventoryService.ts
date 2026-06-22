@@ -5,77 +5,95 @@
  * Replace with real API calls when backend is ready.
  */
 
-import type { InventoryItem, InventoryAddStockData, InventoryEditData } from "shared-utils/types/inventory";
+import type { InventoryItem, InventoryAddStockData, InventoryEditData, InventoryUnit } from "shared-utils/types/inventory";
 import { deriveStockStatus } from "shared-utils/types/inventory";
-import { MOCK_ITEMS_INVENTORY } from "shared-utils/MockBD.js";
+import { API } from "shared-utils/core/APIroutes";
+import { authFetch } from "./httpClient";
 
-
-let nextId = 8;
-
-
-
-let items = [...MOCK_ITEMS_INVENTORY];
-
-// ──────────────────────────────────────────────
-// Service functions
-// ──────────────────────────────────────────────
-
-/** Fetch all inventory items */
-export async function fetchInventoryItems(): Promise<InventoryItem[]> {
-    // TODO: return await fetch("/api/inventory").then(res => res.json());
-    return [...items];
+interface PaginatedInventoryResponse {
+    data: Record<string, unknown>[];
 }
 
-/**
- * Add stock — if the code matches an existing product, increment its amount.
- * Otherwise, create a new inventory entry.
- */
-export async function addStock(data: InventoryAddStockData): Promise<InventoryItem> {
-    // TODO: return await fetch("/api/inventory/add-stock", { method: "POST", body: JSON.stringify(data) }).then(res => res.json());
-    const existing = items.find((item) => item.code === data.code);
+interface SingleInventoryResponse {
+    data: Record<string, unknown>;
+}
 
-    if (existing) {
-        const newAmount = existing.amount + data.amount;
-        const updated: InventoryItem = {
-            ...existing,
-            name: data.name,
-            amount: newAmount,
-            unit: data.unit,
-            status: deriveStockStatus(newAmount),
-        };
-        items = items.map((item) => (item.id === existing.id ? updated : item));
-        return updated;
+// Helper to map backend format to frontend InventoryItem
+function mapToInventoryItem(item: Record<string, unknown>): InventoryItem {
+    return {
+        id: item.publicId as string,
+        name: item.name as string,
+        code: (item.code as string) ?? "",
+        description: (item.description as string) ?? "",
+        amount: (item.quantity as number) ?? 0,
+        unit: item.quantityType as InventoryUnit,
+        status: deriveStockStatus((item.quantity as number) ?? 0),
+    };
+}
+
+export async function fetchInventoryItems(): Promise<InventoryItem[]> {
+    const response = await authFetch(API.AdminInventory.List, {
+        method: "GET",
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch inventory: ${response.status}`);
     }
 
-    const newItem: InventoryItem = {
-        id: String(nextId++),
-        name: data.name,
-        code: data.code,
-        amount: data.amount,
-        unit: data.unit,
-        status: deriveStockStatus(data.amount),
-    };
-    items = [...items, newItem];
-    return newItem;
+    const payload = (await response.json()) as PaginatedInventoryResponse;
+    return (payload.data ?? []).map(mapToInventoryItem);
 }
 
-/** Update an existing inventory item */
+export async function addStock(data: InventoryAddStockData): Promise<InventoryItem> {
+    const response = await authFetch(API.AdminInventory.AddStock, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: data.name,
+            code: data.code,
+            description: data.description,
+            quantity: data.amount,
+            quantityType: data.unit,
+        }),
+    });
+
+    if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(errBody?.message || `Failed to add stock: ${response.status}`);
+    }
+
+    const payload = (await response.json()) as SingleInventoryResponse;
+    return mapToInventoryItem(payload.data);
+}
+
 export async function updateInventoryItem(id: string, data: InventoryEditData): Promise<InventoryItem> {
-    // TODO: return await fetch(`/api/inventory/${id}`, { method: "PUT", body: JSON.stringify(data) }).then(res => res.json());
-    const updated: InventoryItem = {
-        id,
-        name: data.name,
-        code: data.code,
-        amount: data.amount,
-        unit: data.unit,
-        status: deriveStockStatus(data.amount),
-    };
-    items = items.map((item) => (item.id === id ? updated : item));
-    return updated;
+    const response = await authFetch(API.AdminInventory.UpdateById(id), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: data.name,
+            code: data.code,
+            description: data.description,
+            quantity: data.amount,
+            quantityType: data.unit,
+        }),
+    });
+
+    if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error(errBody?.message || `Failed to update inventory item: ${response.status}`);
+    }
+
+    const payload = (await response.json()) as SingleInventoryResponse;
+    return mapToInventoryItem(payload.data);
 }
 
-/** Delete an inventory item by ID */
 export async function deleteInventoryItem(id: string): Promise<void> {
-    // TODO: await fetch(`/api/inventory/${id}`, { method: "DELETE" });
-    items = items.filter((item) => item.id !== id);
+    const response = await authFetch(API.AdminInventory.DeleteById(id), {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to delete inventory item: ${response.status}`);
+    }
 }

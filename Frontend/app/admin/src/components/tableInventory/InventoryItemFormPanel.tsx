@@ -27,6 +27,7 @@ interface InventoryItemFormPanelProps {
 interface FormState {
     name: string;
     code: string;
+    description: string;
     amount: number;
     unit: InventoryUnit;
 }
@@ -34,6 +35,7 @@ interface FormState {
 const EMPTY_FORM: FormState = {
     name: "",
     code: "",
+    description: "",
     amount: 0,
     unit: "un",
 };
@@ -47,6 +49,7 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
         return {
             name: editingItem.name,
             code: editingItem.code,
+            description: editingItem.description ?? "",
             amount: editingItem.amount,
             unit: editingItem.unit,
         };
@@ -64,6 +67,7 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
             onSaveEdit({
                 name: formData.name,
                 code: formData.code,
+                description: formData.description,
                 amount: formData.amount,
                 unit: formData.unit,
             });
@@ -71,6 +75,7 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
             onSaveAdd({
                 name: formData.name,
                 code: formData.code,
+                description: formData.description,
                 amount: formData.amount,
                 unit: formData.unit,
             });
@@ -131,6 +136,20 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                             If code matches an existing product, stock will be added to it.
                         </p>
                     )}
+                </div>
+
+                {/* Description */}
+                <div>
+                    <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
+                        Description
+                    </label>
+                    <textarea
+                        value={formData.description}
+                        onChange={(e) => handleChange("description", e.target.value)}
+                        placeholder="Optional description"
+                        rows={3}
+                        className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors resize-none"
+                    />
                 </div>
 
                 {/* Amount + Unit (side by side) */}

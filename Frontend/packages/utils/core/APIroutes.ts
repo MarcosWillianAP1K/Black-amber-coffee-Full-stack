@@ -44,6 +44,14 @@ export const API = {
         CancelById: (id: string) => `${API_BASE}/orders/${id}/cancel`,
         DeleteById: (id: string) => `${API_BASE}/orders/${id}`,
     },
+    AdminInventory: {
+        List: `${API_BASE}/inventory`,
+        Create: `${API_BASE}/inventory/create`,
+        AddStock: `${API_BASE}/inventory/add-stock`,
+        FindById: (id: string) => `${API_BASE}/inventory/${id}`,
+        UpdateById: (id: string) => `${API_BASE}/inventory/${id}`,
+        DeleteById: (id: string) => `${API_BASE}/inventory/${id}`,
+    },
     OrdersWorker: {
         List: `${API_BASE}/orders`,
         FindById: (id: string) => `${API_BASE}/orders/${id}`,
