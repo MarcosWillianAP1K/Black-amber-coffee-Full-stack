@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { OrderProvider } from "./context/OrderContext";
 import { MenuProvider } from "./context/MenuContext";
 import { EmployeeProvider } from "./context/EmployeeContext";
+import { CustomerProvider } from "./context/CustomerContext";
 
 export default function App() {
   return (
@@ -11,7 +12,9 @@ export default function App() {
       <OrderProvider>
         <MenuProvider>
           <EmployeeProvider>
-            <RouterProvider router={router} />
+            <CustomerProvider>
+              <RouterProvider router={router} />
+            </CustomerProvider>
           </EmployeeProvider>
         </MenuProvider>
       </OrderProvider>

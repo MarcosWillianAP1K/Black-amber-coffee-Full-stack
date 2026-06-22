@@ -28,6 +28,12 @@ export const API = {
         UpdateById: (id: string) => `${API_BASE}/workers/${id}`,
         DeleteById: (id: string) => `${API_BASE}/workers/${id}`,
     },
+    AdminUsers: {
+        List: `${API_BASE}/users`,
+        FindById: (id: string) => `${API_BASE}/users/${id}`,
+        UpdateById: (id: string) => `${API_BASE}/users/${id}`,
+        DeleteById: (id: string) => `${API_BASE}/users/${id}`,
+    },
     AdminOrders: {
         List: `${API_BASE}/orders`,
         Create: `${API_BASE}/orders`,

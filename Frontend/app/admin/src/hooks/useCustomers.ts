@@ -2,61 +2,34 @@
  * useCustomers — Custom hook encapsulating customer state and operations.
  *
  * Provides customers list and handlers ready to plug into SectionCustomers.
- * Uses customerService internally — when API is ready, only the service changes.
+ * Now delegates completely to CustomerContext instead of localStorage.
  */
 
-import { useState, useCallback, useEffect } from "react";
-import type { User as Customer } from "shared-utils/types/user";
-import * as customerService from "../services/customerService";
+import { useCallback } from "react";
+import { useCustomerContext } from "../context/CustomerContext";
 
 interface UseCustomersReturn {
-    customers: Customer[];
-    isLoading: boolean;
+    customers: ReturnType<typeof useCustomerContext>["customers"];
+    isLoading: ReturnType<typeof useCustomerContext>["isLoading"];
+    error: ReturnType<typeof useCustomerContext>["error"];
+    refresh: ReturnType<typeof useCustomerContext>["refresh"];
     handleOptions: (publicId: string) => void;
-    deleteCustomer: (publicId: string) => void;
+    deleteCustomer: ReturnType<typeof useCustomerContext>["deleteCustomer"];
 }
 
 export function useCustomers(): UseCustomersReturn {
-    const [customers, setCustomers] = useState<Customer[]>(() => {
-        const stored = localStorage.getItem("customers");
-        return stored ? JSON.parse(stored) : [];
-    });
-    const [isLoading, setIsLoading] = useState(() => !localStorage.getItem("customers"));
-
-    // Initial fetch
-    useEffect(() => {
-        let cancelled = false;
-
-        if (!localStorage.getItem("customers")) {
-            customerService.fetchCustomers().then((data) => {
-                if (!cancelled) {
-                    setCustomers(data);
-                    localStorage.setItem("customers", JSON.stringify(data));
-                    setIsLoading(false);
-                }
-            });
-        }
-
-        return () => { cancelled = true; };
-    }, []);
+    const { customers, isLoading, error, refresh, deleteCustomer } = useCustomerContext();
 
     const handleOptions = useCallback((publicId: string) => {
         // TODO: Open a dropdown/modal with options (edit, ban, delete, etc.)
         console.log("Options for customer:", publicId);
     }, []);
 
-    const deleteCustomer = useCallback(async (publicId: string) => {
-        await customerService.deleteCustomer(publicId);
-        setCustomers((prev) => {
-            const next = prev.filter((customer) => customer.publicId !== publicId);
-            localStorage.setItem("customers", JSON.stringify(next));
-            return next;
-        });
-    }, []);
-
     return {
         customers,
         isLoading,
+        error,
+        refresh,
         handleOptions,
         deleteCustomer,
     };
