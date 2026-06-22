@@ -30,19 +30,23 @@ export default class UserModel {
     this.profile = profile;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static fromDatabase(client: any, profile: any): UserModel {
+    const toStr = (v: any): string =>
+      v instanceof Date ? v.toISOString() : String(v ?? "");
+
     return new UserModel(
       client.id,
       client.publicId,
       client.email,
-      client.createdAt,
-      client.updatedAt,
+      toStr(client.createdAt),
+      toStr(client.updatedAt),
       {
         fullName: profile?.fullName ?? "",
         phone: profile?.phone ?? null,
         avatarImage: profile?.avatarImage ?? null,
-        createdAt: profile?.createdAt ?? client.createdAt,
-        updatedAt: profile?.updatedAt ?? client.updatedAt,
+        createdAt: toStr(profile?.createdAt ?? client.createdAt),
+        updatedAt: toStr(profile?.updatedAt ?? client.updatedAt),
       },
     );
   }

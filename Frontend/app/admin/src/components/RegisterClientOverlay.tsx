@@ -11,9 +11,10 @@ import { API } from "shared-utils/core/APIroutes";
 
 interface RegisterClientOverlayProps {
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export function RegisterClientOverlay({ onClose }: RegisterClientOverlayProps) {
+export function RegisterClientOverlay({ onClose, onSuccess }: RegisterClientOverlayProps) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -41,6 +42,7 @@ export function RegisterClientOverlay({ onClose }: RegisterClientOverlayProps) {
 
             await response.json();
             setSuccessMessage(`Client "${name}" registered successfully!`);
+            if (onSuccess) onSuccess();
             // Reset form
             setName("");
             setEmail("");
@@ -58,7 +60,7 @@ export function RegisterClientOverlay({ onClose }: RegisterClientOverlayProps) {
     const btnDisabled = "opacity-50 cursor-not-allowed";
 
     return (
-        <div className="w-[360px] min-w-[360px] bg-(--Widget-background) border-l border-(--Border) flex flex-col h-full animate-[slideIn_0.3s_ease-out]">
+        <div className="w-90 min-w-90 bg-(--Widget-background) border-l border-(--Border) flex flex-col h-full animate-[slideIn_0.3s_ease-out]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-(--Border)">
                 <h3 className="text-(--Text-gray) text-lg font-primary font-bold">

@@ -17,7 +17,7 @@ function Skeleton({ className }: { className?: string }) {
 
 export function Staff() {
     const navigate = useNavigate();
-    const { customers, deleteCustomer, isLoading: customersLoading } = useCustomers();
+    const { customers, deleteCustomer, isLoading: customersLoading, refresh: refresh} = useCustomers();
     const { employees, deleteEmployee, toggleEmployeeStatus, isLoading: employeesLoading, error: employeesError, refresh: refreshEmployees } = useEmployee();
     const [showRegisterWorker, setShowRegisterWorker] = useState(false);
     const [showRegisterClient, setShowRegisterClient] = useState(false);
@@ -131,6 +131,10 @@ export function Staff() {
                 {showRegisterClient && (
                     <RegisterClientOverlay
                         onClose={() => setShowRegisterClient(false)}
+                        onSuccess={() => {
+                            setShowRegisterClient(false);
+                            refresh();
+                        }}
                     />
                 )}
             </div>

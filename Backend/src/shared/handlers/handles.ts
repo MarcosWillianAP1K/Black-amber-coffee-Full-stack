@@ -13,6 +13,7 @@ const error = (
   let code = err instanceof Error ? err.message : "INTERNAL_ERROR";
 
   if (err instanceof ZodError) {
+    console.error("ZodError details:", JSON.stringify((err as any).errors, null, 2));
     code = "BAD_REQUEST";
   }
 

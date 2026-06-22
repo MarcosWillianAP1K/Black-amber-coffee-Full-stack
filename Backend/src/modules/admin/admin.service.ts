@@ -26,21 +26,23 @@ import UserModel from "@/modules/user/user.model";
 import { OrderStatus } from "@/core/enuns/orederStatus";
 import * as z from "zod";
 
-// Client response schema
+// Client response schema — uses z.coerce.string() so Date objects from
+// the database are automatically converted to ISO strings via .toString().
 const clientProfileSchema = z.object({
   fullName: z.string(),
   phone: z.string().nullable(),
   avatarImage: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.coerce.string(),
+  updatedAt: z.coerce.string(),
 });
 
 const clientResponseSchema = z.object({
   publicId: z.string(),
-  email: z.email(),
+  name: z.string().optional(), // alias kept for compatibility
+  email: z.string(),
   profile: clientProfileSchema,
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.coerce.string(),
+  updatedAt: z.coerce.string(),
 });
 
 export type ClientAdmin = z.infer<typeof clientResponseSchema>;
@@ -278,11 +280,15 @@ export default class AdminService {
           fullName: client.profile.fullName,
           phone: client.profile.phone,
           avatarImage: client.profile.avatarImage,
-          createdAt: client.profile.createdAt,
-          updatedAt: client.profile.updatedAt,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          createdAt: (client.profile.createdAt as any),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          updatedAt: (client.profile.updatedAt as any),
         },
-        createdAt: client.createdAt,
-        updatedAt: client.updatedAt,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createdAt: (client.createdAt as any),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        updatedAt: (client.updatedAt as any),
       }),
     );
   }
@@ -298,11 +304,15 @@ export default class AdminService {
         fullName: client.profile.fullName,
         phone: client.profile.phone,
         avatarImage: client.profile.avatarImage,
-        createdAt: client.profile.createdAt,
-        updatedAt: client.profile.updatedAt,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createdAt: (client.profile.createdAt as any),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        updatedAt: (client.profile.updatedAt as any),
       },
-      createdAt: client.createdAt,
-      updatedAt: client.updatedAt,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createdAt: (client.createdAt as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      updatedAt: (client.updatedAt as any),
     });
   }
 

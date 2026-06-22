@@ -105,7 +105,7 @@ export default class AdminController {
   // ============================================================
 
   /**
-   * GET /admin/clients
+   * GET /api/users
    * List all clients
    */
   async getAllClients(
@@ -122,7 +122,7 @@ export default class AdminController {
   }
 
   /**
-   * GET /admin/clients/:publicId
+   * GET /api/users/:publicId
    * Get a client by public ID
    */
   async getClient(
@@ -140,7 +140,7 @@ export default class AdminController {
   }
 
   /**
-   * PUT /admin/clients/:publicId
+   * PUT /api/users/:publicId
    * Update a client
    */
   async updateClient(
@@ -158,7 +158,7 @@ export default class AdminController {
   }
 
   /**
-   * DELETE /admin/clients/:publicId
+   * DELETE /api/users/:publicId
    * Delete a client
    */
   async deleteClient(
