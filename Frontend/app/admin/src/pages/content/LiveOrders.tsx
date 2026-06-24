@@ -20,19 +20,21 @@ export function LiveOrders() {
     const [sortType, setSortType] = useState<"created" | "importance" | "value">("created");
 
     const sortedOrders = useMemo(() => {
+        const activeOrders = orders.filter((o) => o.status !== "finalizado" && o.status !== "cancelado");
+
         if (sortType === "created") {
-            return orders;
+            return activeOrders;
         }
 
-        const next = [...orders];
+        const next = [...activeOrders];
 
         if (sortType === "importance") {
             const priority: Record<string, number> = {
-                "LATE": 0,
-                "IN PROGRESS": 1,
-                "PENDING": 2,
-                "COMPLETED": 3,
-                "CANCELLED": 4,
+                em_preparo: 0,
+                criado: 1,
+                pronto: 2,
+                finalizado: 3,
+                cancelado: 4,
             };
 
             next.sort((a, b) => {

@@ -34,7 +34,7 @@ export function NavBarLeft() {
     const navButtonClass = "w-full flex items-center gap-4 px-6 py-3 text-sm font-primary font-medium transition-colors border-r-4 text-(--Text-primary-off) border-transparent hover:bg-(--Button-background) hover:text-(--Text-gray)";
     const userRole = user?.role?.toLowerCase();
     const visibleLinks = mainLinks.filter((link) => {
-        if (ADMIN_ROUTES.includes(link.path) && userRole === "admin") {
+        if (ADMIN_ROUTES.includes(link.path) && (userRole === "gerente" || user?.isAdmin)) {
             return true;
         }
 
@@ -55,9 +55,9 @@ export function NavBarLeft() {
 
             {/* SEÇÃO 1: Perfil do Usuário */}
             <PerfilNav
-                name={user?.profile?.fullName}
+                name={user?.fullName}
                 job={user?.role}
-                avatarUrl={user?.profile?.avatarImage ?? undefined}
+                avatarUrl={user?.avatarUrl ?? undefined}
             />
 
             {/* SEÇÃO 2: Navegação Principal */}

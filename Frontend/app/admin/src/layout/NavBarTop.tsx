@@ -10,8 +10,8 @@ export function NavBarTop() {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    const avatarInitial = user?.profile.fullName.trim().charAt(0).toUpperCase() ?? "U";
-    const avatarImage = user?.profile.avatarImage ?? null;
+    const avatarInitial = user?.fullName.trim().charAt(0).toUpperCase() ?? "U";
+    const avatarImage = user?.avatarUrl ?? null;
 
     const profilePath = user
         ? APP_ROUTES.PERFIL_DETAIL.replace(":kind", "employee").replace(":id", user.publicId)
@@ -52,7 +52,7 @@ export function NavBarTop() {
                     {avatarImage ? (
                         <img
                             src={avatarImage}
-                            alt={user?.profile.fullName ?? "User"}
+                            alt={user?.fullName ?? "User"}
                             className="rounded-full overflow-hidden w-full h-full object-cover"
                         />
                     ) : (

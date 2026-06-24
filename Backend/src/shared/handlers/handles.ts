@@ -36,6 +36,7 @@ const error = (
     error: {
       code,
       message: mapped.message,
+      details: err instanceof ZodError ? (err as any).errors : undefined
     },
   });
 };

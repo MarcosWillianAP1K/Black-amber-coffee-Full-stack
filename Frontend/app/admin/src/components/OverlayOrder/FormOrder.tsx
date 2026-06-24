@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
 import type { Product } from "shared-utils/types/product";
 
-/** Payment methods accepted by the API */
-const PAYMENT_METHODS = ["CASH", "CARD", "PIX"] as const;
-type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+import type { PaymentMethod } from "shared-utils/types/order";
+import { PAYMENT_METHODS } from "shared-utils/types/order";
 
 /** Simplified form data for creating a new order via the overlay form */
 export interface FormOrderData {
@@ -38,7 +37,7 @@ const EMPTY_FORM: FormOrderState = {
     clientPublicId: "",
     isGuest: false,
     observation: "",
-    paymentMethod: "CASH",
+    paymentMethod: "dinheiro",
 };
 
 function createItemRow(): OrderItemRow {

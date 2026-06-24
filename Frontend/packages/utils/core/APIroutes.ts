@@ -86,6 +86,18 @@ export const API = {
         GetMe: `${API_BASE}/workers/me`,
         Login: `${API_BASE}/auth/login`,
         UptadeMe: `${API_BASE}/workers/me`,
-        // DeleteMe: `${API_BASE}/workers/me`,
+    },
+    Analytics: {
+        Dashboard: `${API_BASE}/dashboard`,
+    },
+    Cart: {
+        Get: `${API_BASE}/cart`,
+        AddItem: `${API_BASE}/cart/items`,
+        UpdateItem: (productId: number) => `${API_BASE}/cart/items/${productId}`,
+        RemoveItem: (productId: number) => `${API_BASE}/cart/items/${productId}`,
+        Clear: `${API_BASE}/cart`,
+    },
+    Payments: {
+        Simulate: `${API_BASE}/payments/simulate`,
     },
 } as const;

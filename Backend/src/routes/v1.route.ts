@@ -7,6 +7,8 @@ import { createWorkerRoutes } from "@/modules/worker/routes/worker.routes";
 import { createUserRoutes } from "@/modules/user/routes/user.routes";
 import { createInventoryRoutes } from "@/modules/inventory/inventory.routes";
 import { createAnalyticsRoutes } from "@/modules/analytics/analytics.routes";
+import { createCartRoutes } from "@/modules/cart/routes/cart.routes";
+import { createPaymentRoutes } from "@/modules/payment/routes/payment.routes";
 import setupSwagger from "@/shared/swagger";
 
 // Shared dependencies for controllers
@@ -20,6 +22,12 @@ import UserRepository from "@/modules/user/user.repository";
 import ProductRepository from "@/modules/product/product.repository";
 import ProductController from "@/modules/product/product.controller";
 import ProductService from "@/modules/product/product.service";
+import CartRepository from "@/modules/cart/cart.repository";
+import CartService from "@/modules/cart/cart.service";
+import CartController from "@/modules/cart/cart.controller";
+import PaymentRepository from "@/modules/payment/payment.repository";
+import PaymentService from "@/modules/payment/payment.service";
+import PaymentController from "@/modules/payment/payment.controller";
 
 const routes = Router();
 
@@ -37,6 +45,21 @@ const orderCtrl = new OrderController(orderSvc);
 
 const productSvc = new ProductService(productRepo);
 const productCtrl = new ProductController(productSvc);
+
+const cartRepo = new CartRepository(db);
+const cartSvc = new CartService(cartRepo, userRepo, productRepo);
+const cartCtrl = new CartController(cartSvc);
+
+const paymentRepo = new PaymentRepository(db);
+const paymentSvc = new PaymentService(
+  cartRepo,
+  userRepo,
+  productRepo,
+  orderRepo,
+  orderHistoryRepo,
+  paymentRepo,
+);
+const paymentCtrl = new PaymentController(paymentSvc);
 
 // ============================================================
 // BASE ROUTES (no prefix changes)
@@ -65,6 +88,12 @@ routes.use("/api/inventory", createInventoryRoutes());
 
 // Analytics routes: /api/analytics/* (admin only)
 routes.use("/api", createAnalyticsRoutes());
+
+// Cart routes: /api/cart/* (client only)
+routes.use("/api/cart", createCartRoutes(cartCtrl));
+
+// Payment routes: /api/payments/* (client only, simulated)
+routes.use("/api/payments", createPaymentRoutes(paymentCtrl));
 
 // ============================================================
 // Swagger Docs

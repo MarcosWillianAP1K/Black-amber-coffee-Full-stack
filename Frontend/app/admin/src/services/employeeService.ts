@@ -69,15 +69,12 @@ export async function createEmployee(data: {
             publicId: String(nextId++),
             role: data.role,
             salary: data.salary,
+            isAdmin: data.role === "gerente",
             isActive: true,
-            profile: {
-                fullName: data.fullName,
-                phone: data.phone ?? null,
-                avatarImage: null,
-                email: data.email,
-                createdAt: now,
-                updatedAt: now,
-            },
+            email: data.email,
+            fullName: data.fullName,
+            phone: data.phone ?? null,
+            avatarUrl: null,
             createdAt: now,
             updatedAt: now,
         };
@@ -121,27 +118,7 @@ export async function createEmployee(data: {
     }
 
     const payload = (await response.json()) as AdminWorkerResponse;
-
-    // Map from RegisterWorkerResponse shape to Worker
-    const { data: workerData } = payload;
-    const worker: Worker = {
-        publicId: workerData.publicId,
-        role: workerData.role as Worker["role"],
-        salary: workerData.salary,
-        isActive: true,
-        profile: {
-            fullName: workerData.profile.fullName,
-            phone: workerData.profile.phone ?? null,
-            avatarImage: workerData.profile.avatarImage ?? null,
-            email: workerData.profile.email,
-            createdAt: workerData.profile.createdAt,
-            updatedAt: workerData.profile.updatedAt,
-        },
-        createdAt: workerData.createdAt,
-        updatedAt: workerData.updatedAt,
-    };
-
-    return worker;
+    return payload.data;
 }
 
 /** Update an existing employee */
@@ -152,13 +129,9 @@ export async function updateEmployee(publicId: string, updates: Partial<WorkerUp
             e.publicId === publicId
                 ? {
                     ...e,
-                    profile: {
-                        ...e.profile,
-                        fullName: updates.fullName ?? e.profile.fullName,
-                        email: updates.email ?? e.profile.email,
-                        phone: updates.phone ?? e.profile.phone,
-                        updatedAt: now,
-                    },
+                    fullName: updates.fullName ?? e.fullName,
+                    email: updates.email ?? e.email,
+                    phone: updates.phone ?? e.phone,
                     updatedAt: now,
                 }
                 : e

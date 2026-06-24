@@ -32,12 +32,11 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *         name: status
    *         schema:
    *           type: string
-   *           enum: [PENDING, IN PROGRESS, COMPLETED, LATE, CANCELLED]
+   *           enum: [criado, em_preparo, pronto, finalizado, cancelado]
    *         description: Filter by status (worker/admin only)
    */
   router.get("/", (req, res, next) => {
-    const role = req.user?.role;
-    const isWorkerOrAdmin = role === "worker" || role === "admin" || req.user?.isAdmin;
+    const isWorkerOrAdmin = req.user?.role !== undefined || req.user?.isAdmin;
 
     if (isWorkerOrAdmin) {
       if (req.query.status) {
@@ -86,7 +85,7 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *                       type: string
    *               paymentMethod:
    *                 type: string
-   *                 enum: [CASH, CARD, PIX]
+   *                 enum: [pix, cartao_credito, cartao_debito, dinheiro]
    *               observation:
    *                 type: string
    */
@@ -94,8 +93,7 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
     "/",
     validationMiddleware(CreateOrderRequestSchema),
     (req, res, next) => {
-      const role = req.user?.role;
-      const isWorkerOrAdmin = role === "worker" || role === "admin" || req.user?.isAdmin;
+      const isWorkerOrAdmin = req.user?.role !== undefined || req.user?.isAdmin;
 
       if (isWorkerOrAdmin) {
         return orderCtrl.createForWorker(req, res, next);
@@ -149,7 +147,7 @@ export function createOrderRoutes(orderCtrl: OrderController): Router {
    *             properties:
    *               status:
    *                 type: string
-   *                 enum: [PENDING, IN PROGRESS, COMPLETED, LATE, CANCELLED]
+   *                 enum: [criado, em_preparo, pronto, finalizado, cancelado]
    */
   router.patch(
     "/:publicId/status",

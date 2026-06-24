@@ -29,7 +29,7 @@ const EMPTY_FORM: ProductInput = {
     description: "",
     category: PRODUCT_CATEGORIES[0],
     price: 0,
-    imageUrl: "",
+    imgUrl: "",
     imageFile: null,
 };
 
@@ -47,13 +47,13 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
             description: editingItem.description,
             category: editingItem.category,
             price: editingItem.price,
-            imageUrl: editingItem.imageUrl ?? "",
+            imgUrl: editingItem.imgUrl ?? "",
             imageFile: null,
         };
     }, [editingItem]);
 
     const [formData, setFormData] = useState<ProductInput>(initialFormData);
-    const [imagePreview, setImagePreview] = useState<string>(editingItem?.imageUrl ?? "");
+    const [imagePreview, setImagePreview] = useState<string>(editingItem?.imgUrl ?? "");
     const [isSaving, setIsSaving] = useState(false);
 
     const handleChange = (
@@ -79,7 +79,7 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
 
         const previewUrl = URL.createObjectURL(file);
         setImagePreview(previewUrl);
-        setFormData((prev) => ({ ...prev, imageFile: file, imageUrl: previewUrl }));
+        setFormData((prev) => ({ ...prev, imageFile: file, imgUrl: previewUrl }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {

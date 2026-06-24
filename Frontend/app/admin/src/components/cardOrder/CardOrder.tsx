@@ -6,16 +6,16 @@ import { useState } from "react";
 import type { Order } from "shared-utils/types/order";
 import { formatPrice } from "shared-utils/helpers/currency";
 import { StatusBadge } from "ui-shared/components/ui/StatusBadge";
-import type { StatusColorMap } from "ui-shared/components/ui/StatusBadge";
+import { ORDER_STATUS_LABELS } from "shared-utils/types/order";
 import { ButtonOrder } from "./ButtonOrder";
 
 /** Color map for order statuses — used with the generic StatusBadge */
-const ORDER_STATUS_COLORS: StatusColorMap = {
-    "PENDING": { bg: "bg-(--Select-background)", text: "text-(--Text-primary-off)" },
-    "IN PROGRESS": { bg: "bg-(--Primary-20)/20", text: "text-(--Primary)" },
-    "COMPLETED": { bg: "bg-[#04DCFF]", text: "text-[#003640]" },
-    "LATE": { bg: "bg-(--Negacion)", text: "text-(--Text-gray)" },
-    "CANCELLED": { bg: "bg-(--Negacion)", text: "text-(--Text-gray)" },
+const ORDER_STATUS_COLORS = {
+    criado: { bg: "bg-(--Select-background)", text: "text-(--Text-primary-off)" },
+    em_preparo: { bg: "bg-(--Primary-20)/20", text: "text-(--Primary)" },
+    pronto: { bg: "bg-[#04DCFF]", text: "text-[#003640]" },
+    finalizado: { bg: "bg-(--Afirmation)", text: "text-(--Text-gray)" },
+    cancelado: { bg: "bg-(--Negacion)", text: "text-(--Text-gray)" },
 };
 
 interface CardOrderProps {
@@ -47,7 +47,9 @@ export function CardOrder({ order, onAction }: CardOrderProps) {
                         <h1 className="text-(--Primary-off) text-lg font-primary font-bold">Order #{order.id}</h1>
                     </div>
 
-                    <StatusBadge status={order.status} colorMap={ORDER_STATUS_COLORS} />
+                    <StatusBadge status={order.status} colorMap={ORDER_STATUS_COLORS}>
+                        {ORDER_STATUS_LABELS[order.status]}
+                    </StatusBadge>
                 </div>
 
                 {/* List items */}

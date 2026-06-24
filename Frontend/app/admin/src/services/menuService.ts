@@ -69,11 +69,10 @@ export async function createMenuItem(data: ProductInput): Promise<Product> {
             publicId: `product-${id}`,
             name: data.name,
             description: data.description ?? null,
-            size: data.size ?? null,
             category: data.category,
             price: data.price,
             isActive: data.isActive ?? true,
-            imageUrl: data.imageUrl ?? null,
+            imgUrl: data.imgUrl ?? null,
             createdAt: now,
             updatedAt: now,
         };
@@ -88,8 +87,7 @@ export async function createMenuItem(data: ProductInput): Promise<Product> {
         body: JSON.stringify({
             name: data.name,
             description: data.description ?? null,
-            imageUrl: null, // image is uploaded separately via uploadProductImage()
-            size: data.size ?? null,
+            imgUrl: null,
             price: data.price,
             category: data.category,
         }),
@@ -114,11 +112,10 @@ export async function updateMenuItem(publicId: string, data: ProductInput): Prom
             publicId,
             name: data.name,
             description: data.description ?? null,
-            size: data.size ?? null,
             category: data.category,
             price: data.price,
             isActive: data.isActive ?? true,
-            imageUrl: data.imageUrl ?? null,
+            imgUrl: data.imgUrl ?? null,
             createdAt: existing.createdAt,
             updatedAt: now,
         };
@@ -132,11 +129,9 @@ export async function updateMenuItem(publicId: string, data: ProductInput): Prom
         body: JSON.stringify({
             name: data.name,
             description: data.description ?? null,
-            size: data.size ?? null,
             price: data.price,
             category: data.category,
             isActive: data.isActive,
-            // imageUrl is intentionally omitted — image is uploaded via uploadProductImage()
         }),
     });
 

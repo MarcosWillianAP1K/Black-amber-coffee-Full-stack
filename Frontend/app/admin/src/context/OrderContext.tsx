@@ -24,9 +24,9 @@ import * as orderService from "../services/orderService";
 const POLL_INTERVAL_MS = 30_000; // 30 seconds — starts immediately (no stagger)
 
 const ACTION_STATUS_MAP: Record<string, OrderStatus> = {
-    start: "IN PROGRESS",
-    hold: "PENDING",
-    ready: "COMPLETED",
+    start: "em_preparo",
+    hold: "criado",
+    ready: "pronto",
 };
 
 // ──────────────────────────────────────────────
@@ -163,12 +163,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                         data.itens?.map((item) => ({
                             productId: item.productId,
                             quantity: item.quantity,
-                            unitPrice: item.unitPrice,
-                            name: item.name,
                             observation: null,
                         })) ?? [],
-                    totalPrice: data.totalPrice,
-                    paymentMethod: data.paymentMethod ?? "CASH",
+                    paymentMethod: data.paymentMethod ?? "dinheiro",
                     observation: data.observation ?? null,
                 });
 

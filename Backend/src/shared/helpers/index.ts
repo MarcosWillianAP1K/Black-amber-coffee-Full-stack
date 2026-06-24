@@ -82,6 +82,22 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 400,
     message: "Produto inativo.",
   },
+  CART_EMPTY: {
+    status: 400,
+    message: "O carrinho está vazio.",
+  },
+  CART_ITEM_NOT_FOUND: {
+    status: 404,
+    message: "Item não encontrado no carrinho.",
+  },
+  PAYMENT_NOT_FOUND: {
+    status: 404,
+    message: "Pagamento não encontrado.",
+  },
+  INVALID_PAYMENT_METHOD: {
+    status: 400,
+    message: "Método de pagamento inválido.",
+  },
 
   // Profile Errors
   PROFILE_NOT_FOUND: {

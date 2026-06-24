@@ -40,10 +40,10 @@ export function ProductCard({ name, itens, price, promotionPrice, imageUrl, onCl
                 <div className="w-full h-fit flex flex-row items-center justify-between gap-0">
                     <div className=" flex items-center gap-1 whitespace-nowrap">
                         {promotionPrice !== undefined && (
-                            <span className="text-[12px] font-bold text-(--Primary)">R$ {promotionPrice.toFixed(2)}</span>
+                            <span className="text-[12px] font-bold text-(--Primary)">${promotionPrice.toFixed(2)}</span>
                         )}
                         <span className={`text-[8px] font-bold ${promotionPrice !== undefined ? 'text-(--Text-gray) line-through' : 'text-(--Primary)'}`}>
-                            R$ {price.toFixed(2)}
+                            ${price.toFixed(2)}
                         </span>
                     </div>
                         

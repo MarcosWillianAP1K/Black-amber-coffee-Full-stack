@@ -96,7 +96,7 @@ export async function filterCustomers(
     const q = filters.query.toLowerCase();
     return customers.filter((customer) => {
         return (
-            customer.profile?.fullName?.toLowerCase().includes(q) ||
+            customer.fullName?.toLowerCase().includes(q) ||
             customer.email?.toLowerCase().includes(q)
         );
     });

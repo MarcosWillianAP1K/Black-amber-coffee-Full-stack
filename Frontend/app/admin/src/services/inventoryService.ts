@@ -26,7 +26,7 @@ function mapToInventoryItem(item: Record<string, unknown>): InventoryItem {
         code: (item.code as string) ?? "",
         description: (item.description as string) ?? "",
         amount: (item.quantity as number) ?? 0,
-        unit: item.quantityType as InventoryUnit,
+        unit: item.unit as InventoryUnit,
         status: deriveStockStatus((item.quantity as number) ?? 0),
     };
 }
@@ -53,7 +53,7 @@ export async function addStock(data: InventoryAddStockData): Promise<InventoryIt
             code: data.code,
             description: data.description,
             quantity: data.amount,
-            quantityType: data.unit,
+            unit: data.unit,
         }),
     });
 
@@ -75,7 +75,7 @@ export async function updateInventoryItem(id: string, data: InventoryEditData): 
             code: data.code,
             description: data.description,
             quantity: data.amount,
-            quantityType: data.unit,
+            unit: data.unit,
         }),
     });
 

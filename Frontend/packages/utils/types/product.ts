@@ -8,11 +8,10 @@ export interface Product {
     publicId: string;
     name: string;
     description: string | null;
-    size: string | null;
+    imgUrl: string | null;
     price: number;
     category: string;
     isActive: boolean;
-    imageUrl?: string | null;
     createdAt: string;
     updatedAt: string;
 }
@@ -21,20 +20,33 @@ export interface Product {
 export interface ProductInput {
     name: string;
     description?: string | null;
-    size?: string | null;
+    imgUrl?: string | null;
     price: number;
     category: string;
     isActive?: boolean;
-    imageUrl?: string;
     imageFile?: File | null;
 }
 
-/** Available product categories (UI only) */
+/** Available product categories (backend enum) */
 export const PRODUCT_CATEGORIES = [
-    "COFFEE",
-    "DRINKS",
-    "FOOD",
-    "OTHER"
+    "cafe",
+    "cha",
+    "suco",
+    "smoothie",
+    "lanche",
+    "sobremesa",
+    "outro",
 ] as const;
 
-export type ProductCategory = string;
+export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
+
+/** Display labels for product categories */
+export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
+    cafe: "Café",
+    cha: "Chá",
+    suco: "Suco",
+    smoothie: "Smoothie",
+    lanche: "Lanche",
+    sobremesa: "Sobremesa",
+    outro: "Outro",
+};

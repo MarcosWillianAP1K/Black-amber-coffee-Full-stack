@@ -3,7 +3,8 @@
 
 /* Isso manda o Tailwind rastrear as pastas para gerar os estilos! */
 @source "./"; /* Lê os componentes compartilhados (NavItem, etc) */
-@source "../../app/admin/src"; /* Lê as telas do seu painel Admin */
+@source "../../app/admin/src";
+@source "../../app/client/src";
 
 
 

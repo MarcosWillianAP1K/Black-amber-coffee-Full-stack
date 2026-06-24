@@ -22,7 +22,7 @@ export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCu
 
         if (query) {
             next = next.filter((customer) => {
-                const values = [customer.profile?.fullName ?? "", customer.email ?? ""];
+                const values = [customer.fullName ?? "", customer.email ?? ""];
                 return values.some((value) => value.toLowerCase().includes(query));
             });
         }
@@ -31,10 +31,10 @@ export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCu
 
         switch (sortType) {
             case "name-asc":
-                next.sort((a, b) => nameCompare(a.profile.fullName, b.profile.fullName));
+                next.sort((a, b) => nameCompare(a.fullName, b.fullName));
                 break;
             case "name-desc":
-                next.sort((a, b) => nameCompare(b.profile.fullName, a.profile.fullName));
+                next.sort((a, b) => nameCompare(b.fullName, a.fullName));
                 break;
             case "newest":
                 next.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

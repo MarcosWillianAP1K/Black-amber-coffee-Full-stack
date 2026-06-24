@@ -2,10 +2,10 @@
  * Barrel export — all shared domain types.
  */
 export type { Product, ProductInput, ProductCategory } from "./product";
-export { PRODUCT_CATEGORIES } from "./product";
+export { PRODUCT_CATEGORIES, PRODUCT_CATEGORY_LABELS } from "./product";
 
-export type { Order, OrderStatus, OrderItem, AdminOrderListResponse, WorkerOrderResponse } from "./order";
-export { ORDER_STATUSES } from "./order";
+export type { Order, OrderStatus, OrderItem, PaymentMethod, AdminOrderListResponse, WorkerOrderResponse } from "./order";
+export { ORDER_STATUSES, PAYMENT_METHODS, ORDER_STATUS_LABELS } from "./order";
 
 export type {
 	InventoryItem,
@@ -18,7 +18,6 @@ export { INVENTORY_UNITS, UNIT_LABELS, STOCK_STATUSES, deriveStockStatus } from 
 
 export type {
 	User,
-	UserProfile,
 	UserUpdateInput,
 	GetUserResponse,
 	UpdateUserResponse,
@@ -45,10 +44,12 @@ export type {
 
 export type {
 	Worker,
-	WorkerProfile,
 	WorkerUpdateInput,
 	GetWorkerResponse,
 	UpdateWorkerResponse,
 	WorkerRole,
 } from "./worker";
-export { WORKER_ROLES } from "./worker";
+export { WORKER_ROLES, WORKER_ROLE_LABELS } from "./worker";
+
+export type { Cart, CartItem, GetCartResponse, AddCartItemInput, UpdateCartItemInput } from "./cart";
+export type { Payment, SimulatePaymentInput, SimulatePaymentResponse } from "./payment";

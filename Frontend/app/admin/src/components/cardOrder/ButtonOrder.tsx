@@ -22,14 +22,14 @@ export function ButtonOrder({ status, onAction, disabled }: ButtonOrderProps) {
         `${BUTTON_BASE} ${custom} ${disabled ? BUTTON_DISABLED : ""}`;
 
     switch (status) {
-        case "PENDING":
+        case "criado":
             return (
                 <button className={btnClass("bg-(--Button-background)")} onClick={handleClick("start")} disabled={disabled}>
                     <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">START</p>
                 </button>
             );
 
-        case "IN PROGRESS":
+        case "em_preparo":
             return (
                 <div className="w-fit h-fit flex gap-2">
                     <button className={btnClass("bg-(--Button-background)")} onClick={handleClick("hold")} disabled={disabled}>
@@ -41,21 +41,21 @@ export function ButtonOrder({ status, onAction, disabled }: ButtonOrderProps) {
                 </div>
             );
 
-        case "COMPLETED":
+        case "pronto":
             return (
                 <button className={btnClass("bg-[#04DCFF]")} onClick={handleClick("complete")} disabled={disabled}>
                     <p className="text-[#003640] text-[12px] font-secondary font-bold">COMPLETE</p>
                 </button>
             );
 
-        case "LATE":
+        case "finalizado":
             return (
-                <button className={btnClass("bg-(--Negacion-off)")} onClick={handleClick("complete")} disabled={disabled}>
-                    <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">COMPLETE</p>
+                <button className={btnClass("bg-[#04DCFF]")} onClick={handleClick("complete")} disabled={disabled}>
+                    <p className="text-[#003640] text-[12px] font-secondary font-bold">COMPLETE</p>
                 </button>
             );
 
-        case "CANCELLED":
+        case "cancelado":
             return (
                 <button className={btnClass("bg-(--Negacion-off)")} onClick={handleClick("delete")} disabled={disabled}>
                     <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">DELETE</p>

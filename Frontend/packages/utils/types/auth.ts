@@ -17,8 +17,9 @@ export interface LoginInput {
 export interface ProfileResponse {
     fullName: string;
     phone: string | null;
-    avatarImage: string | null;
+    avatarUrl: string | null;
     createdAt: string;
+    updatedAt?: string;
 }
 
 export interface RegisterResponse {
@@ -41,6 +42,7 @@ export interface LoginResponse {
             publicId: string;
             email: string;
             userType: UserType;
+            role?: string | null;
             profile: ProfileResponse;
         };
     };

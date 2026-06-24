@@ -1,7 +1,5 @@
 /**
  * CardEmployee — Admin-specific employee card.
- * Combines PerfilCard (avatar + name + email) with CompTime.
- * Uses OptionsEllipsis for the dropdown menu with dynamic actions.
  */
 
 import { useState } from "react";
@@ -11,14 +9,23 @@ import { OptionsEllipsis } from "ui-shared/components/OptionElipisses";
 import { ConfirmDialog } from "ui-shared/components/ConfirmDialog";
 import type { Worker } from "shared-utils/types/worker";
 
-/** CardEmployee props = Worker data + action callbacks */
 export interface CardEmployeeProps extends Worker {
     onDeleteEmployee: (publicId: string) => void;
     onBlockEmployee: (publicId: string) => void;
     onViewEmployee: (publicId: string) => void;
 }
 
-export function CardEmployee({ publicId, profile, role, isActive, onDeleteEmployee, onBlockEmployee, onViewEmployee }: CardEmployeeProps) {
+export function CardEmployee({
+    publicId,
+    fullName,
+    email,
+    role,
+    avatarUrl,
+    isActive,
+    onDeleteEmployee,
+    onBlockEmployee,
+    onViewEmployee,
+}: CardEmployeeProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -33,14 +40,12 @@ export function CardEmployee({ publicId, profile, role, isActive, onDeleteEmploy
 
     return (
         <div className="w-90 h-fit p-4 bg-(--Widget-background) rounded-md border border-(--Border) flex flex-col gap-6">
-
-            {/* Top: Profile + Options dropdown */}
             <div className="flex items-start justify-between">
                 <PerfilCard
-                    name={profile.fullName}
-                    email={profile.email}
+                    name={fullName}
+                    email={email}
                     job={role}
-                    avatarUrl={profile.avatarImage ?? undefined}
+                    avatarUrl={avatarUrl ?? undefined}
                 />
 
                 <OptionsEllipsis
@@ -57,11 +62,10 @@ export function CardEmployee({ publicId, profile, role, isActive, onDeleteEmploy
                 <CompTime active={isActive} />
             </div>
 
-            {/* Confirm Delete Dialog */}
             <ConfirmDialog
                 isOpen={confirmDelete}
                 title="Delete Employee"
-                description={`Are you sure you want to delete ${profile.fullName}? This action cannot be undone.`}
+                description={`Are you sure you want to delete ${fullName}? This action cannot be undone.`}
                 confirmLabel="Delete"
                 cancelLabel="Cancel"
                 danger

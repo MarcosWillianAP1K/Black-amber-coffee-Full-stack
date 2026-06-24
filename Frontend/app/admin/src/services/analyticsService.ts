@@ -86,10 +86,10 @@ export function computeAnalytics(
 
     const totalOrders = orders.length;
     const totalSales = orders
-        .filter((o) => o.status === "COMPLETED")
+        .filter((o) => o.status === "finalizado")
         .reduce((sum, o) => sum + o.totalPrice, 0);
     const pendingDeliveries = orders.filter(
-        (o) => o.status === "PENDING" || o.status === "IN PROGRESS",
+        (o) => o.status === "criado" || o.status === "em_preparo",
     ).length;
     const activeStaff = employees.filter((e) => e.isActive).length;
     const menuItems = products.length;

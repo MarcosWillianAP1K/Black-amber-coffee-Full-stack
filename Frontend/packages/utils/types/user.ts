@@ -1,21 +1,15 @@
 /**
- * User domain types aligned with backend user schema.
+ * User (client) domain types aligned with backend user schema.
  */
 
-export interface UserProfile {
-    fullName: string;
-    phone: string | null;
-    avatarBuffer?: ArrayBuffer | Uint8Array;
-    avatarImage: string | null;
-    createdAt: string;
-    updatedAt: string;
-}
-
+/** Represents a client user (flat shape from API) */
 export interface User {
     publicId: string;
-    name: string;
+    fullName: string;
     email: string;
-    profile: UserProfile;
+    phone: string | null;
+    avatarUrl: string | null;
+    isActive: boolean;
     createdAt: string;
     updatedAt: string;
 }
@@ -25,7 +19,6 @@ export interface UserUpdateInput {
     email?: string;
     phone?: string;
     password?: string;
-    profile?: Partial<UserProfile>;
 }
 
 export interface GetUserResponse {

@@ -24,7 +24,7 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
 
         if (query) {
             next = next.filter((employee) => {
-                const values = [employee.profile.fullName, employee.profile.email, employee.role];
+                const values = [employee.fullName, employee.email, employee.role];
                 return values.some((value) => value.toLowerCase().includes(query));
             });
         }
@@ -41,10 +41,10 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
 
         switch (sortType) {
             case "name-asc":
-                next.sort((a, b) => nameCompare(a.profile.fullName, b.profile.fullName));
+                next.sort((a, b) => nameCompare(a.fullName, b.fullName));
                 break;
             case "name-desc":
-                next.sort((a, b) => nameCompare(b.profile.fullName, a.profile.fullName));
+                next.sort((a, b) => nameCompare(b.fullName, a.fullName));
                 break;
             case "role-asc":
                 next.sort((a, b) => nameCompare(a.role, b.role));

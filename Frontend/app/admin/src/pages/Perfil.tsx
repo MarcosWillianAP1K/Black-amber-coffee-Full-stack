@@ -5,7 +5,6 @@ import { CompTime } from "ui-shared/components/CompTIme";
 import { useCustomers } from "../hooks/useCustomers";
 import { useEmployee } from "../hooks/useEmployee";
 import { useAuth } from "../hooks/useAuth";
-import type { User as Customer } from "shared-utils/types/user";
 import type { Worker } from "shared-utils/types/worker";
 
 export const Perfil = () => {
@@ -37,8 +36,6 @@ export const Perfil = () => {
         (resolvedKind === "customer" && customersLoading) ||
         (resolvedKind === "employee" && employeesLoading);
 
-    const isCustomerProfile = (value: Customer | Worker): value is Customer => "email" in value && !("role" in value);
-
     const profileSubtitle = resolvedKind === "customer"
         ? "Customer profile"
         : resolvedKind === "employee"
@@ -61,13 +58,15 @@ export const Perfil = () => {
         );
     }
 
-    const accountType = isCustomerProfile(profile) ? "Customer" : "Employee";
-    const fullName = profile.profile.fullName;
-    const email = isCustomerProfile(profile) ? profile.email : profile.profile.email;
-    const avatarImage = profile.profile.avatarImage;
-    const statusLabel = !isCustomerProfile(profile) ? (profile.isActive ? "Active" : "Inactive") : "Member";
-    const roleLabel = !isCustomerProfile(profile) ? (profile.role ?? "Staff") : "Loyalty member";
-    const profileId = isCustomerProfile(profile) ? profile.publicId : profile.publicId;
+    const isEmployee = resolvedKind === "employee" || (resolvedKind === null && !!loggedUser);
+    const accountType = isEmployee ? "Employee" : "Customer";
+    const fullName = profile.fullName;
+    const email = profile.email;
+    const avatarImage = profile.avatarUrl;
+    const worker = isEmployee && "role" in profile ? (profile as Worker) : null;
+    const statusLabel = worker ? (worker.isActive ? "Active" : "Inactive") : "Member";
+    const roleLabel = worker ? worker.role : "Loyalty member";
+    const profileId = profile.publicId;
     const backLabel = (location.state as { from?: string } | null)?.from === "staff"
         ? "Back to Staff"
         : "Back";
@@ -119,8 +118,8 @@ export const Perfil = () => {
                                 <span className="px-4 py-1.5 rounded-full text-[11px] font-secondary font-semibold uppercase tracking-wider border border-(--Border2) bg-(--Select-background) text-(--Text-primary-off)">
                                     {accountType}
                                 </span>
-                                {!isCustomerProfile(profile) && (
-                                    <span className={`px-4 py-1.5 rounded-full text-[11px] font-secondary font-semibold uppercase tracking-wider ${profile.isActive ? "bg-(--Afirmation)/15 text-(--Afirmation) border border-(--Afirmation)/40" : "bg-(--Negacion)/15 text-(--Negacion) border border-(--Negacion)/40"}`}>
+                                {worker && (
+                                    <span className={`px-4 py-1.5 rounded-full text-[11px] font-secondary font-semibold uppercase tracking-wider ${worker.isActive ? "bg-(--Afirmation)/15 text-(--Afirmation) border border-(--Afirmation)/40" : "bg-(--Negacion)/15 text-(--Negacion) border border-(--Negacion)/40"}`}>
                                         {statusLabel}
                                     </span>
                                 )}
@@ -163,13 +162,13 @@ export const Perfil = () => {
                     </div>
 
                     <div className="rounded-sm border border-(--Border) bg-(--Widget-background) p-6">
-                        {!isCustomerProfile(profile) ? (
+                        {worker ? (
                             <CompTime
-                                active={profile.isActive}
+                                active={worker.isActive}
                             />
                         ) : (
                             <div className="text-(--Text-primary-off) text-sm font-secondary">
-                                Member since {new Date(profile.profile.createdAt).toLocaleDateString()}
+                                Member since {new Date(profile.createdAt).toLocaleDateString()}
                             </div>
                         )}
                     </div>

@@ -21,9 +21,9 @@ export function TableMenuRow({ item, isSelected = false, onEdit, onDelete, }: Ta
             <td className="py-3 pr-4">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-md overflow-hidden bg-(--Button-background) shrink-0">
-                        {item.imageUrl ? (
+                        {item.imgUrl ? (
                             <img
-                                src={item.imageUrl}
+                                src={item.imgUrl}
                                 alt={item.name}
                                 className="w-full h-full object-cover"
                             />

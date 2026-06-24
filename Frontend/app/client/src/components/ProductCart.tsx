@@ -47,10 +47,10 @@ export function ProductCart({ name, price, promotionPrice, imageUrl, quantity, o
 
                 <div className=" flex items-center gap-1 whitespace-nowrap">
                     {promotionPrice !== undefined && (
-                        <span className="text-[12px] font-bold text-(--Primary)">R$ {promotionPrice.toFixed(2)}</span>
+                        <span className="text-[12px] font-bold text-(--Primary)">${promotionPrice.toFixed(2)}</span>
                     )}
                     <span className={` font-bold ${promotionPrice !== undefined ? 'text-(--Text-gray) text-[8px] line-through' : 'text-(--Primary) text-[12px]'}`}>
-                        R$ {price.toFixed(2)}
+                        ${price.toFixed(2)}
                     </span>
                 </div>
 

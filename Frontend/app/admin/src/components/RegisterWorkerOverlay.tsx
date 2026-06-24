@@ -21,7 +21,7 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [phone, setPhone] = useState("");
-    const [role, setRole] = useState<WorkerRole>("BARISTA");
+    const [role, setRole] = useState<WorkerRole>("barista");
     const [salary, setSalary] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
