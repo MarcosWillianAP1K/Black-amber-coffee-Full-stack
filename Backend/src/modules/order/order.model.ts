@@ -6,6 +6,7 @@ interface Item {
   name: string;
   price: number;
   quantity: number;
+  observation: string | null;
 }
 
 export default class OrderModel {

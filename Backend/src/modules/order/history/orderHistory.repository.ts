@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { orderHistory } from "@/db/schema";
+import { orderStatusHistory } from "@/db/schema";
 
 export default class OrderHistoryRepository {
   db: ReturnType<typeof drizzle>;
@@ -11,19 +11,19 @@ export default class OrderHistoryRepository {
 
   async add(
     orderId: number,
-    changedBy: string,
+    changedByWorkerId: number | null,
     previousStatus: string,
     newStatus: string,
   ) {
-    const values: typeof orderHistory.$inferInsert = {
+    const values: typeof orderStatusHistory.$inferInsert = {
       orderId,
-      changedBy,
-      previousStatus: previousStatus as typeof orderHistory.$inferInsert['previousStatus'],
-      newStatus: newStatus as typeof orderHistory.$inferInsert['newStatus'],
+      changedByWorker: changedByWorkerId,
+      previousStatus: previousStatus as typeof orderStatusHistory.$inferInsert['previousStatus'],
+      newStatus: newStatus as typeof orderStatusHistory.$inferInsert['newStatus'],
     };
 
     const [row] = await this.db
-      .insert(orderHistory)
+      .insert(orderStatusHistory)
       .values(values)
       .returning();
 
@@ -33,11 +33,10 @@ export default class OrderHistoryRepository {
   async getByOrderId(orderId: number) {
     const rows = await this.db
       .select()
-      .from(orderHistory)
-      .where(eq(orderHistory.orderId, orderId))
-      .orderBy(orderHistory.createdAt);
+      .from(orderStatusHistory)
+      .where(eq(orderStatusHistory.orderId, orderId))
+      .orderBy(orderStatusHistory.changedAt);
 
     return rows;
   }
 }
-

@@ -16,6 +16,7 @@ export default class OrderRepository {
       .select({
         quantity: orderItems.quantity,
         unitPrice: orderItems.unitPrice,
+        observation: orderItems.observation,
         productId: products.id,
         productName: products.name,
         productPrice: products.price,
@@ -29,7 +30,7 @@ export default class OrderRepository {
       name: item.productName ?? "",
       price: Number(item.unitPrice ?? item.productPrice ?? 0),
       quantity: item.quantity,
-      observation: null,
+      observation: item.observation ?? null,
     }));
   }
 
@@ -198,6 +199,7 @@ export default class OrderRepository {
           productId: item.productId,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
+          observation: item.observation ?? null,
         }),
       );
 
@@ -210,7 +212,7 @@ export default class OrderRepository {
         await tx.insert(payments).values({
           orderId: createdOrder.id,
           amount: totalAmount,
-          method: paymentMethod,
+          method: paymentMethod as any,
         });
       }
 
@@ -219,6 +221,7 @@ export default class OrderRepository {
         .select({
           quantity: orderItems.quantity,
           unitPrice: orderItems.unitPrice,
+          observation: orderItems.observation,
           productId: products.id,
           productName: products.name,
           productPrice: products.price,
@@ -232,7 +235,7 @@ export default class OrderRepository {
         name: item.productName ?? "",
         price: Number(item.unitPrice ?? item.productPrice ?? 0),
         quantity: item.quantity,
-        observation: null,
+        observation: item.observation ?? null,
       }));
 
       return OrderModel.fromDatabase(
@@ -245,7 +248,7 @@ export default class OrderRepository {
   async cancelOrder(publicId: string): Promise<OrderModel | null> {
     const [updatedRow] = await this.db
       .update(orders)
-      .set({ status: OrderStatus.CANCELLED, updatedAt: new Date() })
+      .set({ status: OrderStatus.CANCELADO, updatedAt: new Date() })
       .where(eq(orders.publicId, publicId))
       .returning();
 

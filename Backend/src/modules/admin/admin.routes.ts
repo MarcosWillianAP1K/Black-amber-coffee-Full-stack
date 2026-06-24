@@ -78,7 +78,7 @@ adminRoutes.use(AuthMiddleware, AdminMiddleware);
  *                 example: "11988888888"
  *               role:
  *                 type: string
- *                 enum: [ADMIN, BARISTA, BARMAN, WAITER]
+ *                 enum: [gerente, barista, caixa, atendente]
  *                 example: "BARISTA"
  *               salary:
  *                 type: number
@@ -322,8 +322,8 @@ adminRoutes.get("/admin/workers/:publicId", (req, res, next) =>
  *                 example: 3000.00
  *               role:
  *                 type: string
- *                 enum: [ADMIN, BARISTA, BARMAN, WAITER]
- *                 example: "BARMAN"
+ *                 enum: [gerente, barista, caixa, atendente]
+ *                 example: "caixa"
  *     responses:
  *       200:
  *         description: Worker updated

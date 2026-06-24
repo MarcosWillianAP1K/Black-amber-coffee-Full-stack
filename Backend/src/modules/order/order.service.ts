@@ -92,7 +92,7 @@ export default class OrderService {
       publicId,
       code,
       String(total),
-      OrderStatus.PENDING,
+      OrderStatus.CRIADO,
       data.observation ?? null,
       itemsWithPrice,
       data.paymentMethod ?? null,
@@ -100,9 +100,9 @@ export default class OrderService {
 
     await this.orderHistoryRepository.add(
       created.id,
-      userPublicId,
-      OrderStatus.PENDING,
-      OrderStatus.PENDING,
+      null,
+      OrderStatus.CRIADO,
+      OrderStatus.CRIADO,
     );
 
     return CreateOrderResponseSchema.parse({
@@ -155,7 +155,7 @@ export default class OrderService {
       publicId,
       code,
       String(total),
-      OrderStatus.PENDING,
+      OrderStatus.CRIADO,
       data.observation ?? null,
       itemsWithPrice,
       data.paymentMethod ?? null,
@@ -163,9 +163,9 @@ export default class OrderService {
 
     await this.orderHistoryRepository.add(
       created.id,
-      workerPublicId,
-      OrderStatus.PENDING,
-      OrderStatus.PENDING,
+      worker.id,
+      OrderStatus.CRIADO,
+      OrderStatus.CRIADO,
     );
 
     return CreateOrderResponseSchema.parse({
@@ -177,16 +177,16 @@ export default class OrderService {
     const order = await this.orderRepository.getbyPublicId(publicId);
     if (!order) throw new Error("ORDER_NOT_FOUND");
 
-    if (order.status === OrderStatus.CANCELLED)
+    if (order.status === OrderStatus.CANCELADO)
       throw new Error("ORDER_ALREADY_CANCELLED");
 
     const updated = await this.orderRepository.cancelOrder(publicId);
     if (updated) {
       await this.orderHistoryRepository.add(
         updated.id,
-        "SYSTEM",
+        null,
         order.status,
-        OrderStatus.CANCELLED,
+        OrderStatus.CANCELADO,
       );
     }
 
@@ -240,11 +240,11 @@ export default class OrderService {
     if (!order) throw new Error("ORDER_NOT_FOUND");
 
     const allowed: Record<string, string[]> = {
-      PENDING: ["IN PROGRESS", "CANCELLED"],
-      "IN PROGRESS": ["COMPLETED", "LATE"],
-      COMPLETED: [],
-      LATE: ["COMPLETED"],
-      CANCELLED: [],
+      [OrderStatus.CRIADO]: [OrderStatus.EM_PREPARO, OrderStatus.CANCELADO],
+      [OrderStatus.EM_PREPARO]: [OrderStatus.PRONTO, OrderStatus.CANCELADO],
+      [OrderStatus.PRONTO]: [OrderStatus.FINALIZADO],
+      [OrderStatus.FINALIZADO]: [],
+      [OrderStatus.CANCELADO]: [],
     };
 
     const from = order.status;
@@ -262,7 +262,7 @@ export default class OrderService {
     if (updated) {
       await this.orderHistoryRepository.add(
         updated.id,
-        workerPublicId,
+        worker.id,
         from,
         newStatus,
       );

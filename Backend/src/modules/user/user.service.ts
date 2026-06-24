@@ -1,5 +1,4 @@
 import SecurityUtils from "@/core/security";
-import authRepository from "@/modules/auth/auth.repository";
 import UserRepository from "@/modules/user/user.repository";
 import { r2StorageProvider, imageService } from "@/infra/storage";
 import UserModel from "@/modules/user/user.model";
@@ -11,11 +10,9 @@ import {
 } from "./user.schema";
 
 export default class UserService {
-  private authRepository: authRepository;
   private userRepository: UserRepository;
 
-  constructor(authRepository: authRepository, userRepository: UserRepository) {
-    this.authRepository = authRepository;
+  constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
   }
 
@@ -27,15 +24,11 @@ export default class UserService {
 
     return UserResponseSchema.parse({
       publicId: user.publicId,
-      name: user.profile.fullName,
+      fullName: user.fullName,
       email: user.email,
-      profile: {
-        fullName: user.profile.fullName,
-        phone: user.profile.phone,
-        avatarImage: user.profile.avatarImage,
-        createdAt: new Date(user.profile.createdAt).toISOString(),
-        updatedAt: new Date(user.profile.updatedAt).toISOString(),
-      },
+      phone: user.phone,
+      avatarUrl: user.avatarUrl,
+      isActive: user.isActive,
       createdAt: new Date(user.createdAt).toISOString(),
       updatedAt: new Date(user.updatedAt).toISOString(),
     });
@@ -52,11 +45,11 @@ export default class UserService {
       throw new Error("USER_NOT_FOUND");
     }
 
-    let avatarImageUpdate: string | null = user.profile.avatarImage;
+    let avatarUrlUpdate: string | null = user.avatarUrl;
 
-    if (validatedData.profile.avatarBuffer) {
+    if (validatedData.avatarBuffer) {
       const processedImages = await imageService.processAvatar(
-        validatedData.profile.avatarBuffer,
+        validatedData.avatarBuffer,
       );
       const keys = imageService.generateAvatarKeys(publicId);
 
@@ -66,7 +59,7 @@ export default class UserService {
         contentType: processedImages.contentType,
       });
 
-      avatarImageUpdate = keys.large;
+      avatarUrlUpdate = keys.large;
     }
 
     let password = undefined;
@@ -78,30 +71,23 @@ export default class UserService {
       user.id,
       user.publicId,
       validatedData.email ?? user.email,
+      validatedData.fullName ?? user.fullName,
+      validatedData.phone ?? user.phone,
+      avatarUrlUpdate,
+      user.isActive,
       user.createdAt,
       new Date().toISOString(),
-      {
-        fullName: validatedData.fullName ?? user.profile.fullName,
-        phone: validatedData.phone ?? user.profile.phone,
-        avatarImage: avatarImageUpdate,
-        createdAt: user.profile.createdAt,
-        updatedAt: new Date().toISOString(),
-      },
     );
 
     const result = await this.userRepository.update(updatedUser, password);
 
     return UserResponseSchema.parse({
       publicId: result.publicId,
-      name: result.profile.fullName,
+      fullName: result.fullName,
       email: result.email,
-      profile: {
-        fullName: result.profile.fullName,
-        phone: result.profile.phone,
-        avatarImage: result.profile.avatarImage,
-        createdAt: new Date(result.profile.createdAt).toISOString(),
-        updatedAt: new Date(result.profile.updatedAt).toISOString(),
-      },
+      phone: result.phone,
+      avatarUrl: result.avatarUrl,
+      isActive: result.isActive,
       createdAt: new Date(result.createdAt).toISOString(),
       updatedAt: new Date(result.updatedAt).toISOString(),
     });

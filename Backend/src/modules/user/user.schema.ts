@@ -1,19 +1,12 @@
 import * as z from "zod";
 
-export const UserProfileSchema = z.object({
-  fullName: z.string(),
-  phone: z.string().nullable(),
-  avatarBuffer: z.instanceof(Buffer).optional(),
-  avatarImage: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
 export const UserResponseSchema = z.object({
   publicId: z.string(),
-  name: z.string(),
+  fullName: z.string(),
   email: z.email(),
-  profile: UserProfileSchema,
+  phone: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
+  isActive: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -27,7 +20,7 @@ export const UserUpdateInputSchema = z
       .string()
       .min(6, "Password must be at least 6 characters long")
       .optional(),
-    profile: UserProfileSchema,
+    avatarBuffer: z.instanceof(Buffer).optional(),
   })
   .refine(
     (data) => Object.keys(data).length > 0,
@@ -59,7 +52,6 @@ export const UpdateUserResponseSchema = z.object({
   message: z.string().optional(),
 });
 
-export type UserProfile = z.infer<typeof UserProfileSchema>;
 export type UserResponse = z.infer<typeof UserResponseSchema>;
 export type UserUpdateInput = z.infer<typeof UserUpdateInputSchema>;
 export type UserUpdateRequest = z.infer<typeof UserUpdateRequestSchema>;

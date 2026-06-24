@@ -1,14 +1,12 @@
 import { db } from "../config/database";
 import {
   clients,
-  profiles,
   workers,
-  workerProfiles,
   products,
   orders,
   orderItems,
   payments,
-  orderHistory,
+  orderStatusHistory,
   stocks,
 } from "../db/schema";
 import SecurityUtils from "../core/security";
@@ -19,28 +17,28 @@ import { generateOrderCode } from "@/shared/utils/code.gerator";
 
 const workerSeedData = [
   {
-    fullName: "Admin Black Amber",
+    fullName: "Gerente Black Amber",
     email: "admin@blackamber.com",
     phone: "11999999999",
-    role: "ADMIN" as const,
+    role: "gerente" as const,
   },
   {
     fullName: "João Barista",
     email: "barista@blackamber.com",
     phone: "11988888888",
-    role: "BARISTA" as const,
+    role: "barista" as const,
   },
   {
-    fullName: "Carlos Barman",
-    email: "barman@blackamber.com",
+    fullName: "Carlos Caixa",
+    email: "caixa@blackamber.com",
     phone: "11977777777",
-    role: "BARMAN" as const,
+    role: "caixa" as const,
   },
   {
-    fullName: "Maria Garçonete",
-    email: "waiter@blackamber.com",
+    fullName: "Maria Atendente",
+    email: "atendente@blackamber.com",
     phone: "11966666666",
-    role: "WAITER" as const,
+    role: "atendente" as const,
   },
 ];
 
@@ -55,37 +53,27 @@ export async function seed() {
       );
       await db.transaction(async (tx) => {
         // Delete in dependency order (children first, parents last)
-        // Order -> Products
         await tx
-          .delete(orderHistory)
-          .where(eq(orderHistory.id, orderHistory.id));
+          .delete(orderStatusHistory)
+          .where(eq(orderStatusHistory.id, orderStatusHistory.id));
         await tx
           .delete(payments)
           .where(eq(payments.id, payments.id));
         await tx
           .delete(orderItems)
-          .where(eq(orderItems.id, orderItems.id));
+          .where(eq(orderItems.orderId, orderItems.orderId));
         await tx
           .delete(orders)
           .where(eq(orders.id, orders.id));
         await tx
           .delete(stocks)
-          .where(eq(stocks.id, stocks.id));
+          .where(eq(stocks.productId, stocks.productId));
         await tx
           .delete(products)
           .where(eq(products.id, products.id));
-
-        // Workers -> Clients
-        await tx
-          .delete(workerProfiles)
-          .where(eq(workerProfiles.id, workerProfiles.id));
         await tx
           .delete(workers)
           .where(eq(workers.id, workers.id));
-
-        await tx
-          .delete(profiles)
-          .where(eq(profiles.id, profiles.id));
         await tx
           .delete(clients)
           .where(eq(clients.id, clients.id));
@@ -101,85 +89,57 @@ export async function seed() {
       );
       throw connErr;
     }
-    // Make seed idempotent per-record: create workers that are missing and ensure test client exists
-    const existingWorkerProfile = await db
-      .select()
-      .from(workerProfiles)
-      .limit(1);
 
     const now = new Date();
     const hashedPassword = await SecurityUtils.hashPassword("123456");
 
-    // Create missing workers and their profiles
-    if (existingWorkerProfile.length === 0) {
-      await db.transaction(async (tx) => {
-        console.log("👷 Criando workers...");
+    // Create missing workers
+    const existingWorkers = await db
+      .select()
+      .from(workers)
+      .limit(1);
 
-        const insertedWorkers = await tx
-          .insert(workers)
-          .values(
-            workerSeedData.map((worker) => ({
-              publicId: generateId(),
-              role: worker.role,
-              salary: "0",
-              isActive: true,
-              isAdmin: worker.role === "ADMIN",
-              createdAt: now,
-              updatedAt: now,
-            })),
-          )
-          .returning();
-
-        await tx.insert(workerProfiles).values(
-          insertedWorkers.map((worker, index) => ({
-            workerId: worker.id,
-            email: workerSeedData[index].email,
-            password: hashedPassword,
-            fullName: workerSeedData[index].fullName,
-            phone: workerSeedData[index].phone,
-            avatarImage: null,
-            createdAt: now,
-            updatedAt: now,
-          })),
-        );
-      });
+    if (existingWorkers.length === 0) {
+      console.log("👷 Criando workers...");
+      await db.insert(workers).values(
+        workerSeedData.map((worker) => ({
+          email: worker.email,
+          password: hashedPassword,
+          fullName: worker.fullName,
+          phone: worker.phone,
+          avatarUrl: null,
+          role: worker.role,
+          salary: "0",
+          isActive: true,
+          isAdmin: worker.role === "gerente",
+          createdAt: now,
+          updatedAt: now,
+        })),
+      );
     } else {
-      // Ensure each expected worker/profile exists (insert missing ones individually)
       console.log("🔍 Verificando workers existentes e inserindo ausentes...");
       for (const seed of workerSeedData) {
         const found = await db
           .select()
-          .from(workerProfiles)
-          .where(eq(workerProfiles.email, seed.email))
+          .from(workers)
+          .where(eq(workers.email, seed.email))
           .limit(1);
 
         if (!found.length) {
-          await db.transaction(async (tx) => {
-            const [worker] = await tx
-              .insert(workers)
-              .values({
-                publicId: generateId(),
-                role: seed.role,
-                salary: "0",
-                isActive: true,
-                isAdmin: seed.role === "ADMIN",
-                createdAt: now,
-                updatedAt: now,
-              })
-              .returning();
-
-            await tx.insert(workerProfiles).values({
-              workerId: worker.id,
-              email: seed.email,
-              password: hashedPassword,
-              fullName: seed.fullName,
-              phone: seed.phone,
-              avatarImage: null,
-              createdAt: now,
-              updatedAt: now,
-            });
+          await db.insert(workers).values({
+            email: seed.email,
+            password: hashedPassword,
+            fullName: seed.fullName,
+            phone: seed.phone,
+            avatarUrl: null,
+            role: seed.role,
+            salary: "0",
+            isActive: true,
+            isAdmin: seed.role === "gerente",
+            createdAt: now,
+            updatedAt: now,
           });
-          console.log(`+ Inserido worker/profile ${seed.email}`);
+          console.log(`+ Inserido worker ${seed.email}`);
         }
       }
     }
@@ -193,26 +153,14 @@ export async function seed() {
 
     if (!existingClient.length) {
       console.log("👤 Criando cliente de teste...");
-      await db.transaction(async (tx) => {
-        const [client] = await tx
-          .insert(clients)
-          .values({
-            publicId: generateId(),
-            email: "cliente@teste.com",
-            password: hashedPassword,
-            createdAt: now,
-            updatedAt: now,
-          })
-          .returning();
-
-        await tx.insert(profiles).values({
-          clientId: client.id,
-          fullName: "Cliente Teste",
-          phone: "11955555555",
-          avatarImage: null,
-          createdAt: now,
-          updatedAt: now,
-        });
+      await db.insert(clients).values({
+        email: "cliente@teste.com",
+        password: hashedPassword,
+        fullName: "Cliente Teste",
+        phone: "11955555555",
+        avatarUrl: null,
+        createdAt: now,
+        updatedAt: now,
       });
     }
 
@@ -224,64 +172,55 @@ export async function seed() {
         name: "Café Expresso",
         description: "Café puro e encorpado",
         price: "5.00",
-        category: "COFFEE",
-        size: "150ml",
+        category: "cafe",
       },
       {
         name: "Café Latte",
         description: "Café com leite vaporizado",
         price: "8.00",
-        category: "COFFEE",
-        size: "300ml",
+        category: "cafe",
       },
       {
         name: "Cappuccino",
         description: "Café com leite e espuma cremosa",
         price: "10.00",
-        category: "COFFEE",
-        size: "300ml",
+        category: "cafe",
       },
       {
         name: "Mocha",
         description: "Café com chocolate e leite",
         price: "12.00",
-        category: "COFFEE",
-        size: "300ml",
+        category: "cafe",
       },
       {
         name: "Suco de Laranja",
         description: "Suco natural de laranja",
         price: "7.00",
-        category: "DRINKS",
-        size: "400ml",
+        category: "suco",
       },
       {
         name: "Água Mineral",
         description: "Água sem gás 500ml",
         price: "3.00",
-        category: "DRINKS",
-        size: "500ml",
+        category: "outro",
       },
       {
         name: "Croissant",
         description: "Croissant artesanal de manteiga",
         price: "6.00",
-        category: "FOOD",
-        size: null,
+        category: "lanche",
       },
       {
         name: "Bolo de Cenoura",
         description: "Fatia de bolo de cenoura com cobertura de chocolate",
         price: "8.00",
-        category: "FOOD",
-        size: null,
+        category: "sobremesa",
       },
       {
         name: "Sanduíche Natural",
         description: "Sanduíche integral com frango e salada",
         price: "15.00",
-        category: "FOOD",
-        size: null,
+        category: "lanche",
       },
     ];
 
@@ -294,14 +233,12 @@ export async function seed() {
       console.log("☕ Criando produtos...");
       const insertedProducts = await db.insert(products).values(
         productSeedData.map((product) => ({
-          publicId: generateId(),
           name: product.name,
           description: product.description,
-          size: product.size,
           price: product.price,
-          category: product.category,
+          category: product.category as any,
           isActive: true,
-          img: null,
+          imgUrl: null,
           createdAt: now,
           updatedAt: now,
         })),
@@ -330,7 +267,6 @@ export async function seed() {
             productId: product.id,
             quantity: s.quantity,
             minQuantity: s.minQuantity,
-            createdAt: now,
             updatedAt: now,
           };
         }),
@@ -346,26 +282,22 @@ export async function seed() {
 
         if (!found.length) {
           const [inserted] = await db.insert(products).values({
-            publicId: generateId(),
             name: seed.name,
             description: seed.description,
-            size: seed.size,
             price: seed.price,
-            category: seed.category,
+            category: seed.category as any,
             isActive: true,
-            img: null,
+            imgUrl: null,
             createdAt: now,
             updatedAt: now,
           }).returning();
           console.log(`+ Inserido produto ${seed.name}`);
 
           // Create stock for the new product
-          const defaultStock = { quantity: 20, minQuantity: 5 };
           await db.insert(stocks).values({
             productId: inserted.id,
-            quantity: defaultStock.quantity,
-            minQuantity: defaultStock.minQuantity,
-            createdAt: now,
+            quantity: 20,
+            minQuantity: 5,
             updatedAt: now,
           });
         }
@@ -385,7 +317,6 @@ export async function seed() {
             productId: prod.id,
             quantity: 20,
             minQuantity: 5,
-            createdAt: now,
             updatedAt: now,
           });
           console.log(`+ Criado estoque para ${prod.name}`);
@@ -393,9 +324,6 @@ export async function seed() {
       }
     }
 
-    // ============================================================
-    // Orders seed
-    // ============================================================
     // ============================================================
     // Additional clients seed
     // ============================================================
@@ -413,26 +341,14 @@ export async function seed() {
         .limit(1);
 
       if (!exists.length) {
-        await db.transaction(async (tx) => {
-          const [client] = await tx
-            .insert(clients)
-            .values({
-              publicId: generateId(),
-              email: c.email,
-              password: hashedPassword,
-              createdAt: now,
-              updatedAt: now,
-            })
-            .returning();
-
-          await tx.insert(profiles).values({
-            clientId: client.id,
-            fullName: c.name,
-            phone: c.phone,
-            avatarImage: null,
-            createdAt: now,
-            updatedAt: now,
-          });
+        await db.insert(clients).values({
+          email: c.email,
+          password: hashedPassword,
+          fullName: c.name,
+          phone: c.phone,
+          avatarUrl: null,
+          createdAt: now,
+          updatedAt: now,
         });
         console.log(`+ Cliente ${c.email}`);
       }
@@ -446,12 +362,16 @@ export async function seed() {
     if (existingOrders.length === 0) {
       const allClients = await db.select().from(clients);
       const allProducts = await db.select().from(products);
+      const allWorkers = await db.select().from(workers);
 
       if (allClients.length > 0 && allProducts.length > 0) {
         const testClientId = allClients.find((c) => c.email === "cliente@teste.com")!.id;
         const otherClientIds = allClients
           .filter((c) => c.email !== "cliente@teste.com")
           .map((c) => c.id);
+
+        // Get first worker for history reference
+        const firstWorkerId = allWorkers.length > 0 ? allWorkers[0].id : null;
 
         // Helper to find a product by name
         const findProduct = (name: string) =>
@@ -468,7 +388,7 @@ export async function seed() {
 
         const orderSeeds: Array<{
             status: (typeof OrderStatus.VALUES)[number];
-            paymentMethod: string | null;
+            paymentMethod: "dinheiro" | "cartao_credito" | "cartao_debito" | "pix" | null;
             observation: string | null;
             clientId: number;
             createdAt: Date;
@@ -476,8 +396,8 @@ export async function seed() {
           }> = [
             // Today's orders
             {
-              status: OrderStatus.PENDING,
-              paymentMethod: "PIX",
+              status: OrderStatus.CRIADO,
+              paymentMethod: "pix",
               observation: "Cliente solicita canela extra",
               clientId: testClientId,
               createdAt: now,
@@ -487,8 +407,8 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.IN_PROGRESS,
-              paymentMethod: "CARD",
+              status: OrderStatus.EM_PREPARO,
+              paymentMethod: "cartao_credito",
               observation: null,
               clientId: testClientId,
               createdAt: now,
@@ -497,8 +417,8 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.COMPLETED,
-              paymentMethod: "CASH",
+              status: OrderStatus.FINALIZADO,
+              paymentMethod: "dinheiro",
               observation: "Mesa 5",
               clientId: otherClientIds[0],
               createdAt: now,
@@ -509,9 +429,9 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.LATE,
-              paymentMethod: "PIX",
-              observation: "Pedido atrasado - cliente aguardando",
+              status: OrderStatus.PRONTO,
+              paymentMethod: "pix",
+              observation: "Pedido pronto - cliente aguardando",
               clientId: otherClientIds[1],
               createdAt: now,
               items: [
@@ -520,7 +440,7 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.CANCELLED,
+              status: OrderStatus.CANCELADO,
               paymentMethod: null,
               observation: "Cliente desistiu",
               clientId: testClientId,
@@ -531,8 +451,8 @@ export async function seed() {
             },
             // Yesterday's orders (for analytics comparison)
             {
-              status: OrderStatus.COMPLETED,
-              paymentMethod: "PIX",
+              status: OrderStatus.FINALIZADO,
+              paymentMethod: "pix",
               observation: null,
               clientId: testClientId,
               createdAt: daysAgo(1),
@@ -542,8 +462,8 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.COMPLETED,
-              paymentMethod: "CARD",
+              status: OrderStatus.FINALIZADO,
+              paymentMethod: "cartao_credito",
               observation: "Mesa 2",
               clientId: otherClientIds[2],
               createdAt: daysAgo(1),
@@ -553,8 +473,8 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.COMPLETED,
-              paymentMethod: "CASH",
+              status: OrderStatus.FINALIZADO,
+              paymentMethod: "dinheiro",
               observation: null,
               clientId: otherClientIds[0],
               createdAt: daysAgo(2),
@@ -565,8 +485,8 @@ export async function seed() {
               ],
             },
             {
-              status: OrderStatus.COMPLETED,
-              paymentMethod: "PIX",
+              status: OrderStatus.FINALIZADO,
+              paymentMethod: "pix",
               observation: null,
               clientId: testClientId,
               createdAt: daysAgo(3),
@@ -578,7 +498,6 @@ export async function seed() {
           ];
 
         for (const seed of orderSeeds) {
-          const orderPublicId = generateId();
           const orderCode = generateOrderCode();
 
           const totalAmount = seed.items
@@ -593,7 +512,6 @@ export async function seed() {
             const [createdOrder] = await tx
               .insert(orders)
               .values({
-                publicId: orderPublicId,
                 code: orderCode,
                 clientId: seed.clientId,
                 totalAmount,
@@ -617,19 +535,18 @@ export async function seed() {
               await tx.insert(payments).values({
                 orderId: createdOrder.id,
                 amount: totalAmount,
-                method: seed.paymentMethod,
+                method: seed.paymentMethod as any,
                 createdAt: now,
                 updatedAt: now,
               });
             }
 
             // Add order history entry
-            await tx.insert(orderHistory).values({
+            await tx.insert(orderStatusHistory).values({
               orderId: createdOrder.id,
-              changedBy: "cliente@teste.com",
+              changedByWorker: firstWorkerId,
               previousStatus: seed.status as any,
               newStatus: seed.status as any,
-              createdAt: now,
             });
           });
 
@@ -644,10 +561,10 @@ export async function seed() {
 
     console.log("✅ Seed concluída com sucesso!");
     console.log("\n📧 Credenciais de teste:");
-    console.log("   Admin: admin@blackamber.com / 123456");
+    console.log("   Gerente: admin@blackamber.com / 123456");
     console.log("   Barista: barista@blackamber.com / 123456");
-    console.log("   Barman: barman@blackamber.com / 123456");
-    console.log("   Waiter: waiter@blackamber.com / 123456");
+    console.log("   Caixa: caixa@blackamber.com / 123456");
+    console.log("   Atendente: atendente@blackamber.com / 123456");
     console.log("   Cliente: cliente@teste.com / 123456");
   } catch (error) {
     console.error("❌ Erro na seed:", error);

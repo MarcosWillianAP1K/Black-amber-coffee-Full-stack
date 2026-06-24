@@ -68,7 +68,7 @@ export function createAdminProductRoutes(productCtrl: ProductController): Router
    *                 example: 5.00
    *               category:
    *                 type: string
-   *                 example: "COFFEE"
+   *                 example: "cafe"
    *     responses:
    *       201:
    *         description: Product created

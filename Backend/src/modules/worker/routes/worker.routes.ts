@@ -166,7 +166,7 @@ export function createWorkerRoutes(): Router {
    *                 type: string
    *               role:
    *                 type: string
-   *                 enum: [ADMIN, BARISTA, BARMAN, WAITER]
+   *                 enum: [gerente, barista, caixa, atendente]
    *               salary:
    *                 type: number
    *     responses:
@@ -245,7 +245,7 @@ export function createWorkerRoutes(): Router {
    *                 type: number
    *               role:
    *                 type: string
-   *                 enum: [ADMIN, BARISTA, BARMAN, WAITER]
+   *                 enum: [gerente, barista, caixa, atendente]
    *     responses:
    *       200:
    *         description: Worker updated

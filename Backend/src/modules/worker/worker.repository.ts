@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { workers, workerProfiles } from "@/db/schema";
+import { workers } from "@/db/schema";
 import WorkerModel from "./worker.model";
 
 export default class WorkerRepository {
@@ -14,7 +14,6 @@ export default class WorkerRepository {
     const result = await this.db
       .select()
       .from(workers)
-      .leftJoin(workerProfiles, eq(workers.id, workerProfiles.workerId))
       .where(eq(workers.publicId, publicId))
       .limit(1);
 
@@ -22,15 +21,13 @@ export default class WorkerRepository {
       return null;
     }
 
-    const { workers: workerRow, worker_profiles: profileRow } = result[0];
-    return WorkerModel.fromDatabase(workerRow, profileRow);
+    return WorkerModel.fromDatabase(result[0]);
   }
 
   async getById(id: number): Promise<WorkerModel | null> {
     const result = await this.db
       .select()
       .from(workers)
-      .leftJoin(workerProfiles, eq(workers.id, workerProfiles.workerId))
       .where(eq(workers.id, id))
       .limit(1);
 
@@ -38,63 +35,44 @@ export default class WorkerRepository {
       return null;
     }
 
-    const { workers: workerRow, worker_profiles: profileRow } = result[0];
-    return WorkerModel.fromDatabase(workerRow, profileRow);
+    return WorkerModel.fromDatabase(result[0]);
   }
 
   async getAll(): Promise<WorkerModel[]> {
     const result = await this.db
       .select()
-      .from(workers)
-      .leftJoin(workerProfiles, eq(workers.id, workerProfiles.workerId));
+      .from(workers);
 
-    return result.map(({ workers: workerRow, worker_profiles: profileRow }) =>
-      WorkerModel.fromDatabase(workerRow, profileRow),
-    );
+    return result.map((row) => WorkerModel.fromDatabase(row));
   }
 
-  async updateProfile(worker: WorkerModel): Promise<WorkerModel> {
-    const [updatedProfile] = await this.db
-      .update(workerProfiles)
-      .set({
-        fullName: worker.profile.fullName,
-        email: worker.profile.email,
-        phone: worker.profile.phone,
-        avatarImage: worker.profile.avatarImage,
-        password: worker.profile.password,
-        updatedAt: new Date(worker.profile.updatedAt),
-      })
-      .where(eq(workerProfiles.workerId, worker.id))
+  async update(worker: WorkerModel, password?: string): Promise<WorkerModel> {
+    const updateData: any = {
+      fullName: worker.fullName,
+      email: worker.email,
+      phone: worker.phone,
+      avatarUrl: worker.avatarUrl,
+      updatedAt: new Date(worker.updatedAt),
+    };
+
+    if (password) {
+      updateData.password = password;
+    }
+
+    const [updated] = await this.db
+      .update(workers)
+      .set(updateData)
+      .where(eq(workers.id, worker.id))
       .returning();
 
-    return WorkerModel.fromDatabase(
-      {
-        id: worker.id,
-        publicId: worker.publicId,
-        role: worker.role,
-        salary: worker.salary,
-        isActive: worker.isActive,
-        createdAt: new Date(worker.createdAt),
-        updatedAt: new Date(worker.updatedAt),
-      },
-      updatedProfile,
-    );
+    if (!updated) {
+      throw new Error("WORKER_NOT_FOUND");
+    }
+
+    return WorkerModel.fromDatabase(updated);
   }
 
   async deleteByPublicId(publicId: string): Promise<void> {
-    await this.db.transaction(async (tx) => {
-      const [worker] = await tx
-        .select()
-        .from(workers)
-        .where(eq(workers.publicId, publicId))
-        .limit(1);
-
-      if (!worker) {
-        return;
-      }
-
-      await tx.delete(workerProfiles).where(eq(workerProfiles.workerId, worker.id));
-      await tx.delete(workers).where(eq(workers.id, worker.id));
-    });
+    await this.db.delete(workers).where(eq(workers.publicId, publicId));
   }
 }

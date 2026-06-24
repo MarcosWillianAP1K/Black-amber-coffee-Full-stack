@@ -54,21 +54,14 @@ export default class userController {
 
       const currentUser = await this.userService.get(publicId);
       const avatarBuffer = req.file?.buffer;
-      const fullName = req.body.fullName ?? req.body.name ?? currentUser.name;
+      const fullName = req.body.fullName ?? req.body.name ?? currentUser.fullName;
 
       const data = UserUpdateInputSchema.parse({
         fullName,
         email: req.body.email,
         phone: req.body.phone,
         password: req.body.password,
-        profile: {
-          fullName,
-          phone: req.body.phone ?? currentUser.profile.phone,
-          avatarBuffer,
-          avatarImage: currentUser.profile.avatarImage,
-          createdAt: currentUser.profile.createdAt,
-          updatedAt: currentUser.profile.updatedAt,
-        },
+        avatarBuffer,
       });
 
       const updatedUser = await this.userService.updateClient(publicId, data);

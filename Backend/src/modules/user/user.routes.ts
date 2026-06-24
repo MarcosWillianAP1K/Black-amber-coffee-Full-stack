@@ -2,7 +2,6 @@ import { Router } from "express";
 import userController from "@/modules/user/user.controller";
 import userService from "@/modules/user/user.service";
 import userRepository from "@/modules/user/user.repository";
-import authRepository from "@/modules/auth/auth.repository";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
 import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
 import validationMiddleware from "@/shared/middlewares/validation.middleware";
@@ -12,9 +11,8 @@ import { db } from "@/config/database";
 const userRoutes = Router();
 
 // Initialize dependencies
-const authRepo = new authRepository(db);
 const userRepo = new userRepository(db);
-const userSvc = new userService(authRepo, userRepo);
+const userSvc = new userService(userRepo);
 const userCtrl = new userController(userSvc);
 
 // Rota de compatibilidade retroativa (backward compatibility)

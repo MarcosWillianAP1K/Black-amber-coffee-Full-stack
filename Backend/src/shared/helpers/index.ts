@@ -131,7 +131,7 @@ const errorMap: Record<string, { status: number; message: string }> = {
   INVALID_ROLE: {
     status: 400,
     message:
-      "Função/papel inválido. Valores permitidos: ADMIN, BARISTA, BARMAN, WAITER.",
+      "Função/papel inválido. Valores permitidos: barista, caixa, gerente, atendente",
   },
   INVALID_SALARY: {
     status: 400,

@@ -1,37 +1,38 @@
-interface UserProfile {
-  fullName: string;
-  phone: string | null;
-  avatarImage: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export default class UserModel {
   id: number;
   publicId: string;
   email: string;
+  fullName: string;
+  phone: string | null;
+  avatarUrl: string | null;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  profile: UserProfile;
 
   constructor(
     id: number,
     publicId: string,
     email: string,
+    fullName: string,
+    phone: string | null,
+    avatarUrl: string | null,
+    isActive: boolean,
     createdAt: string,
     updatedAt: string,
-    profile: UserProfile,
   ) {
     this.id = id;
     this.publicId = publicId;
     this.email = email;
+    this.fullName = fullName;
+    this.phone = phone;
+    this.avatarUrl = avatarUrl;
+    this.isActive = isActive;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.profile = profile;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  static fromDatabase(client: any, profile: any): UserModel {
+  static fromDatabase(client: any): UserModel {
     const toStr = (v: any): string =>
       v instanceof Date ? v.toISOString() : String(v ?? "");
 
@@ -39,15 +40,12 @@ export default class UserModel {
       client.id,
       client.publicId,
       client.email,
+      client.fullName ?? "",
+      client.phone ?? null,
+      client.avatarUrl ?? null,
+      client.isActive ?? true,
       toStr(client.createdAt),
       toStr(client.updatedAt),
-      {
-        fullName: profile?.fullName ?? "",
-        phone: profile?.phone ?? null,
-        avatarImage: profile?.avatarImage ?? null,
-        createdAt: toStr(profile?.createdAt ?? client.createdAt),
-        updatedAt: toStr(profile?.updatedAt ?? client.updatedAt),
-      },
     );
   }
 }

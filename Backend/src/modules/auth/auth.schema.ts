@@ -19,7 +19,7 @@ export const LoginClientSchema = z.object({
 export const ProfileResponseSchema = z.object({
   fullName: z.string(),
   phone: z.string().nullable(),
-  avatarImage: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
   createdAt: z.string(),
 });
 
@@ -117,7 +117,7 @@ export const ResetPasswordResponseSchema = z.object({
     profile: z.object({
       fullName: z.string(),
       phone: z.string().nullable(),
-      avatarImage: z.string().nullable(),
+      avatarUrl: z.string().nullable(),
       createdAt: z.string(),
     }),
   }),

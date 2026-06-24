@@ -7,8 +7,7 @@ export const productSchema = z.object({
   publicId: z.string(),
   name: z.string(),
   description: z.string().nullable(),
-  imageUrl: z.string().nullable(),
-  size: z.string().nullable(),
+  imgUrl: z.string().nullable(),
   price: z.number(),
   category: z.string(),
   isActive: z.boolean(),
@@ -21,8 +20,7 @@ export const productSchema = z.object({
 export const CreateProductRequestSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().nullable(),
-  imageUrl: z.string().nullable(),
-  size: z.string().nullable(),
+  imgUrl: z.string().nullable(),
   price: z.number().positive("Price must be a positive number"),
   category: z.string().min(1, "Category is required"),
 });
@@ -30,8 +28,7 @@ export const CreateProductRequestSchema = z.object({
 export const UpdateProductRequestSchema = z.object({
   name: z.string().min(1, "Name is required").optional(),
   description: z.string().nullable().optional(),
-  imageUrl: z.string().nullable().optional(),
-  size: z.string().nullable().optional(),
+  imgUrl: z.string().nullable().optional(),
   price: z.number().positive("Price must be a positive number").optional(),
   category: z.string().min(1, "Category is required").optional(),
   isActive: z.boolean().optional(),
@@ -63,8 +60,7 @@ export const productDetailSchema = z.object({
   publicId: z.string(),
   name: z.string(),
   description: z.string().nullable(),
-  imageUrl: z.string().nullable(),
-  size: z.string().nullable(),
+  imgUrl: z.string().nullable(),
   price: z.number(),
   category: z.string(),
   isActive: z.boolean(),
@@ -89,7 +85,6 @@ export const productStockSchema = z.object({
     productId: z.number(),
     quantity: z.number(),
     minQuantity: z.number(),
-    createdAt: z.string(),
     updatedAt: z.string(),
 });
 
@@ -102,7 +97,6 @@ export const stockResponseSchema = z.object({
     productId: z.number(),
     quantity: z.number(),
     minQuantity: z.number(),
-    createdAt: z.string(),
     updatedAt: z.string(),
 });
 

@@ -102,11 +102,9 @@ export default class ProductRepository {
     const [inserted] = await this.db
       .insert(products)
       .values({
-        publicId: generateId(),
         name: data.name,
         description: data.description,
-        img: data.imageUrl,
-        size: data.size,
+        imgUrl: data.imgUrl,
         price: String(data.price),
         category: data.category,
         isActive: data.isActive,
@@ -131,8 +129,7 @@ export default class ProductRepository {
     if (data.name !== undefined) updateData.name = data.name;
     if (data.description !== undefined)
       updateData.description = data.description;
-    if (data.imageUrl !== undefined) updateData.img = data.imageUrl;
-    if (data.size !== undefined) updateData.size = data.size;
+    if (data.imgUrl !== undefined) updateData.imgUrl = data.imgUrl;
     if (data.price !== undefined) updateData.price = String(data.price);
     if (data.category !== undefined) updateData.category = data.category;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
@@ -175,7 +172,7 @@ export default class ProductRepository {
     const conditions: ReturnType<typeof eq>[] = [];
 
     if (params.category) {
-      conditions.push(eq(products.category, params.category));
+      conditions.push(eq(products.category, params.category as any));
     }
     if (params.minPrice !== undefined) {
       conditions.push(gte(products.price, String(params.minPrice)));
@@ -209,8 +206,7 @@ export default class ProductRepository {
         publicId: products.publicId,
         name: products.name,
         description: products.description,
-        img: products.img,
-        size: products.size,
+        imgUrl: products.imgUrl,
         price: products.price,
         category: products.category,
         isActive: products.isActive,
@@ -259,7 +255,6 @@ export default class ProductRepository {
         productId,
         quantity,
         minQuantity: minQuantity ?? 0,
-        createdAt: now,
         updatedAt: now,
       })
       .returning();

@@ -1,14 +1,14 @@
 export class WorkerRoles {
-  static readonly ADMIN = "ADMIN";
-  static readonly BARMAN = "BARMAN";
-  static readonly BARISTA = "BARISTA";
-  static readonly WAITER = "WAITER";
+  static readonly BARISTA = "barista";
+  static readonly CAIXA = "caixa";
+  static readonly GERENTE = "gerente";
+  static readonly ATENDENTE = "atendente";
 
   static readonly VALUES = [
-    WorkerRoles.ADMIN,
     WorkerRoles.BARISTA,
-    WorkerRoles.BARMAN,
-    WorkerRoles.WAITER
+    WorkerRoles.CAIXA,
+    WorkerRoles.GERENTE,
+    WorkerRoles.ATENDENTE
   ] as const;
 
   static values (){

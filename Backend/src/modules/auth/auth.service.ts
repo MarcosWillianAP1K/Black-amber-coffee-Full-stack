@@ -69,7 +69,7 @@ export default class authService {
         profile: {
           fullName: createdClient.name,
           phone: createdClient.phone ?? null,
-          avatarImage: null,
+          avatarUrl: createdClient.avatarUrl ?? null,
           createdAt: createdClient.createdAt,
         },
       },
@@ -120,7 +120,7 @@ export default class authService {
           profile: {
             fullName: authEntity.user.name,
             phone: authEntity.user.phone ?? null,
-            avatarImage: null,
+            avatarUrl: authEntity.user.avatarUrl ?? null,
             createdAt: authEntity.user.createdAt,
             updatedAt: authEntity.user.updatedAt,
           },
@@ -223,7 +223,7 @@ export default class authService {
 
     return SendPasswordResetResponseSchema.parse({
       email: validatedData.email,
-      userTokenId: userToken.publicId as string | null,
+      userTokenId: userToken.code as string | null,
       expiresAt,
     });
   }
@@ -234,7 +234,7 @@ export default class authService {
   ): Promise<CheckPasswordResetResponse> {
     const validatedData = CheckPasswordResetSchema.parse(data);
 
-    const reset = await this.authRepository.getPasswordReset(userTokenId);
+    const reset = await this.authRepository.getPasswordResetByCode(validatedData.code);
     if (!reset) {
       throw new Error("NOT_FOUND");
     }
@@ -243,7 +243,7 @@ export default class authService {
       throw new Error("EXPIRED_CODE");
     }
 
-    if (reset.usedAt || reset.deletedAt) {
+    if (reset.used) {
       throw new Error("CODE_ALREADY_USED");
     }
 
@@ -252,11 +252,7 @@ export default class authService {
       throw new Error("USER_NOT_FOUND");
     }
 
-    if (validatedData.code !== reset.code) {
-      throw new Error("INVALID_CODE");
-    }
-
-    await this.authRepository.markPasswordResetAsUsed(userTokenId);
+    await this.authRepository.markPasswordResetAsUsed(validatedData.code);
 
     const resetToken = this.jwtService.generatePasswordResetToken({
       userId: authEntity.user.id,
@@ -317,7 +313,7 @@ export default class authService {
         profile: {
           fullName: authEntity.user.name,
           phone: authEntity.user.phone ?? null,
-          avatarImage: null,
+          avatarUrl: authEntity.user.avatarUrl ?? null,
           createdAt: authEntity.user.createdAt,
         },
       },

@@ -1,27 +1,17 @@
 import * as z from "zod";
 import { WorkerRoles } from "../../core/enuns/workerRole";
-import { PaymentMethod } from "@/core/enuns/payment.types";
-///admin querys to be cadastrate aq worker and login worker and get worker by id and update worker
-/// at allm worker have a profile with fullName, phone, avatarImage, email, createdAt and updatedAt whe be update at separate shema only for update profile with fullName, phone and avatarImage.
 
-
-// Worker Profile Response
-export const workerProfileSchema = z.object({
-  fullName: z.string(),
-  phone: z.string().nullable(),
-  avatarImage: z.string().nullable(),
-  email: z.email(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-// Worker Response
+// Worker Response (flat — no nested profile)
 export const workerResponseSchema = z.object({
   publicId: z.string(),
+  email: z.email(),
+  fullName: z.string(),
+  phone: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
   role: z.enum(WorkerRoles.VALUES, { message: "Invalid Role" }),
   salary: z.number(),
   isActive: z.boolean(),
-  profile: workerProfileSchema,
+  isAdmin: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -44,15 +34,7 @@ export const loginWorkerSchema = z.object({
 
 // Register Worker Response
 export const registerWorkerResponseSchema = z.object({
-  data: z.object({
-    publicId: z.string(),
-    email: z.email(),
-    role: z.enum(WorkerRoles.VALUES, { message: "Invalid Role" }),
-    salary: z.number(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    profile: workerProfileSchema,
-  }),
+  data: workerResponseSchema,
 });
 
 // Login Worker Response
@@ -63,7 +45,8 @@ export const loginWorkerResponseSchema = z.object({
     user: z.object({
       publicId: z.string(),
       role: z.enum(WorkerRoles.VALUES, { message: "Invalid Role" }),
-      profile: workerProfileSchema,
+      email: z.email(),
+      fullName: z.string(),
     }),
   }),
 });
@@ -98,7 +81,6 @@ export const updateWorkerResponseSchema = z.object({
 });
 
 // Types
-export type WorkerProfile = z.infer<typeof workerProfileSchema>;
 export type Worker = z.infer<typeof workerResponseSchema>;
 export type RegisterWorkerInput = z.infer<typeof registerWorkerSchema>;
 export type LoginWorkerInput = z.infer<typeof loginWorkerSchema>;

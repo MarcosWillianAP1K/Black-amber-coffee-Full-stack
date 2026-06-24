@@ -16,28 +16,28 @@ export default class WorkerService {
     this.workerRepository = workerRepository;
   }
 
+  private serializeWorker(worker: WorkerModel): Worker {
+    return WorkerResponseSchema.parse({
+      publicId: worker.publicId,
+      email: worker.email,
+      fullName: worker.fullName,
+      phone: worker.phone,
+      avatarUrl: worker.avatarUrl,
+      role: worker.role,
+      salary: worker.salary,
+      isAdmin: worker.isAdmin,
+      isActive: worker.isActive,
+      createdAt: worker.createdAt,
+      updatedAt: worker.updatedAt,
+    });
+  }
+
   async getByPublicId(publicId: string): Promise<Worker> {
     const worker = await this.workerRepository.getByPublicId(publicId);
     if (!worker) {
       throw new Error("WORKER_NOT_FOUND");
     }
-
-    return WorkerResponseSchema.parse({
-      publicId: worker.publicId,
-      role: worker.role,
-      salary: worker.salary,
-      isActive: worker.isActive,
-      profile: {
-        fullName: worker.profile.fullName,
-        phone: worker.profile.phone,
-        avatarImage: worker.profile.avatarImage,
-        email: worker.profile.email,
-        createdAt: worker.profile.createdAt,
-        updatedAt: worker.profile.updatedAt,
-      },
-      createdAt: worker.createdAt,
-      updatedAt: worker.updatedAt,
-    });
+    return this.serializeWorker(worker);
   }
 
   async getById(id: number): Promise<Worker> {
@@ -45,23 +45,7 @@ export default class WorkerService {
     if (!worker) {
       throw new Error("WORKER_NOT_FOUND");
     }
-
-    return WorkerResponseSchema.parse({
-      publicId: worker.publicId,
-      role: worker.role,
-      salary: worker.salary,
-      isActive: worker.isActive,
-      profile: {
-        fullName: worker.profile.fullName,
-        phone: worker.profile.phone,
-        avatarImage: worker.profile.avatarImage,
-        email: worker.profile.email,
-        createdAt: worker.profile.createdAt,
-        updatedAt: worker.profile.updatedAt,
-      },
-      createdAt: worker.createdAt,
-      updatedAt: worker.updatedAt,
-    });
+    return this.serializeWorker(worker);
   }
 
   async update(publicId: string, data: WorkerUpdateInput): Promise<Worker> {
@@ -71,11 +55,12 @@ export default class WorkerService {
     if (!worker) {
       throw new Error("WORKER_NOT_FOUND");
     }
-    let avatarImageUpdate: string | null = worker.profile.avatarImage;
-    
-    if (validatedData.profile.avatarBuffer) {
+
+    let avatarUrlUpdate: string | null = worker.avatarUrl;
+
+    if (validatedData.avatarBuffer) {
       const processedImages = await imageService.processAvatar(
-        validatedData.profile.avatarBuffer,
+        validatedData.avatarBuffer,
       );
       const keys = imageService.generateAvatarKeys(publicId);
 
@@ -85,9 +70,10 @@ export default class WorkerService {
         contentType: processedImages.contentType,
       });
 
-      avatarImageUpdate = keys.large;
+      avatarUrlUpdate = keys.large;
     }
-    let password = worker.profile.password;
+
+    let password = undefined;
     if (validatedData.password) {
       password = await SecurityUtils.hashPassword(validatedData.password);
     }
@@ -95,40 +81,20 @@ export default class WorkerService {
     const updatedWorker = new WorkerModel(
       worker.id,
       worker.publicId,
+      validatedData.email ?? worker.email,
+      validatedData.fullName ?? worker.fullName,
+      validatedData.phone ?? worker.phone,
+      avatarUrlUpdate,
       worker.role,
       worker.salary,
+      worker.isAdmin,
       worker.isActive,
       worker.createdAt,
-      worker.updatedAt,
-      {
-        fullName: validatedData.fullName ?? worker.profile.fullName,
-        email: validatedData.email ?? worker.profile.email,
-        phone: validatedData.phone ?? worker.profile.phone,
-        avatarImage: avatarImageUpdate,
-        password,
-        createdAt: worker.profile.createdAt,
-        updatedAt: new Date().toISOString(),
-      },
+      new Date().toISOString(),
     );
 
-    const result = await this.workerRepository.updateProfile(updatedWorker);
-
-    return WorkerResponseSchema.parse({
-      publicId: result.publicId,
-      role: result.role,
-      salary: result.salary,
-      isActive: result.isActive,
-      profile: {
-        fullName: result.profile.fullName,
-        phone: result.profile.phone,
-        avatarImage: result.profile.avatarImage,
-        email: result.profile.email,
-        createdAt: result.profile.createdAt,
-        updatedAt: result.profile.updatedAt,
-      },
-      createdAt: result.createdAt,
-      updatedAt: result.updatedAt,
-    });
+    const result = await this.workerRepository.update(updatedWorker, password);
+    return this.serializeWorker(result);
   }
 
   async delete(publicId: string): Promise<void> {

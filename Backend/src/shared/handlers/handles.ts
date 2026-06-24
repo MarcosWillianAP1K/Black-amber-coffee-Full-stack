@@ -10,6 +10,7 @@ const error = (
   res: Response,
   _next: NextFunction,
 ) => {
+  console.error("Full error:", err);
   let code = err instanceof Error ? err.message : "INTERNAL_ERROR";
 
   if (err instanceof ZodError) {

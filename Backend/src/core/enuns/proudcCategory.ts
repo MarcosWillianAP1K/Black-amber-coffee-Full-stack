@@ -1,14 +1,20 @@
 export class ProductCategory {
-  static readonly COFFEE = "COFFEE";
-  static readonly DRINKS = "DRINKS";
-  static readonly FOOD = "FOOD";
-  static readonly OTHER = "OTHER";
+  static readonly CAFE = "cafe";
+  static readonly CHA = "cha";
+  static readonly SUCO = "suco";
+  static readonly SMOOTHIE = "smoothie";
+  static readonly LANCHE = "lanche";
+  static readonly SOBREMESA = "sobremesa";
+  static readonly OUTRO = "outro";
 
   static readonly VALUES = [
-    ProductCategory.COFFEE,
-    ProductCategory.DRINKS,
-    ProductCategory.FOOD,
-    ProductCategory.OTHER,
+    ProductCategory.CAFE,
+    ProductCategory.CHA,
+    ProductCategory.SUCO,
+    ProductCategory.SMOOTHIE,
+    ProductCategory.LANCHE,
+    ProductCategory.SOBREMESA,
+    ProductCategory.OUTRO,
   ] as const;
 
   static values() {

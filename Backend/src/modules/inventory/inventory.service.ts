@@ -26,17 +26,15 @@ export default class InventoryService {
   }
 
   async create(data: CreateInventoryInput): Promise<InventoryResponse> {
-    const publicId = generateId();
-    
     const dbData = {
-      publicId,
       code: data.code,
       name: data.name,
       description: data.description,
       category: data.category,
-      quantityType: data.quantityType,
-      quantity: data.quantity ?? null,
-      img: data.img,
+      quantity: data.quantity != null ? String(data.quantity) : "0",
+      unit: data.unit,
+      minQuantity: data.minQuantity != null ? String(data.minQuantity) : "0",
+      imgUrl: data.imgUrl,
     };
 
     const newItem = await this.inventoryRepository.create(dbData);
@@ -53,7 +51,7 @@ export default class InventoryService {
         return this.update(existing.publicId, {
           name: data.name,
           quantity: currentQty + addQty,
-          quantityType: data.quantityType,
+          unit: data.unit,
         });
       }
     }
@@ -70,9 +68,10 @@ export default class InventoryService {
     if (data.code !== undefined) updateData.code = data.code;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.category !== undefined) updateData.category = data.category;
-    if (data.quantityType !== undefined) updateData.quantityType = data.quantityType;
-    if (data.quantity !== undefined) updateData.quantity = data.quantity;
-    if (data.img !== undefined) updateData.img = data.img;
+    if (data.unit !== undefined) updateData.unit = data.unit;
+    if (data.quantity !== undefined) updateData.quantity = String(data.quantity);
+    if (data.minQuantity !== undefined) updateData.minQuantity = String(data.minQuantity);
+    if (data.imgUrl !== undefined) updateData.imgUrl = data.imgUrl;
 
     const updatedItem = await this.inventoryRepository.update(publicId, updateData);
     return InventoryResponseSchema.parse(updatedItem);

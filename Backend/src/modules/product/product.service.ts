@@ -29,61 +29,36 @@ export default class ProductService {
     this.productRepository = productRepository;
   }
 
-  async getById(id: number): Promise<ProductDetailResponse> {
-    const product = await this.productRepository.getById(id);
-    if (!product) throw new Error("PRODUCT_NOT_FOUND");
-
+  private serializeProduct(product: ProductModel) {
     return productSchema.parse({
       id: product.id,
       publicId: product.publicId,
       name: product.name,
       description: product.description,
-      imageUrl: product.imageUrl,
-      size: product.size,
+      imgUrl: product.imgUrl,
       price: product.price,
       category: product.category,
       isActive: product.isActive,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
     });
+  }
+
+  async getById(id: number): Promise<ProductDetailResponse> {
+    const product = await this.productRepository.getById(id);
+    if (!product) throw new Error("PRODUCT_NOT_FOUND");
+    return this.serializeProduct(product);
   }
 
   async getByPublicId(publicId: string): Promise<ProductDetailResponse> {
     const product = await this.productRepository.getByPublicId(publicId);
     if (!product) throw new Error("PRODUCT_NOT_FOUND");
-
-    return productSchema.parse({
-      id: product.id,
-      publicId: product.publicId,
-      name: product.name,
-      description: product.description,
-      imageUrl: product.imageUrl,
-      size: product.size,
-      price: product.price,
-      category: product.category,
-      isActive: product.isActive,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt,
-    });
+    return this.serializeProduct(product);
   }
 
   async getAll(): Promise<ProductDetailResponse[]> {
     const products = await this.productRepository.getAll();
-    return products.map((product) =>
-      productSchema.parse({
-        id: product.id,
-        publicId: product.publicId,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        size: product.size,
-        price: product.price,
-        category: product.category,
-        isActive: product.isActive,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-      }),
-    );
+    return products.map((product) => this.serializeProduct(product));
   }
 
   async paginate(
@@ -98,21 +73,7 @@ export default class ProductService {
     const paginated = allProducts.slice(start, end);
 
     return paginatedProductsSchema.parse({
-      products: paginated.map((product) =>
-        productSchema.parse({
-          id: product.id,
-          publicId: product.publicId,
-          name: product.name,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          size: product.size,
-          price: product.price,
-          category: product.category,
-          isActive: product.isActive,
-          createdAt: product.createdAt,
-          updatedAt: product.updatedAt,
-        }),
-      ),
+      products: paginated.map((product) => this.serializeProduct(product)),
       total,
       page,
       limit,
@@ -121,21 +82,7 @@ export default class ProductService {
 
   async filter(params: FilterProductsRequest): Promise<ProductDetailResponse[]> {
     const products = await this.productRepository.filter(params);
-    return products.map((product) =>
-      productSchema.parse({
-        id: product.id,
-        publicId: product.publicId,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        size: product.size,
-        price: product.price,
-        category: product.category,
-        isActive: product.isActive,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-      }),
-    );
+    return products.map((product) => this.serializeProduct(product));
   }
 
   async getCategories(): Promise<ProductCategoriesResponse> {
@@ -145,21 +92,7 @@ export default class ProductService {
 
   async getByCategory(category: ProductCategoryType): Promise<ProductDetailResponse[]> {
     const products = await this.productRepository.getByCategory(category);
-    return products.map((product) =>
-      productSchema.parse({
-        id: product.id,
-        publicId: product.publicId,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        size: product.size,
-        price: product.price,
-        category: product.category,
-        isActive: product.isActive,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt,
-      }),
-    );
+    return products.map((product) => this.serializeProduct(product));
   }
 
   // ---- Admin operations ----
@@ -168,26 +101,13 @@ export default class ProductService {
     const created = await this.productRepository.create({
       name: data.name,
       description: data.description ?? null,
-      imageUrl: data.imageUrl ?? null,
-      size: data.size ?? null,
+      imgUrl: data.imgUrl ?? null,
       price: data.price,
       category: data.category as ProductCategoryType,
       isActive: true,
     });
 
-    return productSchema.parse({
-      id: created.id,
-      publicId: created.publicId,
-      name: created.name,
-      description: created.description,
-      imageUrl: created.imageUrl,
-      size: created.size,
-      price: created.price,
-      category: created.category,
-      isActive: created.isActive,
-      createdAt: created.createdAt,
-      updatedAt: created.updatedAt,
-    });
+    return this.serializeProduct(created);
   }
 
   async update(
@@ -200,28 +120,14 @@ export default class ProductService {
     const updated = await this.productRepository.update(publicId, {
       name: data.name,
       description: data.description,
-      imageUrl: data.imageUrl,
-      size: data.size,
+      imgUrl: data.imgUrl,
       price: data.price,
       category: data.category as ProductCategoryType | undefined,
       isActive: data.isActive,
     });
 
     if (!updated) throw new Error("PRODUCT_NOT_FOUND");
-
-    return productSchema.parse({
-      id: updated.id,
-      publicId: updated.publicId,
-      name: updated.name,
-      description: updated.description,
-      imageUrl: updated.imageUrl,
-      size: updated.size,
-      price: updated.price,
-      category: updated.category,
-      isActive: updated.isActive,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.serializeProduct(updated);
   }
 
   async uploadImage(
@@ -242,24 +148,11 @@ export default class ProductService {
     });
 
     const updated = await this.productRepository.update(publicId, {
-      imageUrl: key,
+      imgUrl: key,
     });
 
     if (!updated) throw new Error("PRODUCT_NOT_FOUND");
-
-    return productSchema.parse({
-      id: updated.id,
-      publicId: updated.publicId,
-      name: updated.name,
-      description: updated.description,
-      imageUrl: updated.imageUrl,
-      size: updated.size,
-      price: updated.price,
-      category: updated.category,
-      isActive: updated.isActive,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.serializeProduct(updated);
   }
 
   async delete(publicId: string): Promise<void> {
@@ -272,39 +165,13 @@ export default class ProductService {
   async activate(publicId: string): Promise<ProductDetailResponse> {
     const updated = await this.productRepository.activate(publicId);
     if (!updated) throw new Error("PRODUCT_NOT_FOUND");
-
-    return productSchema.parse({
-      id: updated.id,
-      publicId: updated.publicId,
-      name: updated.name,
-      description: updated.description,
-      imageUrl: updated.imageUrl,
-      size: updated.size,
-      price: updated.price,
-      category: updated.category,
-      isActive: updated.isActive,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.serializeProduct(updated);
   }
 
   async deactivate(publicId: string): Promise<ProductDetailResponse> {
     const updated = await this.productRepository.deactivate(publicId);
     if (!updated) throw new Error("PRODUCT_NOT_FOUND");
-
-    return productSchema.parse({
-      id: updated.id,
-      publicId: updated.publicId,
-      name: updated.name,
-      description: updated.description,
-      imageUrl: updated.imageUrl,
-      size: updated.size,
-      price: updated.price,
-      category: updated.category,
-      isActive: updated.isActive,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-    });
+    return this.serializeProduct(updated);
   }
 
   async getStock(
@@ -333,7 +200,6 @@ export default class ProductService {
       productId: stock.productId,
       quantity: stock.quantity,
       minQuantity: stock.minQuantity,
-      createdAt: stock.createdAt,
       updatedAt: stock.updatedAt,
     });
   }

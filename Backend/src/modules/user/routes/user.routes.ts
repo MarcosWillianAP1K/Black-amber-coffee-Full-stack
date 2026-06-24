@@ -21,7 +21,7 @@ import ProductRepository from "@/modules/product/product.repository";
 // ============================================================
 const authRepo = new authRepository(db);
 const userRepo = new UserRepository(db);
-const userSvc = new UserService(authRepo, userRepo);
+const userSvc = new UserService(userRepo);
 const userCtrl = new UserController(userSvc);
 
 // Admin service for client management

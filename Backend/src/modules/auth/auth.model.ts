@@ -8,6 +8,7 @@ export default class authModel {
   email: string;
   password: string;
   phone?: string;
+  avatarUrl?: string | null;
   createdAt: string;
   updatedAt: string;
 
@@ -18,6 +19,7 @@ export default class authModel {
     email: string,
     password: string,
     phone?: string,
+    avatarUrl?: string | null,
     createdAt?: Date | string,
     updatedAt?: Date | string,
   ) {
@@ -27,6 +29,7 @@ export default class authModel {
     this.email = email;
     this.password = password;
     this.phone = phone;
+    this.avatarUrl = avatarUrl ?? null;
     this.createdAt =
       typeof createdAt === "string"
         ? createdAt
@@ -46,6 +49,7 @@ export default class authModel {
       data.email,
       data.password,
       data.phone,
+      null,
       now.toISOString(),
       now.toISOString(),
     );

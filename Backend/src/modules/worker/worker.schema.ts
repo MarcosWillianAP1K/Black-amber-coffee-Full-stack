@@ -1,22 +1,16 @@
 import * as z from "zod";
 import { WorkerRoles } from "@/core/enuns/workerRole";
 
-export const WorkerProfileSchema = z.object({
-  fullName: z.string(),
-  phone: z.string().nullable(),
-  avatarImage: z.string().nullable(),
-  avatarBuffer: z.instanceof(Buffer).nullable().optional(),
-  email: z.email(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
 export const WorkerResponseSchema = z.object({
   publicId: z.string(),
+  email: z.email(),
+  fullName: z.string(),
+  phone: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
   role: z.enum(WorkerRoles.VALUES, { message: "Invalid Role" }),
   salary: z.number(),
+  isAdmin: z.boolean(),
   isActive: z.boolean(),
-  profile: WorkerProfileSchema,
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -30,7 +24,7 @@ export const WorkerUpdateInputSchema = z
       .string()
       .min(6, "Password must be at least 6 characters long")
       .optional(),
-    profile: WorkerProfileSchema,
+    avatarBuffer: z.instanceof(Buffer).nullable().optional(),
   })
   .refine(
     (data) => Object.keys(data).length > 0,
@@ -74,12 +68,12 @@ export const WorkerLoginResponseSchema = z.object({
     user: z.object({
       publicId: z.string(),
       role: z.enum(WorkerRoles.VALUES, { message: "Invalid Role" }),
-      profile: WorkerProfileSchema,
+      email: z.email(),
+      fullName: z.string(),
     }),
   }),
 });
 
-export type WorkerProfile = z.infer<typeof WorkerProfileSchema>;
 export type Worker = z.infer<typeof WorkerResponseSchema>;
 export type WorkerUpdateInput = z.infer<typeof WorkerUpdateInputSchema>;
 export type WorkerUpdateRequest = z.infer<typeof WorkerUpdateRequestSchema>;

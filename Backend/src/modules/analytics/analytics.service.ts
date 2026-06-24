@@ -122,10 +122,10 @@ export default class AnalyticsService {
 
     // Pending and in-progress counts from today's orders
     const pendingOrders = ordersToday.filter(
-      (o) => o.status === OrderStatus.PENDING,
+      (o) => o.status === OrderStatus.CRIADO,
     ).length;
     const inProgressOrders = ordersToday.filter(
-      (o) => o.status === OrderStatus.IN_PROGRESS,
+      (o) => o.status === OrderStatus.EM_PREPARO,
     ).length;
 
     return dashboardAnalyticsSchema.parse({

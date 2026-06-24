@@ -5,8 +5,7 @@ export default class ProductModel {
     publicId: string;
     name: string;
     description: string | null;
-    imageUrl: string | null;
-    size: string | null;
+    imgUrl: string | null;
     price: number;
     category: ProductCategoryType;
     isActive: boolean;
@@ -18,8 +17,7 @@ export default class ProductModel {
         publicId: string,
         name: string,
         description: string | null,
-        imageUrl: string | null,
-        size: string | null,
+        imgUrl: string | null,
         price: number,
         category: ProductCategoryType,
         isActive: boolean,
@@ -30,8 +28,7 @@ export default class ProductModel {
         this.publicId = publicId;
         this.name = name;
         this.description = description;
-        this.imageUrl = imageUrl;
-        this.size = size;
+        this.imgUrl = imgUrl;
         this.price = price;
         this.category = category;
         this.isActive = isActive;
@@ -45,8 +42,7 @@ export default class ProductModel {
             product.publicId,
             product.name,
             product.description ?? null,
-            product.img ?? null,
-            product.size ?? null,
+            product.imgUrl ?? null,
             Number(product.price),
             product.category,
             Boolean(product.isActive),
