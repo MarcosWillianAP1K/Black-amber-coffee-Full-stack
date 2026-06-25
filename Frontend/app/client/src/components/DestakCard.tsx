@@ -12,7 +12,7 @@ export interface DestakCardProps {
 export function DestakCard({ title, description, imageUrl, onClick }: DestakCardProps) {
 
     return (
-        <button className="w-70 h-80 bg-(--Widget-background) rounded-am shadow-lg overflow-hidden flex flex-col relative"
+        <button className="w-full aspect-[4/3] bg-(--Widget-background) rounded-sm shadow-lg overflow-hidden flex flex-col relative"
             onClick={onClick}>
 
                 {/* Imagem de fundo */}

@@ -14,7 +14,7 @@ export const router = createBrowserRouter([
         path: "/",
         element: (
             <RouteProtector>
-                <Template />
+            <Template />
             </RouteProtector>
         ),
         children: [

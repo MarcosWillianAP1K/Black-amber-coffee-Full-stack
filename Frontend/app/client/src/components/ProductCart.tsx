@@ -29,11 +29,11 @@ export function ProductCart({ name, price, promotionPrice, imageUrl, quantity, o
                         <img
                             src={imageUrl}
                             alt={name}
-                            className="w-12 h-12 object-cover rounded-sm overflow-hidden"
+                            className="w-12 aspect-square object-cover rounded-sm overflow-hidden"
                         />
                     ) :
                         (
-                            <div className="w-10 h-10 bg-gray-300 rounded-sm flex items-center justify-center">
+                            <div className="w-12 aspect-square bg-gray-300 rounded-sm flex items-center justify-center">
                                 <span className="text-gray-500 text-sm">NaN</span>
                             </div>
                         )

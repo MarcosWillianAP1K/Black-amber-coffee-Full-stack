@@ -33,9 +33,9 @@ export function Menu() {
         <div className="w-full max-w-lg mx-auto gap-6 flex flex-col pb-8">
             <div className="flex flex-col gap-1">
                 <p className="text-(--Primary-off) text-[10px] font-secondary uppercase tracking-widest">
-                    The Distilled Workspace
+                    Nosso Cardápio
                 </p>
-                <h1 className="text-(--Text-gray) text-2xl font-primary font-bold uppercase">Curated Brews</h1>
+                <h1 className="text-(--Text-gray) text-2xl font-primary font-bold uppercase">Cafés Especiais</h1>
             </div>
 
             <CategoryCarousel
@@ -52,13 +52,13 @@ export function Menu() {
                     <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-(--Primary)" />
                         <span className="text-(--Primary) text-[10px] font-secondary uppercase tracking-widest">
-                            Choice Barist
+                            Escolha do Barista
                         </span>
                     </div>
 
                     <DestakCard
                         title={featured.name}
-                        description={featured.description ?? "Product Items"}
+                        description={featured.description ?? "Detalhes do produto"}
                         imageUrl={featured.imgUrl ?? undefined}
                         onClick={() => addItem(featured)}
                     />
@@ -78,7 +78,7 @@ export function Menu() {
                         onClick={() => addItem(featured)}
                         className="w-full py-3 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase"
                     >
-                        Quick Add to Cart
+                        Adicionar ao Carrinho
                     </button>
                 </div>
             )}

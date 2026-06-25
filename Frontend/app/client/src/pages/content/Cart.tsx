@@ -52,7 +52,7 @@ export function Cart() {
 
     return (
         <div className="w-full max-w-lg mx-auto gap-6 flex flex-col pb-8">
-            <h1 className="text-(--Text-gray) text-2xl font-primary font-bold uppercase">Cart Items</h1>
+            <h1 className="text-(--Text-gray) text-2xl font-primary font-bold uppercase">Carrinho</h1>
 
             {items.length === 0 ? (
                 <p className="text-(--Text-primary-off) text-sm font-secondary">Seu carrinho está vazio.</p>
@@ -74,15 +74,15 @@ export function Cart() {
 
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
-                    <span className="text-(--Text-primary-off) text-xs font-secondary">Observations</span>
+                    <span className="text-(--Text-primary-off) text-xs font-secondary">Observações</span>
                     <span className="text-(--Text-primary-off) text-[10px] font-secondary">
-                        {observation.length}/500 Letter
+                        {observation.length}/500 Caracteres
                     </span>
                 </div>
                 <textarea
                     value={observation}
                     onChange={(e) => setObservation(e.target.value.slice(0, 500))}
-                    placeholder="Write here..."
+                    placeholder="Escreva algo importante para nós..."
                     className="w-full min-h-28 p-4 bg-(--Widget-background) border border-(--Border)/30 rounded-md text-(--Text-gray) text-sm font-secondary resize-none focus:outline-none focus:border-(--Primary)"
                 />
             </div>
@@ -90,7 +90,7 @@ export function Cart() {
             <div className="flex items-center justify-between p-4 bg-(--Widget-background) rounded-md border border-(--Border)/30">
                 <div className="flex items-center gap-2 text-(--Primary)">
                     <TicketPlus size={18} />
-                    <span className="text-sm font-secondary">Add coupon for discounts</span>
+                    <span className="text-sm font-secondary">Adicionar cupom de desconto</span>
                 </div>
                 <button
                     type="button"

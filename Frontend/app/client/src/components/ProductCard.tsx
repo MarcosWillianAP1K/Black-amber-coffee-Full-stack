@@ -16,16 +16,16 @@ export interface ProductCardProps {
 export function ProductCard({ name, itens, price, promotionPrice, imageUrl, onClick }: ProductCardProps) {
 
     return (
-        <div className="w-36 h-fit p-4 bg-(--Widget-background) rounded-sm flex flex-col items-center justify-center gap-2 shadow-lg">
+        <div className="w-full h-fit p-4 bg-(--Widget-background) rounded-sm flex flex-col items-center justify-center gap-2 shadow-lg">
             {
                 imageUrl ? (
                     <img
                         src={imageUrl}
                         alt={name}
-                        className="w-full h-26 object-cover rounded-sm overflow-hidden"
+                        className="w-full aspect-square object-cover rounded-sm overflow-hidden"
                     />
                 ) : (
-                    <div className="w-full h-full bg-gray-300 rounded-sm flex items-center justify-center">
+                    <div className="w-full aspect-square bg-gray-300 rounded-sm flex items-center justify-center">
                         <span className="text-gray-500 text-sm">NaN</span>
                     </div>
                 )

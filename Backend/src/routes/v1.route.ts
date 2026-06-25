@@ -87,7 +87,7 @@ routes.use("/api/users", createUserRoutes());
 routes.use("/api/inventory", createInventoryRoutes());
 
 // Analytics routes: /api/analytics/* (admin only)
-routes.use("/api", createAnalyticsRoutes());
+routes.use("/api/analytics", createAnalyticsRoutes());
 
 // Cart routes: /api/cart/* (client only)
 routes.use("/api/cart", createCartRoutes(cartCtrl));

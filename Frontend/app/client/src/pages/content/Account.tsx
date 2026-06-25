@@ -22,19 +22,19 @@ interface MenuOption {
 
 const ACCOUNT_OPTIONS: MenuOption[] = [
     { icon: Settings, label: "Configurações" },
-    { icon: Shield, label: "Security" },
-    { icon: Bell, label: "Notification" },
-    { icon: History, label: "Purchase history" },
+    { icon: Shield, label: "Segurança" },
+    { icon: Bell, label: "Notificações" },
+    { icon: History, label: "Histórico de compras" },
 ];
 
 const PREFERENCE_OPTIONS: MenuOption[] = [
-    { icon: Languages, label: "Language" },
-    { icon: Moon, label: "Theme" },
+    { icon: Languages, label: "Idioma" },
+    { icon: Moon, label: "Tema" },
 ];
 
 const SUPPORT_OPTIONS: MenuOption[] = [
-    { icon: HelpCircle, label: "Help center" },
-    { icon: Info, label: "About Us" },
+    { icon: HelpCircle, label: "Central de ajuda" },
+    { icon: Info, label: "Sobre nós" },
 ];
 
 function MenuSection({ title, options }: { title: string; options: MenuOption[] }) {
@@ -74,7 +74,7 @@ export function Account() {
 
     return (
         <div className="w-full max-w-lg mx-auto gap-6 flex flex-col pb-8">
-            <h1 className="text-(--Text-gray) text-2xl font-primary font-bold uppercase">Profile</h1>
+            <h1 className="text-(--Text-gray) text-2xl font-primary font-bold uppercase">Perfil</h1>
 
             <div className="p-4 bg-(--Widget-background) rounded-md border border-(--Border)/30 flex flex-col gap-4">
                 <div className="flex items-center gap-4">
@@ -95,7 +95,7 @@ export function Account() {
                         type="button"
                         className="px-3 py-1.5 bg-(--Primary) text-(--Text-dark) text-xs font-secondary font-bold rounded-sm shrink-0"
                     >
-                        Edit Profile
+                        Editar Perfil
                     </button>
                 </div>
             </div>
@@ -103,26 +103,26 @@ export function Account() {
             <div className="grid grid-cols-3 gap-3">
                 <div className="p-4 bg-(--Widget-background) rounded-md border border-(--Border)/20 flex flex-col items-center gap-2">
                     <Coffee size={20} className="text-(--Primary)" />
-                    <span className="text-(--Text-primary-off) text-[10px] font-secondary uppercase">Orders</span>
+                    <span className="text-(--Text-primary-off) text-[10px] font-secondary uppercase">Pedidos</span>
                     <span className="text-(--Text-gray) text-xl font-primary font-bold">{orders.length}</span>
                 </div>
                 <div className="p-4 bg-(--Widget-background) rounded-md border border-(--Border)/20 flex flex-col items-center gap-2">
                     <Banknote size={20} className="text-(--Primary)" />
-                    <span className="text-(--Text-primary-off) text-[10px] font-secondary uppercase">Saved</span>
+                    <span className="text-(--Text-primary-off) text-[10px] font-secondary uppercase">Economia</span>
                     <span className="text-(--Text-gray) text-xl font-primary font-bold">${totalSaved.toFixed(2)}</span>
                 </div>
                 <div className="p-4 bg-(--Widget-background) rounded-md border border-(--Border)/20 flex flex-col items-center gap-2">
                     <div className="w-10 h-10 rounded-full border-2 border-(--Primary) flex items-center justify-center">
                         <span className="text-(--Primary) text-xs font-bold">60%</span>
                     </div>
-                    <span className="text-(--Text-primary-off) text-[10px] font-secondary uppercase">Score</span>
+                    <span className="text-(--Text-primary-off) text-[10px] font-secondary uppercase">Pontos</span>
                     <span className="text-(--Text-gray) text-xl font-primary font-bold">500</span>
                 </div>
             </div>
 
-            <MenuSection title="Account" options={ACCOUNT_OPTIONS} />
-            <MenuSection title="Preferences" options={PREFERENCE_OPTIONS} />
-            <MenuSection title="Support" options={SUPPORT_OPTIONS} />
+            <MenuSection title="Conta" options={ACCOUNT_OPTIONS} />
+            <MenuSection title="Preferências" options={PREFERENCE_OPTIONS} />
+            <MenuSection title="Suporte" options={SUPPORT_OPTIONS} />
 
             <button
                 type="button"

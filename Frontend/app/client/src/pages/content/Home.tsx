@@ -30,7 +30,7 @@ export function Home() {
         <div className="w-full max-w-lg mx-auto gap-8 flex flex-col pb-8">
             {/* Hero */}
             <section className="flex flex-col items-center gap-3 pt-2">
-                <p className="text-(--Primary) text-xs font-secondary uppercase tracking-widest">Welcome</p>
+                <p className="text-(--Primary) text-xs font-secondary uppercase tracking-widest">Bem-vindo</p>
                 <div className="w-20 h-20 rounded-full bg-(--Widget-background) border border-(--Border) flex items-center justify-center text-4xl">
                     ☕
                 </div>
@@ -42,7 +42,7 @@ export function Home() {
             {/* About */}
             <section className="flex flex-col gap-2">
                 <h2 className="text-(--Primary) text-sm font-primary font-bold border-b border-(--Border) pb-1 w-fit">
-                    About Us
+                    Sobre Nós
                 </h2>
                 <p className="text-(--Text-gray) text-xs font-secondary leading-relaxed">
                     No coração da cidade, a Black Amber nasceu da paixão por cafés especiais e experiências
@@ -53,8 +53,8 @@ export function Home() {
 
             {/* Last News */}
             <section className="flex flex-col gap-4">
-                <p className="text-(--Primary) text-xs font-secondary uppercase tracking-widest">Welcome</p>
-                <h2 className="text-(--Text-gray) text-xl font-primary font-bold uppercase">Last News</h2>
+                <p className="text-(--Primary) text-xs font-secondary uppercase tracking-widest">Novidades</p>
+                <h2 className="text-(--Text-gray) text-xl font-primary font-bold uppercase">Últimas Notícias</h2>
 
                 <DestakCard
                     title={NEWS_ITEMS[newsIndex]?.title ?? "News"}
@@ -80,7 +80,7 @@ export function Home() {
 
             {/* Daily Promotions */}
             <section className="flex flex-col gap-4">
-                <h2 className="text-(--Text-gray) text-lg font-primary font-bold">Daily Promotions</h2>
+                <h2 className="text-(--Text-gray) text-lg font-primary font-bold">Promoções do Dia</h2>
 
                 {isLoading ? (
                     <p className="text-(--Text-primary-off) text-sm font-secondary">Carregando...</p>
@@ -106,7 +106,7 @@ export function Home() {
                     onClick={() => addItem(featured)}
                     className="w-full py-3 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase"
                 >
-                    Quick add — {featured.name}
+                    Adicionar rápido — {featured.name}
                 </button>
             )}
         </div>
