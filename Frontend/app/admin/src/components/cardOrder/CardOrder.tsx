@@ -11,11 +11,11 @@ import { ButtonOrder } from "./ButtonOrder";
 
 /** Color map for order statuses — used with the generic StatusBadge */
 const ORDER_STATUS_COLORS = {
-    criado: { bg: "bg-(--Select-background)", text: "text-(--Text-primary-off)" },
-    em_preparo: { bg: "bg-(--Primary-20)/20", text: "text-(--Primary)" },
-    pronto: { bg: "bg-[#04DCFF]", text: "text-[#003640]" },
-    finalizado: { bg: "bg-(--Afirmation)", text: "text-(--Text-gray)" },
-    cancelado: { bg: "bg-(--Negacion)", text: "text-(--Text-gray)" },
+    criado:     { bg: "bg-(--Select-background)", text: "text-(--Text-primary-off)" },
+    em_preparo: { bg: "bg-(--Primary-20)/20",     text: "text-(--Primary)" },
+    pronto:     { bg: "bg-(--Info)/20",            text: "text-(--Info)" },
+    finalizado: { bg: "bg-(--Afirmation)",         text: "text-(--Text-gray)" },
+    cancelado:  { bg: "bg-(--Negacion)",           text: "text-(--Text-gray)" },
 };
 
 interface CardOrderProps {

@@ -20,11 +20,11 @@ import { ConfirmDialog } from "ui-shared/components/ConfirmDialog";
 
 const mainLinks = [
     { label: "Dashboard", icon: LayoutDashboard, path: APP_ROUTES.DASHBOARD },
-    { label: "Menu", icon: Menu, path: APP_ROUTES.MENU },
-    { label: "Live Orders", icon: Activity, path: APP_ROUTES.LIVE_ORDERS },
-    { label: "Inventory", icon: Archive, path: APP_ROUTES.INVENTORY },
-    { label: "Analytics", icon: BarChart2, path: APP_ROUTES.ANALYTICS },
-    { label: "Staff", icon: Users, path: APP_ROUTES.STAFF },
+    { label: "Cardápio", icon: Menu, path: APP_ROUTES.MENU },
+    { label: "Pedidos ao Vivo", icon: Activity, path: APP_ROUTES.LIVE_ORDERS },
+    { label: "Estoque", icon: Archive, path: APP_ROUTES.INVENTORY },
+    { label: "Análises", icon: BarChart2, path: APP_ROUTES.ANALYTICS },
+    { label: "Equipe", icon: Users, path: APP_ROUTES.STAFF },
 ];
 
 export function NavBarLeft() {
@@ -76,7 +76,7 @@ export function NavBarLeft() {
             <div className="mt-auto">
                 <NavItem
                     icon={HelpCircle}
-                    label="Support"
+                    label="Suporte"
                     to={APP_ROUTES.SUPPORT}
                 />
                 <button
@@ -85,7 +85,7 @@ export function NavBarLeft() {
                     className={navButtonClass}
                 >
                     <LogOut size={20} />
-                    <span>Logout</span>
+                    <span>Sair</span>
                 </button>
             </div>
 
@@ -93,10 +93,10 @@ export function NavBarLeft() {
 
             <ConfirmDialog
                 isOpen={isLogoutOpen}
-                title="Sign out"
-                description="Are you sure you want to log out?"
-                confirmLabel="Logout"
-                cancelLabel="Cancel"
+                title="Sair da conta"
+                description="Tem certeza que deseja sair?"
+                confirmLabel="Sair"
+                cancelLabel="Cancelar"
                 danger
                 onCancel={() => setIsLogoutOpen(false)}
                 onConfirm={async () => {

@@ -60,7 +60,7 @@ export function Dashboard() {
 
     return (
         <div className="w-full h-fit gap-6 flex flex-col">
-            <DestakTitle title="Dashboard" subtitle="Welcome to your dashboard" />
+            <DestakTitle title="Dashboard" subtitle="Bem-vindo ao seu painel" />
 
             {/* Analytics cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -118,17 +118,17 @@ export function Dashboard() {
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--Border) pb-3">
                         <div className="flex flex-col gap-1">
                             <h2 className="text-(--Primary-off) text-[22px] font-primary font-bold">
-                                Priority Orders
+                                Pedidos Prioritários
                             </h2>
                             <p className="text-(--Text-gray) text-sm">
-                                Late and in-progress orders that need attention
+                                Pedidos atrasados e em andamento que precisam de atenção
                             </p>
                         </div>
                         <StatusBadge
                             status="Priority"
                             colorMap={{ Priority: { bg: "bg-(--Primary-20)/20", text: "text-(--Primary)" } }}
                         >
-                            {priorityOrders.length} urgent
+                            {priorityOrders.length} urgente(s)
                         </StatusBadge>
                     </div>
 
@@ -154,7 +154,7 @@ export function Dashboard() {
                             ))
                         ) : (
                             <div className="w-full h-full flex items-center justify-center py-10 text-(--Text-gray)">
-                                No priority orders right now
+                                Nenhum pedido prioritário no momento
                             </div>
                         )}
                     </div>

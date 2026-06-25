@@ -13,7 +13,7 @@ export function Menu() {
     if (isLoading) {
         return (
             <div className="w-full h-full gap-6 flex flex-col">
-                <DestakTitle title="Menu" subtitle="Manage your coffee menu" />
+                <DestakTitle title="Cardápio" subtitle="Gerencie o cardápio do café" />
 
                 <div className="w-full h-170 p-4 rounded-md bg-(--Widget-background) border border-(--Border) flex flex-col gap-4">
                     <div className="flex items-center justify-between">
@@ -42,7 +42,7 @@ export function Menu() {
     if (menuError) {
         return (
             <div className="w-full h-full gap-6 flex flex-col">
-                <DestakTitle title="Menu" subtitle="Manage your coffee menu" />
+                <DestakTitle title="Cardápio" subtitle="Gerencie o cardápio do café" />
                 <div className="w-full h-80 p-4 rounded-md bg-(--Widget-background) border border-(--Border)">
                     <ErrorState message={menuError} onRetry={refreshMenu} />
                 </div>
@@ -52,7 +52,7 @@ export function Menu() {
 
     return (
         <div className="w-full h-full gap-6 flex flex-col">
-            <DestakTitle title="Menu" subtitle="Manage your coffee menu" />
+            <DestakTitle title="Cardápio" subtitle="Gerencie o cardápio do café" />
 
             <TableMenu
                 items={items}

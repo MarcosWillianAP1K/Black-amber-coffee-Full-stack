@@ -132,37 +132,37 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
 
     const filterOptions: FilterOption[] = [
         {
-            label: "Default order",
+            label: "Ordem padrão",
             action: () => setSortType("default"),
             active: sortType === "default",
         },
         {
-            label: "Name (A-Z)",
+            label: "Nome (A-Z)",
             action: () => setSortType("name-asc"),
             active: sortType === "name-asc",
         },
         {
-            label: "Name (Z-A)",
+            label: "Nome (Z-A)",
             action: () => setSortType("name-desc"),
             active: sortType === "name-desc",
         },
         {
-            label: "Amount (Low to High)",
+            label: "Quantidade (Menor para Maior)",
             action: () => setSortType("amount-asc"),
             active: sortType === "amount-asc",
         },
         {
-            label: "Amount (High to Low)",
+            label: "Quantidade (Maior para Menor)",
             action: () => setSortType("amount-desc"),
             active: sortType === "amount-desc",
         },
         {
-            label: "Status (Critical first)",
+            label: "Status (Crítico primeiro)",
             action: () => setSortType("status-critical"),
             active: sortType === "status-critical",
         },
         {
-            label: "All statuses",
+            label: "Todos os status",
             action: () => setStatusFilter(null),
             active: statusFilter === null,
         },
@@ -182,10 +182,10 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
                         <TableInventoryHeader title={title} isLive={isLive} />
                     </div>
                     <div className="flex items-center gap-3">
-                        <SearchBar placeholder="Search by name" onChange={setSearchTerm} />
+                        <SearchBar placeholder="Buscar por nome" onChange={setSearchTerm} />
                         <FilterButton
-                            title="Inventory filters"
-                            buttonLabel="Filter"
+                            title="Filtros de estoque"
+                            buttonLabel="Filtrar"
                             options={filterOptions}
                             align="right"
                         />
@@ -201,13 +201,13 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
                                     Item
                                 </th>
                                 <th className="text-left py-3 px-4 text-(--Text-primary-off) text-[10px] font-secondary font-bold tracking-wider uppercase">
-                                    Amount
+                                    Quantidade
                                 </th>
                                 <th className="text-left py-3 px-4 text-(--Text-primary-off) text-[10px] font-secondary font-bold tracking-wider uppercase">
                                     Status
                                 </th>
                                 <th className="text-left py-3 pl-4 text-(--Text-primary-off) text-[10px] font-secondary font-bold tracking-wider uppercase">
-                                    Actions
+                                    Ações
                                 </th>
                             </tr>
                         </thead>
@@ -231,10 +231,10 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
                     {displayItems.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-16 gap-3">
                             <p className="text-(--Text-primary-off) text-sm font-secondary">
-                                No inventory items found
+                                Nenhum item de estoque encontrado
                             </p>
                             <p className="text-(--Text-primary-off)/50 text-xs font-secondary">
-                                Adjust filters or add new stock
+                                Ajuste os filtros ou adicione novo estoque
                             </p>
                         </div>
                     )}
@@ -247,7 +247,7 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
                         className="flex items-center gap-2 px-5 py-2.5 bg-(--Widget-background) border border-(--Border) rounded-md text-(--Text-gray) text-sm font-secondary font-semibold hover:border-(--Primary) hover:text-(--Primary) transition-all duration-200 cursor-pointer"
                     >
                         <Plus size={16} />
-                        Add Stock
+                        Adicionar Estoque
                     </button>
                 </div>
             </div>

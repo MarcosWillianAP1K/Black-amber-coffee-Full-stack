@@ -51,27 +51,27 @@ export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCu
 
     const filterOptions: FilterOption[] = [
         {
-            label: "Default order",
+            label: "Ordem padrão",
             action: () => setSortType("default"),
             active: sortType === "default",
         },
         {
-            label: "Name (A-Z)",
+            label: "Nome (A-Z)",
             action: () => setSortType("name-asc"),
             active: sortType === "name-asc",
         },
         {
-            label: "Name (Z-A)",
+            label: "Nome (Z-A)",
             action: () => setSortType("name-desc"),
             active: sortType === "name-desc",
         },
         {
-            label: "Newest first",
+            label: "Mais recentes",
             action: () => setSortType("newest"),
             active: sortType === "newest",
         },
         {
-            label: "Oldest first",
+            label: "Mais antigos",
             action: () => setSortType("oldest"),
             active: sortType === "oldest",
         },
@@ -87,10 +87,10 @@ export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCu
                 </h1>
 
                 <div className="flex items-center gap-3">
-                    <SearchBar placeholder="Search" onChange={setSearchTerm} />
+                    <SearchBar placeholder="Buscar" onChange={setSearchTerm} />
                     <FilterButton
-                        title="Customer filters"
-                        buttonLabel="Filter"
+                        title="Filtros de clientes"
+                        buttonLabel="Filtrar"
                         options={filterOptions}
                         align="right"
                     />

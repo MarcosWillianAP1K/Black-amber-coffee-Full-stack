@@ -31,7 +31,7 @@ export function Staff() {
     if (isLoading) {
         return (
             <div className="w-full h-fit gap-6 flex flex-col">
-                <DestakTitle title="Staff" subtitle="Manage your team and staff members" />
+                <DestakTitle title="Equipe" subtitle="Gerencie sua equipe e funcionários" />
 
                 <div className="w-full bg-(--Widget-background) rounded-md border border-(--Border) p-5 flex flex-col gap-4">
                     <Skeleton className="h-5 w-28" />
@@ -68,7 +68,7 @@ export function Staff() {
 
     return (
         <div className="w-full h-fit gap-6 flex flex-col">
-            <DestakTitle title="Staff" subtitle="Manage your team and staff members" />
+            <DestakTitle title="Equipe" subtitle="Gerencie sua equipe e funcionários" />
 
             {/* Registration buttons */}
             <div className="flex flex-wrap items-center justify-end gap-3">
@@ -77,14 +77,14 @@ export function Staff() {
                     className="flex items-center gap-2 px-4 py-2 bg-(--Primary) text-(--Text-dark) font-bold text-sm rounded-md hover:bg-(--Primary-selected) transition-all uppercase tracking-wide"
                 >
                     <Plus size={16} />
-                    Register Worker
+                    Cadastrar Funcionário
                 </button>
                 <button
                     onClick={() => setShowRegisterClient(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-(--Button-background) text-(--Text-gray) font-secondary font-semibold text-sm rounded-md hover:border-(--Primary) hover:text-(--Primary) transition-all border border-(--Border)"
                 >
                     <Plus size={16} />
-                    Register Client
+                    Cadastrar Cliente
                 </button>
             </div>
 
@@ -93,7 +93,7 @@ export function Staff() {
                 <div className="flex-1 flex flex-col gap-6 min-w-0">
                     <SectionEmployee
                         employees={activeEmployees}
-                        title="Working Now"
+                        title="Trabalhando Agora"
                         onDeleteEmployee={deleteEmployee}
                         onBlockEmployee={toggleEmployeeStatus}
                         onViewEmployee={(publicId) => navigate(buildProfilePath("employee", publicId), { state: { from: "staff" } })}
@@ -101,7 +101,7 @@ export function Staff() {
 
                     <SectionEmployee
                         employees={employees}
-                        title="Staff"
+                        title="Funcionários"
                         onDeleteEmployee={deleteEmployee}
                         onBlockEmployee={toggleEmployeeStatus}
                         onViewEmployee={(publicId) => navigate(buildProfilePath("employee", publicId), { state: { from: "staff" } })}
@@ -109,7 +109,7 @@ export function Staff() {
 
                     <SectionCustomers
                         customers={customers}
-                        title="Customers"
+                        title="Clientes"
                         onDeleteCustomer={deleteCustomer}
                         onBlockCustomer={(publicId) => console.log("Block customer:", publicId)}
                         onViewCustomer={(publicId) => navigate(buildProfilePath("customer", publicId), { state: { from: "staff" } })}

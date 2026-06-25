@@ -37,15 +37,15 @@ export const Perfil = () => {
         (resolvedKind === "employee" && employeesLoading);
 
     const profileSubtitle = resolvedKind === "customer"
-        ? "Customer profile"
+        ? "Perfil do cliente"
         : resolvedKind === "employee"
-            ? "Employee profile"
-            : "Your profile";
+            ? "Perfil do funcionário"
+            : "Seu perfil";
 
     if (!profile && isLoading) {
         return (
             <div className="w-full h-full flex items-center justify-center text-(--Text-primary-off) text-sm font-secondary">
-                Loading profile...
+                Carregando perfil...
             </div>
         );
     }
@@ -53,29 +53,29 @@ export const Perfil = () => {
     if (!profile) {
         return (
             <div className="w-full h-full flex items-center justify-center text-(--Text-primary-off) text-sm font-secondary">
-                Profile not found
+                Perfil não encontrado
             </div>
         );
     }
 
     const isEmployee = resolvedKind === "employee" || (resolvedKind === null && !!loggedUser);
-    const accountType = isEmployee ? "Employee" : "Customer";
+    const accountType = isEmployee ? "Funcionário" : "Cliente";
     const fullName = profile.fullName;
     const email = profile.email;
     const avatarImage = profile.avatarUrl;
     const worker = isEmployee && "role" in profile ? (profile as Worker) : null;
-    const statusLabel = worker ? (worker.isActive ? "Active" : "Inactive") : "Member";
-    const roleLabel = worker ? worker.role : "Loyalty member";
+    const statusLabel = worker ? (worker.isActive ? "Ativo" : "Inativo") : "Membro";
+    const roleLabel = worker ? worker.role : "Programa de fidelidade";
     const profileId = profile.publicId;
     const backLabel = (location.state as { from?: string } | null)?.from === "staff"
-        ? "Back to Staff"
-        : "Back";
+        ? "Voltar para Equipe"
+        : "Voltar";
 
     return (
         <div className="w-full min-h-screen gap-6 flex flex-col bg-(--Page-background) p-4">
             <div className="flex flex-wrap items-center gap-4">
                 <div className="min-w-0 flex-1">
-                    <DestakTitle title="Profile" subtitle={profileSubtitle} />
+                    <DestakTitle title="Perfil" subtitle={profileSubtitle} />
                 </div>
 
                 <button
@@ -126,7 +126,7 @@ export const Perfil = () => {
                             </div>
 
                             <div className="pt-3 text-xs font-secondary text-(--Text-gray)">
-                                <span className="text-(--Primary-off) font-semibold">Function:</span> {roleLabel}
+                                <span className="text-(--Primary-off) font-semibold">Função:</span> {roleLabel}
                             </div>
                         </div>
                     </div>
@@ -135,12 +135,12 @@ export const Perfil = () => {
                 <div className="flex flex-col gap-6">
                     <div className="rounded-sm border border-(--Border) bg-(--Widget-background) p-6">
                         <h3 className="text-(--Primary) text-xs font-primary font-extrabold tracking-[0.3em] uppercase">
-                            Account overview
+                            Visão geral da conta
                         </h3>
 
                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                             <div className="flex flex-col gap-1 rounded-sm border border-(--Border) bg-(--Page-background) p-4">
-                                <span className="text-[11px] font-secondary font-semibold uppercase tracking-wider text-(--Text-primary-off)">Account type</span>
+                                <span className="text-[11px] font-secondary font-semibold uppercase tracking-wider text-(--Text-primary-off)">Tipo de conta</span>
                                 <span className="text-(--Text-gray) text-base font-primary font-extrabold">{accountType}</span>
                             </div>
 
@@ -150,12 +150,12 @@ export const Perfil = () => {
                             </div>
 
                             <div className="flex flex-col gap-1 rounded-sm border border-(--Border) bg-(--Page-background) p-4">
-                                <span className="text-[11px] font-secondary font-semibold uppercase tracking-wider text-(--Text-primary-off)">Email</span>
+                                <span className="text-[11px] font-secondary font-semibold uppercase tracking-wider text-(--Text-primary-off)">E-mail</span>
                                 <span className="text-(--Text-gray) text-sm font-primary font-extrabold break-all">{email}</span>
                             </div>
 
                             <div className="flex flex-col gap-1 rounded-sm border border-(--Border) bg-(--Page-background) p-4">
-                                <span className="text-[11px] font-secondary font-semibold uppercase tracking-wider text-(--Text-primary-off)">Member id</span>
+                                <span className="text-[11px] font-secondary font-semibold uppercase tracking-wider text-(--Text-primary-off)">ID do membro</span>
                                 <span className="text-(--Text-gray) text-sm font-primary font-extrabold">{profileId}</span>
                             </div>
                         </div>
@@ -168,7 +168,7 @@ export const Perfil = () => {
                             />
                         ) : (
                             <div className="text-(--Text-primary-off) text-sm font-secondary">
-                                Member since {new Date(profile.createdAt).toLocaleDateString()}
+                                Membro desde {new Date(profile.createdAt).toLocaleDateString("pt-BR")}
                             </div>
                         )}
                     </div>

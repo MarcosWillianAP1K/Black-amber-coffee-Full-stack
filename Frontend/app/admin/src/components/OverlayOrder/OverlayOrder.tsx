@@ -44,7 +44,7 @@ export function OverlayOrder({ onSave, products }: OverlayOrderProps) {
 
             <ButtonPrimary onClick={() => setIsOrderOverlayOpen(true)}>
                 <span>+</span>
-                <p className="text-(--Text-dark) text-[14px] font-primary font-bold">Register New Order</p>
+                <p className="text-(--Text-dark) text-[14px] font-primary font-bold">Registrar Novo Pedido</p>
             </ButtonPrimary>
 
 

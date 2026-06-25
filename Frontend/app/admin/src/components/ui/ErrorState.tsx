@@ -21,13 +21,13 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
                 {message}
             </p>
             <p className="text-(--Text-primary-off) text-xs font-secondary">
-                Check your connection and try again
+                Verifique sua conexão e tente novamente
             </p>
             <button
                 onClick={onRetry}
                 className="px-5 py-2 bg-(--Primary) text-(--Text-dark) font-bold text-sm rounded-md hover:bg-(--Primary-selected) transition-colors uppercase tracking-wide"
             >
-                Retry
+                Tentar novamente
             </button>
         </div>
     );

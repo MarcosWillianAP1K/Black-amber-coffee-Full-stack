@@ -15,14 +15,14 @@ export function WidgetActiveStaff({ employees, onDeleteEmployee, onBlockEmployee
             <div className="flex items-center justify-between border-b border-(--Border) pb-3">
                 <div>
                     <h2 className="text-(--Primary-off) text-[20px] font-primary font-bold">
-                        Active Staff
+                        Equipe Ativa
                     </h2>
                     <p className="text-(--Text-gray) text-sm">
-                        Team members currently active
+                        Membros da equipe atualmente ativos
                     </p>
                 </div>
                 <span className="text-(--Primary) text-sm font-bold">
-                    {activeEmployees.length} active
+                    {activeEmployees.length} ativo(s)
                 </span>
             </div>
 
@@ -40,7 +40,7 @@ export function WidgetActiveStaff({ employees, onDeleteEmployee, onBlockEmployee
 
                 {activeEmployees.length === 0 && (
                     <div className="text-(--Text-gray) text-sm py-6 text-center">
-                        No staff members active
+                        Nenhum membro da equipe ativo
                     </div>
                 )}
             </div>

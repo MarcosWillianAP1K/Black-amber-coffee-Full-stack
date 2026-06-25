@@ -42,7 +42,7 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
             });
             onSuccess();
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Failed to register worker";
+            const message = err instanceof Error ? err.message : "Falha ao cadastrar funcionário";
             setError(message);
         } finally {
             setIsSubmitting(false);
@@ -58,7 +58,7 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-(--Border)">
                 <h3 className="text-(--Text-gray) text-lg font-primary font-bold">
-                    Register Worker
+                    Cadastrar Funcionário
                 </h3>
                 <button
                     onClick={onClose}
@@ -74,12 +74,12 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
             <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-6 pb-6 flex-1 overflow-y-auto pt-5">
                 {/* Full Name */}
                 <div>
-                    <label className={labelClass}>Full Name</label>
+                    <label className={labelClass}>Nome Completo</label>
                     <input
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Enter full name"
+                        placeholder="Digite o nome completo"
                         required
                         className={inputClass}
                     />
@@ -87,12 +87,12 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
 
                 {/* Email */}
                 <div>
-                    <label className={labelClass}>Email</label>
+                    <label className={labelClass}>E-mail</label>
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter email address"
+                        placeholder="Digite o endereço de e-mail"
                         required
                         className={inputClass}
                     />
@@ -100,12 +100,12 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
 
                 {/* Password */}
                 <div>
-                    <label className={labelClass}>Password</label>
+                    <label className={labelClass}>Senha</label>
                     <input
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password"
+                        placeholder="Digite a senha"
                         required
                         minLength={6}
                         className={inputClass}
@@ -114,12 +114,12 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
 
                 {/* Phone */}
                 <div>
-                    <label className={labelClass}>Phone (optional)</label>
+                    <label className={labelClass}>Telefone (opcional)</label>
                     <input
                         type="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        placeholder="Enter phone number"
+                        placeholder="Digite o número de telefone"
                         className={inputClass}
                     />
                 </div>
@@ -127,7 +127,7 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
                 {/* Role + Salary (side by side) */}
                 <div className="flex gap-3">
                     <div className="flex-1">
-                        <label className={labelClass}>Role</label>
+                        <label className={labelClass}>Cargo</label>
                         <select
                             value={role}
                             onChange={(e) => setRole(e.target.value as WorkerRole)}
@@ -140,7 +140,7 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
                     </div>
 
                     <div className="w-28">
-                        <label className={labelClass}>Salary ($)</label>
+                        <label className={labelClass}>Salário (R$)</label>
                         <input
                             type="number"
                             step="0.01"
@@ -170,14 +170,14 @@ export function RegisterWorkerOverlay({ onClose, onSuccess }: RegisterWorkerOver
                         disabled={isSubmitting}
                         className={`flex-1 px-4 py-2.5 bg-(--Button-background) text-(--Text-gray) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSubmitting ? btnDisabled : "hover:bg-(--Select-background) cursor-pointer"}`}
                     >
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         type="submit"
                         disabled={isSubmitting}
                         className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSubmitting ? `${btnDisabled} animate-pulse` : "hover:bg-(--Primary-selected) cursor-pointer"}`}
                     >
-                        {isSubmitting ? "Registering..." : "Register"}
+                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
                     </button>
                 </div>
             </form>

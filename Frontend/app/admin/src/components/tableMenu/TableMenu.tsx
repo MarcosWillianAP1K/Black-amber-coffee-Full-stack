@@ -142,37 +142,37 @@ export function TableMenu({ items, handlers, title = "ACTIVE MENU", isLive = tru
 
     const filterOptions: FilterOption[] = [
         {
-            label: "Default order",
+            label: "Ordem padrão",
             action: () => setSortType("default"),
             active: sortType === "default",
         },
         {
-            label: "Name (A-Z)",
+            label: "Nome (A-Z)",
             action: () => setSortType("name-asc"),
             active: sortType === "name-asc",
         },
         {
-            label: "Name (Z-A)",
+            label: "Nome (Z-A)",
             action: () => setSortType("name-desc"),
             active: sortType === "name-desc",
         },
         {
-            label: "Price (Low to High)",
+            label: "Preço (Menor para Maior)",
             action: () => setSortType("price-asc"),
             active: sortType === "price-asc",
         },
         {
-            label: "Price (High to Low)",
+            label: "Preço (Maior para Menor)",
             action: () => setSortType("price-desc"),
             active: sortType === "price-desc",
         },
         {
-            label: "All categories",
+            label: "Todas as categorias",
             action: () => setCategoryFilter(null),
             active: categoryFilter === null,
         },
         ...availableCategories.map((category) => ({
-            label: `Category: ${category}`,
+            label: `Categoria: ${category}`,
             action: () => setCategoryFilter(category),
             active: categoryFilter === category,
         })),
@@ -187,10 +187,10 @@ export function TableMenu({ items, handlers, title = "ACTIVE MENU", isLive = tru
                         <TableMenuHeader title={title} isLive={isLive} />
                     </div>
                     <div className="flex items-center gap-3">
-                        <SearchBar placeholder="Search by name" onChange={setSearchTerm} />
+                        <SearchBar placeholder="Buscar por nome" onChange={setSearchTerm} />
                         <FilterButton
-                            title="Menu filters"
-                            buttonLabel="Filter"
+                            title="Filtros do cardápio"
+                            buttonLabel="Filtrar"
                             options={filterOptions}
                             align="right"
                         />
@@ -206,13 +206,13 @@ export function TableMenu({ items, handlers, title = "ACTIVE MENU", isLive = tru
                                     Item
                                 </th>
                                 <th className="text-left py-3 px-4 text-(--Text-primary-off) text-[10px] font-secondary font-bold tracking-wider uppercase">
-                                    Category
+                                    Categoria
                                 </th>
                                 <th className="text-left py-3 px-4 text-(--Text-primary-off) text-[10px] font-secondary font-bold tracking-wider uppercase">
-                                    Price
+                                    Preço
                                 </th>
                                 <th className="text-left py-3 pl-4 text-(--Text-primary-off) text-[10px] font-secondary font-bold tracking-wider uppercase">
-                                    Actions
+                                    Ações
                                 </th>
                             </tr>
                         </thead>
@@ -236,10 +236,10 @@ export function TableMenu({ items, handlers, title = "ACTIVE MENU", isLive = tru
                     {displayItems.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-16 gap-3">
                             <p className="text-(--Text-primary-off) text-sm font-secondary">
-                                No menu items found
+                                Nenhum item encontrado no cardápio
                             </p>
                             <p className="text-(--Text-primary-off)/50 text-xs font-secondary">
-                                Adjust filters or add a new product
+                                Ajuste os filtros ou adicione um novo produto
                             </p>
                         </div>
                     )}
@@ -252,7 +252,7 @@ export function TableMenu({ items, handlers, title = "ACTIVE MENU", isLive = tru
                         className="flex items-center gap-2 px-5 py-2.5 bg-(--Widget-background) border border-(--Border) rounded-md text-(--Text-gray) text-sm font-secondary font-semibold hover:border-(--Primary) hover:text-(--Primary) transition-all duration-200 cursor-pointer"
                     >
                         <Plus size={16} />
-                        Add Product
+                        Adicionar Produto
                     </button>
                 </div>
             </div>
@@ -271,10 +271,10 @@ export function TableMenu({ items, handlers, title = "ACTIVE MENU", isLive = tru
             {/* Confirm Delete Dialog */}
             <ConfirmDialog
                 isOpen={deleteTarget !== null}
-                title="Delete Menu Item"
-                description={`Are you sure you want to delete this menu item? This action cannot be undone.`}
-                confirmLabel="Delete"
-                cancelLabel="Cancel"
+                title="Excluir Item do Cardápio"
+                description={`Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.`}
+                confirmLabel="Excluir"
+                cancelLabel="Cancelar"
                 danger
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setDeleteTarget(null)}

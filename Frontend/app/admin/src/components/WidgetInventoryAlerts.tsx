@@ -1,12 +1,12 @@
 import { TableInventoryHeader } from "./tableInventory/TableInventoryHeader";
 import { StatusBadge } from "ui-shared/components/ui/StatusBadge";
-import type { StatusColorMap } from "ui-shared/components/ui/StatusBadge";
 import { STOCK_STATUSES, UNIT_LABELS } from "shared-utils/types/inventory";
 import type { InventoryItem } from "shared-utils/types/inventory";
 
-const INVENTORY_STATUS_COLORS: StatusColorMap = {
-    "Low Stock": { bg: "bg-[#FDE68A]", text: "text-[#7C2D12]" },
-    "Out of Stock": { bg: "bg-(--Negacion)", text: "text-(--Text-gray)" },
+const INVENTORY_STATUS_COLORS: Record<string, { bg: string; text: string }> = {
+    "Out of Stock": { bg: "bg-(--Negacion)/15", text: "text-(--Negacion)" },
+    "Low Stock":    { bg: "bg-(--Warning)/15",  text: "text-(--Warning)" },
+    "In Stock":     { bg: "bg-(--Afirmation)/15", text: "text-(--Afirmation)" },
 };
 
 export interface WidgetInventoryAlertsProps {
@@ -25,13 +25,13 @@ export function WidgetInventoryAlerts({ items }: WidgetInventoryAlertsProps) {
         <div className="w-full h-95 bg-(--Widget-background) rounded-md border border-(--Border) p-5 flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-(--Border) pb-3">
                 <div className="flex flex-col gap-1">
-                    <TableInventoryHeader title="Inventory Alerts" isLive={false} />
+                    <TableInventoryHeader title="Alertas de Estoque" isLive={false} />
                     <p className="text-(--Text-gray) text-sm">
-                        Low and out of stock items
+                        Itens com estoque baixo ou zerado
                     </p>
                 </div>
                 <span className="text-(--Primary) text-sm font-bold">
-                    {inventoryAlerts.length} items
+                    {inventoryAlerts.length} ite(ns)
                 </span>
             </div>
 
@@ -55,7 +55,7 @@ export function WidgetInventoryAlerts({ items }: WidgetInventoryAlertsProps) {
 
                 {inventoryAlerts.length === 0 && (
                     <div className="text-(--Text-gray) text-sm py-6 text-center">
-                        All items are well stocked
+                        Todos os itens estão bem abastecidos
                     </div>
                 )}
             </div>

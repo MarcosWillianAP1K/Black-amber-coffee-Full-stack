@@ -16,39 +16,39 @@ interface SettingsSection {
 
 const settingsSections: SettingsSection[] = [
     {
-        title: "Account",
-        description: "Profile details and identity preferences.",
+        title: "Conta",
+        description: "Detalhes do perfil e preferências de identidade.",
         items: [
-            { label: "Profile details", value: "Name, email, role", action: "Edit" },
-            { label: "Avatar", value: "Update profile photo", action: "Upload" },
-            { label: "Language", value: "English (US)", action: "Change" },
+            { label: "Detalhes do perfil", value: "Nome, e-mail, cargo", action: "Editar" },
+            { label: "Avatar", value: "Atualizar foto de perfil", action: "Enviar" },
+            { label: "Idioma", value: "Português (BR)", action: "Alterar" },
         ],
     },
     {
-        title: "Security",
-        description: "Password and access controls.",
+        title: "Segurança",
+        description: "Senha e controles de acesso.",
         items: [
-            { label: "Password", value: "Last updated 30 days ago", action: "Update" },
-            { label: "Sessions", value: "2 active devices", action: "Manage" },
-            { label: "Two-factor", value: "Disabled", action: "Enable" },
+            { label: "Senha", value: "Atualizada há 30 dias", action: "Atualizar" },
+            { label: "Sessões", value: "2 dispositivos ativos", action: "Gerenciar" },
+            { label: "Dois fatores", value: "Desativado", action: "Ativar" },
         ],
     },
     {
-        title: "Notifications",
-        description: "Choose how you receive alerts.",
+        title: "Notificações",
+        description: "Escolha como receber alertas.",
         items: [
-            { label: "Order alerts", value: "Enabled", action: "Toggle" },
-            { label: "Inventory alerts", value: "Enabled", action: "Toggle" },
-            { label: "Weekly summary", value: "Disabled", action: "Toggle" },
+            { label: "Alertas de pedidos", value: "Ativado", action: "Alternar" },
+            { label: "Alertas de estoque", value: "Ativado", action: "Alternar" },
+            { label: "Resumo semanal", value: "Desativado", action: "Alternar" },
         ],
     },
     {
-        title: "System",
-        description: "Application preferences and data controls.",
+        title: "Sistema",
+        description: "Preferências do aplicativo e controles de dados.",
         items: [
-            { label: "Theme", value: "Dark", action: "Switch" },
-            { label: "Data export", value: "Download reports", action: "Export" },
-            { label: "Reset settings", value: "Restore defaults", action: "Reset", danger: true },
+            { label: "Tema", value: "Escuro", action: "Alternar" },
+            { label: "Exportar dados", value: "Baixar relatórios", action: "Exportar" },
+            { label: "Redefinir configurações", value: "Restaurar padrões", action: "Redefinir", danger: true },
         ],
     },
 ];
@@ -60,7 +60,7 @@ export function Settings() {
         <div className="w-full h-fit gap-6 flex flex-col bg-(--Page-background) p-4">
             <div className="flex flex-wrap items-center gap-4">
                 <div className="min-w-0 flex-1">
-                    <DestakTitle title="Settings" subtitle="Manage your preferences and security" />
+                    <DestakTitle title="Configurações" subtitle="Gerencie suas preferências e segurança" />
                 </div>
                 <button
                     type="button"
@@ -68,7 +68,7 @@ export function Settings() {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-sm border border-(--Border) text-(--Text-primary-off) text-xs font-secondary font-semibold uppercase tracking-wider hover:border-(--Primary) hover:text-(--Primary) transition-all duration-200"
                     aria-label="Back"
                 >
-                    Back
+                    Voltar
                 </button>
             </div>
 

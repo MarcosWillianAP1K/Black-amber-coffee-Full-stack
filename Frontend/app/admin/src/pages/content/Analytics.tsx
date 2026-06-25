@@ -48,10 +48,10 @@ export function Analytics() {
     if (anyError && !isLoading) {
         return (
             <div className="w-full h-fit gap-6 flex flex-col">
-                <DestakTitle title="Analytics" subtitle="Your business performance at a glance" />
+                <DestakTitle title="Analytics" subtitle="Desempenho do seu negócio em um relance" />
                 <div className="w-full bg-(--Widget-background) rounded-md border border-(--Border) p-5">
                     <ErrorState
-                        message={ordersError || employeesError || menuError || "Failed to load analytics"}
+                        message={ordersError || employeesError || menuError || "Falha ao carregar os análises"}
                         onRetry={() => {
                             if (ordersError) refreshOrders();
                             if (employeesError) refreshEmployees();
@@ -65,7 +65,7 @@ export function Analytics() {
 
     return (
         <div className="w-full h-fit gap-6 flex flex-col">
-            <DestakTitle title="Analytics" subtitle="Your business performance at a glance" />
+            <DestakTitle title="Analytics" subtitle="Desempenho do seu negócio em um relance" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {isLoading ? (

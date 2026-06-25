@@ -14,7 +14,7 @@ export function Inventory() {
     if (isLoading) {
         return (
             <div className="w-full h-full gap-6 flex flex-col">
-                <DestakTitle title="Inventory" subtitle="Manage your stock and supplies" />
+                <DestakTitle title="Estoque" subtitle="Gerencie seu estoque e suprimentos" />
 
                 <div className="w-full h-170 p-4 rounded-md bg-(--Widget-background) border border-(--Border) flex flex-col gap-4">
                     <div className="flex items-center justify-between">
@@ -43,7 +43,7 @@ export function Inventory() {
     if (inventoryError) {
         return (
             <div className="w-full h-full gap-6 flex flex-col">
-                <DestakTitle title="Inventory" subtitle="Manage your stock and supplies" />
+                <DestakTitle title="Estoque" subtitle="Gerencie seu estoque e suprimentos" />
                 <div className="w-full h-80 p-4 rounded-md bg-(--Widget-background) border border-(--Border)">
                     <ErrorState message={inventoryError} onRetry={refreshInventory} />
                 </div>
@@ -53,7 +53,7 @@ export function Inventory() {
 
     return (
         <div className="w-full h-fit gap-6 flex flex-col">
-            <DestakTitle title="Inventory" subtitle="Manage your stock and supplies" />
+            <DestakTitle title="Estoque" subtitle="Gerencie seu estoque e suprimentos" />
 
             <div className="w-100 h-fit">
                 <WidgetInventoryAlerts items={items} />

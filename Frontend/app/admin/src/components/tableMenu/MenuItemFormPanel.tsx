@@ -97,7 +97,7 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
                 <h3 className="text-(--Text-gray) text-lg font-primary font-bold">
-                    {isEditing ? "Edit Selected Item" : "Add New Item"}
+                    {isEditing ? "Editar Item Selecionado" : "Adicionar Novo Item"}
                 </h3>
                 <button
                     onClick={onCancel}
@@ -117,7 +117,7 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                 {/* Image Upload */}
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                        Menu Image
+                        Imagem do Cardápio
                     </label>
                     <button
                         type="button"
@@ -139,10 +139,10 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                             <>
                                 <Upload size={24} className="text-(--Text-primary-off) group-hover:text-(--Primary) transition-colors" />
                                 <span className="text-(--Text-primary-off) text-xs font-secondary">
-                                    Click to replace image
+                                    Clique para substituir imagem
                                 </span>
                                 <span className="text-(--Text-primary-off)/50 text-[10px] font-secondary">
-                                    PNG, JPG up to 10MB
+                                    PNG, JPG até 10MB
                                 </span>
                             </>
                         )}
@@ -159,13 +159,13 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                 {/* Item Name */}
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                        Item Name
+                        Nome do Item
                     </label>
                     <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleChange("name", e.target.value)}
-                        placeholder="Enter item name"
+                        placeholder="Digite o nome do item"
                         required
                         className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors"
                     />
@@ -174,12 +174,12 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                 {/* Description */}
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                        Description
+                        Descrição
                     </label>
                     <textarea
                         value={formData.description ?? ""}
                         onChange={(e) => handleChange("description", e.target.value)}
-                        placeholder="Enter item description"
+                        placeholder="Digite a descrição do item"
                         rows={3}
                         className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors resize-none"
                     />
@@ -189,7 +189,7 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                 <div className="flex gap-3">
                     <div className="flex-1">
                         <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                            Category
+                            Categoria
                         </label>
                         <select
                             value={formData.category}
@@ -206,7 +206,7 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
 
                     <div className="w-24">
                         <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                            Price ($)
+                            Preço (R$)
                         </label>
                         <input
                             type="number"
@@ -234,14 +234,14 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                         disabled={isSaving}
                         className={`flex-1 px-4 py-2.5 bg-(--Button-background) text-(--Text-gray) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:bg-(--Select-background) cursor-pointer"}`}
                     >
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         type="submit"
                         disabled={isSaving}
                         className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSaving ? "opacity-50 cursor-not-allowed animate-pulse" : "hover:bg-(--Primary-selected) cursor-pointer"}`}
                     >
-                        {isEditing ? "Save Changes" : "Add Item"}
+                        {isEditing ? "Salvar Alterações" : "Adicionar Item"}
                     </button>
                 </div>
             </form>

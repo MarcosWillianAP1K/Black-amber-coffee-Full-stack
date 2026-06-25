@@ -74,14 +74,14 @@ export function LiveOrders() {
     return (
         <div className="w-full h-fit gap-6 flex flex-col">
 
-            <DestakTitle title="Orders Queue" subtitle="Manage your live orders" />
+            <DestakTitle title="Fila de Pedidos" subtitle="Gerencie seus pedidos em tempo real" />
 
         
             <div className="w-full flex flex-wrap items-center justify-end gap-4">
                 <OverlayOrder onSave={addOrder} products={products} />
                 <FilterButton
-                    title="Filter orders"
-                    buttonLabel="Filter orders"
+                    title="Filtrar pedidos"
+                    buttonLabel="Filtrar pedidos"
                     options={filterOptions}
                 />
             </div>
@@ -103,7 +103,7 @@ export function LiveOrders() {
                     </div>
                 ) : sortedOrders.length === 0 ? (
                     <div className="w-full flex items-center justify-center py-16 text-(--Text-gray)">
-                        No orders yet
+                        Nenhum pedido ainda
                     </div>
                 ) : (
                     sortedOrders.map((order) => (

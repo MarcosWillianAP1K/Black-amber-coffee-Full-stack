@@ -87,7 +87,7 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
             {/* Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
                 <h3 className="text-(--Text-gray) text-lg font-primary font-bold">
-                    {mode === "edit" ? "Edit Item" : "Add Stock"}
+                    {mode === "edit" ? "Editar Item" : "Adicionar Estoque"}
                 </h3>
                 <button
                     onClick={onCancel}
@@ -106,13 +106,13 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                 {/* Item Name */}
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                        Product Name
+                        Nome do Produto
                     </label>
                     <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleChange("name", e.target.value)}
-                        placeholder="Enter product name"
+                        placeholder="Digite o nome do produto"
                         required
                         className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors"
                     />
@@ -121,19 +121,19 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                 {/* Code */}
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                        Product Code
+                        Código do Produto
                     </label>
                     <input
                         type="text"
                         value={formData.code}
                         onChange={(e) => handleChange("code", e.target.value)}
-                        placeholder="e.g. COF-001"
+                        placeholder="ex: CAF-001"
                         required
                         className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors"
                     />
                     {mode === "add" && (
                         <p className="text-(--Text-primary-off)/50 text-[10px] font-secondary mt-1">
-                            If code matches an existing product, stock will be added to it.
+                            Se o código coincidir com um produto existente, o estoque será incrementado.
                         </p>
                     )}
                 </div>
@@ -141,12 +141,12 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                 {/* Description */}
                 <div>
                     <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                        Description
+                        Descrição
                     </label>
                     <textarea
                         value={formData.description}
                         onChange={(e) => handleChange("description", e.target.value)}
-                        placeholder="Optional description"
+                        placeholder="Descrição opcional"
                         rows={3}
                         className="w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors resize-none"
                     />
@@ -156,7 +156,7 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                 <div className="flex gap-3">
                     <div className="flex-1">
                         <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                            Amount
+                            Quantidade
                         </label>
                         <input
                             type="number"
@@ -174,7 +174,7 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
 
                     <div className="w-28">
                         <label className="text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-2 block">
-                            Unit
+                            Unidade
                         </label>
                         <select
                             value={formData.unit}
@@ -197,13 +197,13 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                         onClick={onCancel}
                         className="flex-1 px-4 py-2.5 bg-(--Button-background) text-(--Text-gray) font-primary font-bold text-sm rounded-md hover:bg-(--Select-background) transition-colors uppercase tracking-wide"
                     >
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         type="submit"
                         className="flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md hover:bg-(--Primary-selected) transition-colors uppercase tracking-wide"
                     >
-                        {mode === "edit" ? "Save Changes" : "Add Stock"}
+                        {mode === "edit" ? "Salvar Alterações" : "Adicionar Estoque"}
                     </button>
                 </div>
             </form>

@@ -58,37 +58,37 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
 
     const filterOptions: FilterOption[] = [
         {
-            label: "Default order",
+            label: "Ordem padrão",
             action: () => setSortType("default"),
             active: sortType === "default",
         },
         {
-            label: "Name (A-Z)",
+            label: "Nome (A-Z)",
             action: () => setSortType("name-asc"),
             active: sortType === "name-asc",
         },
         {
-            label: "Name (Z-A)",
+            label: "Nome (Z-A)",
             action: () => setSortType("name-desc"),
             active: sortType === "name-desc",
         },
         {
-            label: "Role (A-Z)",
+            label: "Cargo (A-Z)",
             action: () => setSortType("role-asc"),
             active: sortType === "role-asc",
         },
         {
-            label: "All statuses",
+            label: "Todos os status",
             action: () => setStatusFilter("all"),
             active: statusFilter === "all",
         },
         {
-            label: "Active only",
+            label: "Somente ativos",
             action: () => setStatusFilter("active"),
             active: statusFilter === "active",
         },
         {
-            label: "Inactive only",
+            label: "Somente inativos",
             action: () => setStatusFilter("inactive"),
             active: statusFilter === "inactive",
         },
@@ -106,10 +106,10 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
                 </h1>
 
                 <div className="flex items-center gap-3">
-                    <SearchBar placeholder="Search" onChange={setSearchTerm} />
+                    <SearchBar placeholder="Buscar" onChange={setSearchTerm} />
                     <FilterButton
-                        title="Employee filters"
-                        buttonLabel="Filter"
+                        title="Filtros de funcionários"
+                        buttonLabel="Filtrar"
                         options={filterOptions}
                         align="right"
                     />

@@ -21,7 +21,7 @@ export function TableInventoryHeader({title = "INVENTORY", isLive = true}: Table
                         <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-(--Primary)" />
                     </span>
                     <span className="text-(--Text-gray) text-xs font-secondary font-semibold tracking-wider uppercase">
-                        Live Updates Active
+                        Atualizações ao Vivo
                     </span>
                 </div>
             )}

@@ -51,9 +51,9 @@ export function CardEmployee({
                 <OptionsEllipsis
                     disabled={isProcessing}
                     options={[
-                        { label: "View Profile", action: () => handleAction(() => onViewEmployee(publicId)) },
-                        { label: "Block Employee", action: () => handleAction(() => onBlockEmployee(publicId)) },
-                        { label: "Delete", action: () => setConfirmDelete(true), danger: true },
+                        { label: "Ver Perfil", action: () => handleAction(() => onViewEmployee(publicId)) },
+                        { label: "Bloquear Funcionário", action: () => handleAction(() => onBlockEmployee(publicId)) },
+                        { label: "Excluir", action: () => setConfirmDelete(true), danger: true },
                     ]}
                 />
             </div>
@@ -64,10 +64,10 @@ export function CardEmployee({
 
             <ConfirmDialog
                 isOpen={confirmDelete}
-                title="Delete Employee"
-                description={`Are you sure you want to delete ${fullName}? This action cannot be undone.`}
-                confirmLabel="Delete"
-                cancelLabel="Cancel"
+                title="Excluir Funcionário"
+                description={`Tem certeza que deseja excluir ${fullName}? Esta ação não pode ser desfeita.`}
+                confirmLabel="Excluir"
+                cancelLabel="Cancelar"
                 danger
                 onConfirm={() => {
                     setConfirmDelete(false);

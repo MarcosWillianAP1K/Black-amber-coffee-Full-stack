@@ -33,16 +33,16 @@ export function CardCustomer({
 
                 <OptionsEllipsis
                     options={[
-                        { label: "View Profile", action: () => onViewCustomer(publicId) },
-                        { label: "Block Customer", action: () => onBlockCustomer(publicId) },
-                        { label: "Delete", action: () => onDeleteCustomer(publicId), danger: true },
+                        { label: "Ver Perfil", action: () => onViewCustomer(publicId) },
+                        { label: "Bloquear Cliente", action: () => onBlockCustomer(publicId) },
+                        { label: "Excluir", action: () => onDeleteCustomer(publicId), danger: true },
                     ]}
                 />
             </div>
 
             <div className="w-full h-fit">
                 <p className="text-(--Text-primary-off) text-xs font-secondary">
-                    Member since {new Date(createdAt).toLocaleDateString()}
+                    Membro desde {new Date(createdAt).toLocaleDateString("pt-BR")}
                 </p>
             </div>
         </div>
