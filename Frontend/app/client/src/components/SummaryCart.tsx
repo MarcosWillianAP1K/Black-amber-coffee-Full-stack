@@ -26,7 +26,7 @@ export function SummaryCart({
   };
 
   return (
-    <div className="w-full max-w-87.5 bg-(--Widget-background) rounded-md p-6 flex flex-col gap-6 border border-(--Border)/30 shadow-lg">
+    <div className="w-full bg-(--Widget-background) rounded-md p-6 flex flex-col gap-6 border border-(--Border)/30 shadow-lg">
       
       {/* HEADER */}
       <div className="flex justify-between items-center uppercase text-xs font-bold tracking-widest mt-2">
@@ -67,7 +67,7 @@ export function SummaryCart({
       {/* BUTTON */}
       <button
         onClick={onCompletePurchase}
-        className="w-full py-3.5 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer hover:brightness-110 transition-all shadow-md"
+        className="w-full py-3.5 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer hover:brightness-110 transition-all shadow-md text-center flex items-center justify-center"
       >
         Complete Purchase
       </button>

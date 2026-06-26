@@ -85,7 +85,7 @@ export function Home() {
                 {isLoading ? (
                     <p className="text-(--Text-primary-off) text-sm font-secondary">Carregando...</p>
                 ) : (
-                    <div className="w-full flex flex-wrap items-center justify-center gap-4">
+                    <div className="w-full grid grid-cols-2 gap-4">
                         {promotions.map((product) => (
                             <ProductCard
                                 key={product.publicId}
