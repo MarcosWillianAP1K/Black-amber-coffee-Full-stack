@@ -9,17 +9,20 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [1.1.0] - 2026-06-26
 
-### Added
+### Addedd
+
 - Security middleware with 5 ASVS rules (HTTP headers, rate limiting, input size limit, auth logging, sensitive data masking)
 - Metrics endpoint `/v1/api/metrics` exposing 10 system/application metrics
 - Unit tests for `authService` (register, login, refreshToken, logout, resetPassword flows)
 - `CHANGELOG.md` tracking all releases
 
 ### Changed
+
 - `server.ts`: registered global security middleware before routes
 - `health.routes.ts`: added `/metrics` route
 
 ### Fixed
+
 - Cross-testing bugs reported by external group (see Issues)
 
 ---
@@ -27,6 +30,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 ## [1.0.0] - 2026-06-10
 
 ### Added
+
 - Full-stack project: Backend (Node/Express/TypeScript) + Frontend (React/Vite)
 - Authentication module: register, login, refresh token, logout, password reset
 - Products, Orders, Cart, Payment, Inventory, Workers, Analytics modules
