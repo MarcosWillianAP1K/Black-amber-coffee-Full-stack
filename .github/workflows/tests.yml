@@ -1,0 +1,111 @@
+name: CI — Testes Unitários e Integração
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Backend: unitários + integração (Jest + supertest)
+  # ─────────────────────────────────────────────────────────────
+  backend-tests:
+    name: Backend Tests (Jest)
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: test
+      PORT: 3000
+      DATABASE_URL: postgresql://test:test@localhost/test
+      JWT_SECRET: test_jwt_secret_at_least_16chars
+      JWT_EXPIRATION: 15m
+      JWT_SECRET_REFRESH: test_refresh_secret_16ch
+      REFRESH_SECRET: test_refresh_secret_16ch
+      RESEND_API_KEY: re_test_key
+      SYSTEM_MAIL_ADDR: test@test.com
+      BUCKET_NAME: bucket
+      BUCKET_ACCESS_KEY: key
+      BUCKET_SECRET_KEY: secret
+      BUCKET_URL: http://localhost:9000
+      BUCKET_REGION: us-east-1
+
+    defaults:
+      run:
+        working-directory: Backend
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Rodar testes unitários
+        run: npm test -- --testPathPatterns="modules" --no-coverage
+
+      - name: Rodar testes de integração
+        run: npm test -- --testPathPatterns="__tests__" --no-coverage
+
+  # ─────────────────────────────────────────────────────────────
+  # Frontend Client: testes (Vitest)
+  # ─────────────────────────────────────────────────────────────
+  frontend-client-tests:
+    name: Frontend Client Tests (Vitest)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Frontend
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Rodar testes do client
+        run: npm run test -w client-app
+
+  # ─────────────────────────────────────────────────────────────
+  # Frontend Admin: testes (Vitest)
+  # ─────────────────────────────────────────────────────────────
+  frontend-admin-tests:
+    name: Frontend Admin Tests (Vitest)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Frontend
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Rodar testes do admin
+        run: npm run test -w admin-app

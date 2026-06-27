@@ -5,11 +5,18 @@ import { seed } from "@/seed/seed";
 import { env } from "@/config/env";
 import router from "@/routes/v1.route";
 import sharedHandlers from "@/shared/handlers/handles";
+import { secureHeaders, rateLimit, bodySizeLimit, securityLogger } from "@/shared/middlewares/security.middleware";
 const app = express();
 const PORT = env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
+
+// Security middlewares (ASVS)
+app.use(secureHeaders);
+app.use(rateLimit);
+app.use(bodySizeLimit);
+app.use(securityLogger);
 
 app.use((req, res, next) => {
   const start = process.hrtime.bigint();
