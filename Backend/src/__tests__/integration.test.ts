@@ -21,7 +21,7 @@ import request from "supertest";
 import { createTestApp } from "./test-app";
 
 // ── Mock: env (evita process.exit em CI) ──────────────────────────────────
-jest.mock("@/config/env", () => ({
+jest.mock("../config/env", () => ({
   env: {
     NODE_ENV: "test",
     isDev: false,
@@ -42,18 +42,18 @@ jest.mock("@/config/env", () => ({
 }));
 
 // ── Mock: database ─────────────────────────────────────────────────────────
-jest.mock("@/config/database", () => ({
+jest.mock("../config/database", () => ({
   db: {},
 }));
 
 // ── Mock: mail service ─────────────────────────────────────────────────────
-jest.mock("@/infra/mail", () => ({
+jest.mock("../infra/mail", () => ({
   mailService: { send: jest.fn().mockResolvedValue(undefined) },
 }));
 
 // ── Mock: auth repository ──────────────────────────────────────────────────
 
-jest.mock("@/modules/auth/auth.repository", () => {
+jest.mock("../modules/auth/auth.repository", () => {
   const user = {
     id: 1,
     publicId: "pub-test-001",
@@ -197,7 +197,7 @@ describe("Headers de segurança (ASVS 14.4.1)", () => {
 
 describe("bodySizeLimit middleware (ASVS 12.1.1)", () => {
   it("12. deve chamar res.status(413) quando Content-Length > 1MB", () => {
-    const { bodySizeLimit } = require("@/shared/middlewares/security.middleware");
+    const { bodySizeLimit } = require("../shared/middlewares/security.middleware");
 
     const mockReq = {
       headers: { "content-length": "2000000" },

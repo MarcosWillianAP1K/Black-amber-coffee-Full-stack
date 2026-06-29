@@ -9,7 +9,7 @@ import {
   SendPasswordResetSchema,
   CheckPasswordResetSchema,
   ResetPasswordSchema,
-} from "@/modules/auth/auth.schema";
+} from "./auth.schema";
 import authService from "./auth.service";
 import authRepository from "./auth.repository";
 import JWTservice from "../../core/jwt.service";

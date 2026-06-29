@@ -5,7 +5,7 @@ import ProductModel from "./product.model";
 import {
   ProductCategoryType,
   ProductCategory,
-} from "@/core/enuns/proudcCategory";
+} from "../../core/enuns/proudcCategory";
 import { generateId } from "../../core/gereteId";
 
 export default class ProductRepository {

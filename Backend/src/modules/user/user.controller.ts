@@ -3,7 +3,7 @@ import {
   GetUserResponseSchema,
   UpdateUserResponseSchema,
   UserUpdateInputSchema,
-} from "@/modules/user/user.schema";
+} from "./user.schema";
 import { NextFunction, Request, Response } from "express";
 
 export default class userController {

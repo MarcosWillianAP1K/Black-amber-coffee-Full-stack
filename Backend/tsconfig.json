@@ -9,9 +9,6 @@
     "baseUrl": ".",
     "rootDir": "./src",
     "outDir": "./dist",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
     "types": ["node", "jest"],
     "skipLibCheck": true
   },

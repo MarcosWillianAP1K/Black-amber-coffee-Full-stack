@@ -39,7 +39,7 @@ const mockJwtService = {
 };
 
 // Stub mailService used inside authService
-jest.mock("@/infra/mail", () => ({
+jest.mock("../../../infra/mail", () => ({
   mailService: { send: jest.fn().mockResolvedValue(undefined) },
 }));
 

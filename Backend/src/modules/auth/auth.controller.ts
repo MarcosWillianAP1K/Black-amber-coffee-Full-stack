@@ -15,7 +15,7 @@ import {
   CheckPasswordResetResponse,
   ResetPasswordInput,
   ResetPasswordResponse,
-} from "@/modules/auth/auth.schema";
+} from "./auth.schema";
 import { NextFunction, Request, Response } from "express";
 
 export default class authController {

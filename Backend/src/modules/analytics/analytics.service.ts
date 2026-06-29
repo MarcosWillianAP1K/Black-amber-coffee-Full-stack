@@ -7,7 +7,7 @@ import {
   clients,
   workers,
   stocks,
-} from "@/db/schema";
+} from "../../db/schema";
 import {
   DashboardAnalytics,
   dashboardAnalyticsSchema,
