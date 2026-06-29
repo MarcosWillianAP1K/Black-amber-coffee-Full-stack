@@ -39,7 +39,8 @@ function validateEnv(): Env {
       console.error(`  ${key}:`);
       messages?.forEach((msg) => console.error(`    - ${msg}`));
     }
-    process.exit(1);
+    // Lançamos um erro em vez de usar process.exit(1) para que a Vercel consiga capturar e exibir o log corretamente.
+    throw new Error("Variáveis de ambiente inválidas. Verifique os logs acima para mais detalhes.");
   }
 
   return result.data;
