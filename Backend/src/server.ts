@@ -40,16 +40,20 @@ app.use((_req, _res, next) => {
 
 app.use(sharedHandlers.error);
 
-app.listen(PORT, async () => {
-  const publicPort = process.env.PUBLIC_PORT || PORT;
-  console.log(`🚀 Server running internally on PORT ${PORT}`);
-  console.log(`📚 Docs v1 available at http://localhost:${publicPort}/v1/docs`);
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    const publicPort = process.env.PUBLIC_PORT || PORT;
+    console.log(`🚀 Server running internally on PORT ${PORT}`);
+    console.log(`📚 Docs v1 available at http://localhost:${publicPort}/v1/docs`);
 
-  if (process.env.NODE_ENV !== "production") {
-    try {
-      await seed();
-    } catch (error) {
-      console.error("❌ Erro ao executar seed:", error);
+    if (process.env.NODE_ENV !== "production") {
+      try {
+        await seed();
+      } catch (error) {
+        console.error("❌ Erro ao executar seed:", error);
+      }
     }
-  }
-});
+  });
+}
+
+export default app;
