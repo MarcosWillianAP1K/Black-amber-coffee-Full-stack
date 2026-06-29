@@ -13,7 +13,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
-import React from 'react';
 
 import { APP_ROUTES, ADMIN_ROUTES } from '../utils/Path';
 import { useAuth } from '../hooks/useAuth';
