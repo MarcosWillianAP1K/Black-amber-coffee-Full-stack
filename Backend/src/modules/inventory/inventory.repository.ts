@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { inventoryItems } from "@/db/schema";
+import { inventoryItems } from "../../db/schema";
 import InventoryModel from "./inventory.model";
 
 export default class InventoryRepository {

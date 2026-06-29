@@ -1,6 +1,6 @@
 import CartRepository from "./cart.repository";
-import UserRepository from "@/modules/user/user.repository";
-import ProductRepository from "@/modules/product/product.repository";
+import UserRepository from "../user/user.repository";
+import ProductRepository from "../product/product.repository";
 import CartModel from "./cart.model";
 import {
   AddCartItemRequest,

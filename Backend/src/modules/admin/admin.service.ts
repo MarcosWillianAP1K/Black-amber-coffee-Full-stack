@@ -1,12 +1,12 @@
-import WorkerRepository from "@/modules/worker/worker.repository";
-import OrderRepository from "@/modules/order/order.repository";
-import OrderHistoryRepository from "@/modules/order/history/orderHistory.repository";
-import ProductRepository from "@/modules/product/product.repository";
-import authRepository from "@/modules/auth/auth.repository";
-import { db } from "@/config/database";
-import SecurityUtils from "@/core/security";
-import WorkerModel from "@/modules/worker/worker.model";
-import { workers } from "@/db/schema";
+import WorkerRepository from "../worker/worker.repository";
+import OrderRepository from "../order/order.repository";
+import OrderHistoryRepository from "../order/history/orderHistory.repository";
+import ProductRepository from "../product/product.repository";
+import authRepository from "../auth/auth.repository";
+import { db } from "../../config/database";
+import SecurityUtils from "../../core/security";
+import WorkerModel from "../worker/worker.model";
+import { workers } from "../../db/schema";
 import { eq } from "drizzle-orm";
 import {
   RegisterWorkerInput,
@@ -20,8 +20,8 @@ import {
   Worker,
   workerResponseSchema,
 } from "./admin.shemas";
-import UserRepository from "@/modules/user/user.repository";
-import UserModel from "@/modules/user/user.model";
+import UserRepository from "../user/user.repository";
+import UserModel from "../user/user.model";
 import * as z from "zod";
 
 // Client response schema — flat structure matching UserModel

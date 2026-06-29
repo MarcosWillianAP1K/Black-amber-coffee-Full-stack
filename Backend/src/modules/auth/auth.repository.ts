@@ -1,8 +1,8 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq, and } from "drizzle-orm";
-import { clients, workers, passwordResetTokens } from "@/db/schema";
-import authModel from "@/modules/auth/auth.model";
-import { WorkerRole } from "@/core/enuns/workerRole";
+import { clients, workers, passwordResetTokens } from "../../db/schema";
+import authModel from "./auth.model";
+import { WorkerRole } from "../../core/enuns/workerRole";
 
 export type UserType = "user" | "worker";
 

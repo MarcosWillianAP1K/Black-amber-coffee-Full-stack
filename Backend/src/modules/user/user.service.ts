@@ -1,7 +1,7 @@
-import SecurityUtils from "@/core/security";
-import UserRepository from "@/modules/user/user.repository";
-import { r2StorageProvider, imageService } from "@/infra/storage";
-import UserModel from "@/modules/user/user.model";
+import SecurityUtils from "../../core/security";
+import UserRepository from "./user.repository";
+import { r2StorageProvider, imageService } from "../../infra/storage";
+import UserModel from "./user.model";
 import {
   UserUpdateInput,
   UserResponse,

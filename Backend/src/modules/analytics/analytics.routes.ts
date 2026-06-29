@@ -1,8 +1,8 @@
 import { Router } from "express";
 import AnalyticsController from "./analytics.controller";
 import AnalyticsService from "./analytics.service";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireAdmin } from "@/shared/middlewares/permission.middleware";
+import { AuthMiddleware } from "../auth/auth.middleware";
+import { requireAdmin } from "../../shared/middlewares/permission.middleware";
 
 /**
  * Creates analytics routes (admin only).

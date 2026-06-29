@@ -4,7 +4,7 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { IStorageProvider, UploadResult } from "./bucket.interface";
-import { env } from "@/config/env";
+import { env } from "../../config/env";
 
 const client = new S3Client({
   region: env.BUCKET_REGION,

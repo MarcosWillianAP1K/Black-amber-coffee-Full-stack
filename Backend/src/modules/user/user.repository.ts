@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { clients } from "@/db/schema";
+import { clients } from "../../db/schema";
 import UserModel from "./user.model";
 
 export default class UserRepository {

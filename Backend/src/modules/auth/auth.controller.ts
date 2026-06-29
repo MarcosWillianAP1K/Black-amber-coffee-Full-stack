@@ -1,4 +1,4 @@
-import authService from "@/modules/auth/auth.service";
+import authService from "./auth.service";
 
 import {
   LoginInput,

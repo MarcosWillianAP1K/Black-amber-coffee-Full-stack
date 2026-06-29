@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq, gt } from "drizzle-orm";
-import { orders, orderItems, products, payments } from "@/db/schema";
-import { OrderStatus, OrderStatusType } from "@/core/enuns/orederStatus";
+import { orders, orderItems, products, payments } from "../../db/schema";
+import { OrderStatus, OrderStatusType } from "../../core/enuns/orederStatus";
 import OrderModel from "./order.model";
 
 export default class OrderRepository {

@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { and, eq } from "drizzle-orm";
-import { cartItems, carts, products } from "@/db/schema";
+import { cartItems, carts, products } from "../../db/schema";
 import CartModel, { CartItemModel } from "./cart.model";
 
 export default class CartRepository {

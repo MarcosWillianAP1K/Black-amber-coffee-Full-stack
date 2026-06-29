@@ -1,8 +1,8 @@
 import { Router } from "express";
 import CartController from "../cart.controller";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireRole } from "@/shared/middlewares/permission.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import { AuthMiddleware } from "../../auth/auth.middleware";
+import { requireRole } from "../../../shared/middlewares/permission.middleware";
+import validationMiddleware from "../../../shared/middlewares/validation.middleware";
 import { AddCartItemSchema, UpdateCartItemSchema } from "../cart.schema";
 
 export function createCartRoutes(cartCtrl: CartController): Router {

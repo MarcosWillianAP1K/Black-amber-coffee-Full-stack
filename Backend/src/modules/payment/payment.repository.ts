@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { payments } from "@/db/schema";
-import { PaymentStatus, PaymentStatusType } from "@/core/enuns/payment.types";
+import { payments } from "../../db/schema";
+import { PaymentStatus, PaymentStatusType } from "../../core/enuns/payment.types";
 
 export interface PaymentRecord {
   id: number;

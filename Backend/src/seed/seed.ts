@@ -13,7 +13,7 @@ import SecurityUtils from "../core/security";
 import { generateId } from "../core/gereteId";
 import { OrderStatus } from "../core/enuns/orederStatus";
 import { eq } from "drizzle-orm";
-import { generateOrderCode } from "@/shared/utils/code.gerator";
+import { generateOrderCode } from "../shared/utils/code.gerator";
 
 const workerSeedData = [
   {

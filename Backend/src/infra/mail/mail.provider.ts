@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import type { IMailProvider } from "./mail.interface";
-import { env } from "@/config/env";
+import { env } from "../../config/env";
 
 export class ResendProvider implements IMailProvider {
   private client: Resend;

@@ -1,6 +1,6 @@
 import ProductRepository from "./product.repository";
 import ProductModel from "./product.model";
-import { r2StorageProvider, imageService } from "@/infra/storage";
+import { r2StorageProvider, imageService } from "../../infra/storage";
 import {
   CreateProductRequest,
   UpdateProductRequest,
@@ -20,7 +20,7 @@ import {
   productStockSchema,
   stockUpdateRequestSchema,
 } from "./product.schema";
-import { ProductCategoryType } from "@/core/enuns/proudcCategory";
+import { ProductCategoryType } from "../../core/enuns/proudcCategory";
 
 export default class ProductService {
   private productRepository: ProductRepository;

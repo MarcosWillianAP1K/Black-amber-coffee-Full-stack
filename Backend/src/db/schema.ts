@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm";
-import { WorkerRoles } from "@/core/enuns/workerRole";
-import { OrderStatus } from "@/core/enuns/orederStatus";
-import { ProductCategory } from "@/core/enuns/proudcCategory";
-import { PaymentMethod, PaymentStatus } from "@/core/enuns/payment.types";
-import { AttendanceStatus } from "@/core/enuns/attendanceStatus";
+import { WorkerRoles } from "../core/enuns/workerRole";
+import { OrderStatus } from "../core/enuns/orederStatus";
+import { ProductCategory } from "../core/enuns/proudcCategory";
+import { PaymentMethod, PaymentStatus } from "../core/enuns/payment.types";
+import { AttendanceStatus } from "../core/enuns/attendanceStatus";
 import {
   pgTable,
   serial,

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import helpers from "@/shared/helpers";
-import { env } from "@/config/env";
-import { logger } from "@/shared/errors";
+import helpers from "../helpers";
+import { env } from "../../config/env";
+import { logger } from "../errors";
 
 const error = (
   err: unknown,

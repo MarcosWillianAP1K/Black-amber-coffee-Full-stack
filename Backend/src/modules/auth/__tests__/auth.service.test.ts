@@ -13,8 +13,8 @@
  *  9. logout()        — sucesso
  */
 
-import authService from "@/modules/auth/auth.service";
-import SecurityUtils from "@/core/security";
+import authService from "../auth.service";
+import SecurityUtils from "../../../core/security";
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
 

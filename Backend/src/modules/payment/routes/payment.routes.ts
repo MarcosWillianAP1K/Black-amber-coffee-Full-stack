@@ -1,8 +1,8 @@
 import { Router } from "express";
 import PaymentController from "../payment.controller";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireRole } from "@/shared/middlewares/permission.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import { AuthMiddleware } from "../../auth/auth.middleware";
+import { requireRole } from "../../../shared/middlewares/permission.middleware";
+import validationMiddleware from "../../../shared/middlewares/validation.middleware";
 import { SimulatePaymentSchema } from "../payment.schema";
 
 export function createPaymentRoutes(paymentCtrl: PaymentController): Router {

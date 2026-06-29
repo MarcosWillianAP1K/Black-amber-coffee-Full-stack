@@ -1,12 +1,12 @@
 import OrderRepository from "./order.repository";
-import WorkerRepository from "@/modules/worker/worker.repository";
+import WorkerRepository from "../worker/worker.repository";
 import OrderHistoryRepository from "./history/orderHistory.repository";
 import OrderModel from "./order.model";
-import { OrderStatus, OrderStatusType } from "@/core/enuns/orederStatus";
-import UserRepository from "@/modules/user/user.repository";
-import ProductRepository from "@/modules/product/product.repository";
-import { generateId } from "@/core/gereteId";
-import { generateOrderCode } from "@/shared/utils/code.gerator";
+import { OrderStatus, OrderStatusType } from "../../core/enuns/orederStatus";
+import UserRepository from "../user/user.repository";
+import ProductRepository from "../product/product.repository";
+import { generateId } from "../../core/gereteId";
+import { generateOrderCode } from "../../shared/utils/code.gerator";
 import {
   CreateOrderRequest,
   CreateOrderResponse,

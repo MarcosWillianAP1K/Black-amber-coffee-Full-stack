@@ -1,8 +1,8 @@
 import { Router } from "express";
 import OrderController from "../order.controller";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireWorker, requireAdmin } from "@/shared/middlewares/permission.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import { AuthMiddleware } from "../../auth/auth.middleware";
+import { requireWorker, requireAdmin } from "../../../shared/middlewares/permission.middleware";
+import validationMiddleware from "../../../shared/middlewares/validation.middleware";
 import {
   CreateOrderRequestSchema,
   GetOrdersByStatusRequestSchema,

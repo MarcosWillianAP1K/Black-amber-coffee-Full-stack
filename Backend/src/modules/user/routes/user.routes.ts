@@ -2,19 +2,19 @@ import { Router } from "express";
 import UserController from "../user.controller";
 import UserService from "../user.service";
 import UserRepository from "../user.repository";
-import authRepository from "@/modules/auth/auth.repository";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireAdmin } from "@/shared/middlewares/permission.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
-import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
+import authRepository from "../../auth/auth.repository";
+import { AuthMiddleware } from "../../auth/auth.middleware";
+import { requireAdmin } from "../../../shared/middlewares/permission.middleware";
+import validationMiddleware from "../../../shared/middlewares/validation.middleware";
+import { avatarUploadMiddleware } from "../../../shared/middlewares/upload.middleware";
 import { UserUpdateRequestSchema } from "../user.schema";
-import { db } from "@/config/database";
-import AdminController from "@/modules/admin/admin.controller";
-import AdminService from "@/modules/admin/admin.service";
-import WorkerRepository from "@/modules/worker/worker.repository";
-import OrderRepository from "@/modules/order/order.repository";
-import OrderHistoryRepository from "@/modules/order/history/orderHistory.repository";
-import ProductRepository from "@/modules/product/product.repository";
+import { db } from "../../../config/database";
+import AdminController from "../../admin/admin.controller";
+import AdminService from "../../admin/admin.service";
+import WorkerRepository from "../../worker/worker.repository";
+import OrderRepository from "../../order/order.repository";
+import OrderHistoryRepository from "../../order/history/orderHistory.repository";
+import ProductRepository from "../../product/product.repository";
 
 // ============================================================
 // Initialize dependencies

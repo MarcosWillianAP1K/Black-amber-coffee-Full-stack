@@ -1,4 +1,4 @@
-import userService from "@/modules/user/user.service";
+import userService from "./user.service";
 import {
   GetUserResponseSchema,
   UpdateUserResponseSchema,

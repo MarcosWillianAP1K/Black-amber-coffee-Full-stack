@@ -1,5 +1,5 @@
 import InventoryRepository from "./inventory.repository";
-import { generateId } from "@/core/gereteId";
+import { generateId } from "../../core/gereteId";
 import {
   CreateInventoryInput,
   UpdateInventoryInput,

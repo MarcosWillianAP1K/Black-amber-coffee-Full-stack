@@ -1,6 +1,6 @@
 import { Router } from "express";
 import ProductController from "../product.controller";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
+import { AuthMiddleware } from "../../auth/auth.middleware";
 
 /**
  * Creates public/authenticated product routes.

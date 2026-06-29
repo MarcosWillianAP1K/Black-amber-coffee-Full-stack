@@ -1,4 +1,4 @@
-import { db } from "@/config/database";
+import { db } from "../../config/database";
 import { eq, and, gte, sql, count } from "drizzle-orm";
 import {
   orders,
@@ -12,7 +12,7 @@ import {
   DashboardAnalytics,
   dashboardAnalyticsSchema,
 } from "./analytics.schema";
-import { OrderStatus } from "@/core/enuns/orederStatus";
+import { OrderStatus } from "../../core/enuns/orederStatus";
 
 export default class AnalyticsService {
   async getDashboard(): Promise<DashboardAnalytics> {

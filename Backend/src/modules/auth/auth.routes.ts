@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import authController from "@/modules/auth/auth.controller";
+import authController from "./auth.controller";
 import {
   RegisterClientSchema,
   LoginClientSchema,
@@ -10,11 +10,11 @@ import {
   CheckPasswordResetSchema,
   ResetPasswordSchema,
 } from "@/modules/auth/auth.schema";
-import authService from "@/modules/auth/auth.service";
-import authRepository from "@/modules/auth/auth.repository";
-import JWTservice from "@/core/jwt.service";
-import { db } from "@/config/database";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import authService from "./auth.service";
+import authRepository from "./auth.repository";
+import JWTservice from "../../core/jwt.service";
+import { db } from "../../config/database";
+import validationMiddleware from "../../shared/middlewares/validation.middleware";
 
 const authRoutes = Router();
 

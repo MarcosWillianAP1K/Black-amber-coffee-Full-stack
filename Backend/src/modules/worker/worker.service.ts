@@ -1,13 +1,13 @@
 import WorkerRepository from "./worker.repository";
 import WorkerModel from "./worker.model";
-import { r2StorageProvider, imageService } from "@/infra/storage";
+import { r2StorageProvider, imageService } from "../../infra/storage";
 import {
   WorkerUpdateInput,
   Worker,
   WorkerResponseSchema,
   WorkerUpdateInputSchema,
 } from "./worker.schema";
-import SecurityUtils from "@/core/security";
+import SecurityUtils from "../../core/security";
 
 export default class WorkerService {
   private workerRepository: WorkerRepository;

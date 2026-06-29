@@ -1,12 +1,12 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq, gt, like, and, gte, lte, count } from "drizzle-orm";
-import { products, stocks } from "@/db/schema";
+import { products, stocks } from "../../db/schema";
 import ProductModel from "./product.model";
 import {
   ProductCategoryType,
   ProductCategory,
 } from "@/core/enuns/proudcCategory";
-import { generateId } from "@/core/gereteId";
+import { generateId } from "../../core/gereteId";
 
 export default class ProductRepository {
   db: ReturnType<typeof drizzle>;

@@ -1,7 +1,7 @@
-import JWTservice from "@/core/jwt.service";
-import authModel from "@/modules/auth/auth.model";
-import authRepository from "@/modules/auth/auth.repository";
-import SecurityUtils from "@/core/security";
+import JWTservice from "../../core/jwt.service";
+import authModel from "./auth.model";
+import authRepository from "./auth.repository";
+import SecurityUtils from "../../core/security";
 
 import {
   RegisterInput,
@@ -32,7 +32,7 @@ import {
   CheckPasswordResetSchema,
   ResetPasswordSchema,
 } from "./auth.schema";
-import { mailService } from "@/infra/mail";
+import { mailService } from "../../infra/mail";
 
 export default class authService {
   private authRepository: authRepository;

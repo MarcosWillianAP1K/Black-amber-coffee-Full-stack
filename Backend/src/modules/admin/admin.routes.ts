@@ -1,16 +1,16 @@
 import { Router } from "express";
 import AdminController from "./admin.controller";
 import AdminService from "./admin.service";
-import WorkerRepository from "@/modules/worker/worker.repository";
-import OrderRepository from "@/modules/order/order.repository";
-import OrderHistoryRepository from "@/modules/order/history/orderHistory.repository";
-import ProductRepository from "@/modules/product/product.repository";
-import authRepository from "@/modules/auth/auth.repository";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { AdminMiddleware } from "@/shared/middlewares/admin.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import WorkerRepository from "../worker/worker.repository";
+import OrderRepository from "../order/order.repository";
+import OrderHistoryRepository from "../order/history/orderHistory.repository";
+import ProductRepository from "../product/product.repository";
+import authRepository from "../auth/auth.repository";
+import { AuthMiddleware } from "../auth/auth.middleware";
+import { AdminMiddleware } from "../../shared/middlewares/admin.middleware";
+import validationMiddleware from "../../shared/middlewares/validation.middleware";
 import { registerWorkerSchema, updateWorkerSchema } from "./admin.shemas";
-import { db } from "@/config/database";
+import { db } from "../../config/database";
 
 const adminRoutes = Router();
 

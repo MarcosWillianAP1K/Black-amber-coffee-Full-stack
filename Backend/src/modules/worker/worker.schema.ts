@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { WorkerRoles } from "@/core/enuns/workerRole";
+import { WorkerRoles } from "../../core/enuns/workerRole";
 
 export const WorkerResponseSchema = z.object({
   publicId: z.string(),

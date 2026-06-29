@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { workers } from "@/db/schema";
+import { workers } from "../../db/schema";
 import WorkerModel from "./worker.model";
 
 export default class WorkerRepository {

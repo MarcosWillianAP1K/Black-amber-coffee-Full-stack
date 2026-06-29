@@ -1,4 +1,4 @@
-import { ProductCategoryType } from "@/core/enuns/proudcCategory";
+import { ProductCategoryType } from "../../core/enuns/proudcCategory";
 
 export default class ProductModel {
     id: number;

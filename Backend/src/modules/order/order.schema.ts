@@ -1,6 +1,6 @@
 import * as z from "zod";
-import { OrderStatus } from "@/core/enuns/orederStatus";
-import { PaymentMethod } from "@/core/enuns/payment.types";
+import { OrderStatus } from "../../core/enuns/orederStatus";
+import { PaymentMethod } from "../../core/enuns/payment.types";
 
 // --- Item Schemas ---
 

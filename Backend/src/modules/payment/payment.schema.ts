@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { PaymentMethod } from "@/core/enuns/payment.types";
+import { PaymentMethod } from "../../core/enuns/payment.types";
 
 export const SimulatePaymentSchema = z.object({
   paymentMethod: z.enum(PaymentMethod.VALUES, {

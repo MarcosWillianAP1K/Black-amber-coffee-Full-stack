@@ -1,11 +1,11 @@
 import "dotenv/config";
 import express, { Response } from "express";
 import cors from "cors";
-import { seed } from "@/seed/seed";
-import { env } from "@/config/env";
-import router from "@/routes/v1.route";
-import sharedHandlers from "@/shared/handlers/handles";
-import { secureHeaders, rateLimit, bodySizeLimit, securityLogger } from "@/shared/middlewares/security.middleware";
+import { seed } from "./seed/seed";
+import { env } from "./config/env";
+import router from "./routes/v1.route";
+import sharedHandlers from "./shared/handlers/handles";
+import { secureHeaders, rateLimit, bodySizeLimit, securityLogger } from "./shared/middlewares/security.middleware";
 const app = express();
 const PORT = env.PORT || 8080;
 

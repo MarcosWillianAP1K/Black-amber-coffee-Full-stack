@@ -1,9 +1,9 @@
 import { Router } from "express";
 import ProductController from "../product.controller";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { AdminMiddleware } from "@/shared/middlewares/admin.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
-import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
+import { AuthMiddleware } from "../../auth/auth.middleware";
+import { AdminMiddleware } from "../../../shared/middlewares/admin.middleware";
+import validationMiddleware from "../../../shared/middlewares/validation.middleware";
+import { avatarUploadMiddleware } from "../../../shared/middlewares/upload.middleware";
 import {
   CreateProductRequestSchema,
   UpdateProductRequestSchema,

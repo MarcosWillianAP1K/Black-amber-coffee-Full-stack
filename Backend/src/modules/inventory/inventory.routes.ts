@@ -2,10 +2,10 @@ import { Router } from "express";
 import InventoryController from "./inventory.controller";
 import InventoryService from "./inventory.service";
 import InventoryRepository from "./inventory.repository";
-import { db } from "@/config/database";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireAdmin } from "@/shared/middlewares/permission.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import { db } from "../../config/database";
+import { AuthMiddleware } from "../auth/auth.middleware";
+import { requireAdmin } from "../../shared/middlewares/permission.middleware";
+import validationMiddleware from "../../shared/middlewares/validation.middleware";
 import { CreateInventoryRequestSchema, UpdateInventoryRequestSchema } from "./inventory.schema";
 
 export function createInventoryRoutes(): Router {

@@ -1,13 +1,13 @@
-import CartRepository from "@/modules/cart/cart.repository";
-import UserRepository from "@/modules/user/user.repository";
-import ProductRepository from "@/modules/product/product.repository";
-import OrderRepository from "@/modules/order/order.repository";
-import OrderHistoryRepository from "@/modules/order/history/orderHistory.repository";
+import CartRepository from "../cart/cart.repository";
+import UserRepository from "../user/user.repository";
+import ProductRepository from "../product/product.repository";
+import OrderRepository from "../order/order.repository";
+import OrderHistoryRepository from "../order/history/orderHistory.repository";
 import PaymentRepository from "./payment.repository";
-import { OrderStatus } from "@/core/enuns/orederStatus";
-import { PaymentMethod } from "@/core/enuns/payment.types";
-import { generateId } from "@/core/gereteId";
-import { generateOrderCode } from "@/shared/utils/code.gerator";
+import { OrderStatus } from "../../core/enuns/orederStatus";
+import { PaymentMethod } from "../../core/enuns/payment.types";
+import { generateId } from "../../core/gereteId";
+import { generateOrderCode } from "../../shared/utils/code.gerator";
 import {
   SimulatePaymentRequest,
   SimulatePaymentResponse,

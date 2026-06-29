@@ -1,5 +1,5 @@
-import { RegisterInput } from "@/modules/auth/auth.schema";
-import { generateId } from "@/core/gereteId";
+import { RegisterInput } from "./auth.schema";
+import { generateId } from "../../core/gereteId";
 
 export default class authModel {
   id: number;

@@ -2,7 +2,7 @@ import { Router } from "express";
 import ProductController from "./product.controller";
 import ProductService from "./product.service";
 import ProductRepository from "./product.repository";
-import { db } from "@/config/database";
+import { db } from "../../config/database";
 import { createPublicProductRoutes } from "./routes/product.public.routes";
 import { createAdminProductRoutes } from "./routes/product.admin.routes";
 

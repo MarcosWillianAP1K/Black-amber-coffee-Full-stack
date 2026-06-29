@@ -10,10 +10,10 @@
 import express from "express";
 import cors from "cors";
 import { Router } from "express";
-import { healthRoutes } from "@/modules/health/health.routes";
-import { authRoutes } from "@/modules/auth/auth.routes";
-import sharedHandlers from "@/shared/handlers/handles";
-import { secureHeaders, rateLimit, bodySizeLimit, securityLogger } from "@/shared/middlewares/security.middleware";
+import { healthRoutes } from "../modules/health/health.routes";
+import { authRoutes } from "../modules/auth/auth.routes";
+import sharedHandlers from "../shared/handlers/handles";
+import { secureHeaders, rateLimit, bodySizeLimit, securityLogger } from "../shared/middlewares/security.middleware";
 
 export function createTestApp() {
   const app = express();

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import userController from "@/modules/user/user.controller";
-import userService from "@/modules/user/user.service";
-import userRepository from "@/modules/user/user.repository";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
-import { UserUpdateRequestSchema } from "@/modules/user/user.schema";
-import { db } from "@/config/database";
+import userController from "./user.controller";
+import userService from "./user.service";
+import userRepository from "./user.repository";
+import { AuthMiddleware } from "../auth/auth.middleware";
+import { avatarUploadMiddleware } from "../../shared/middlewares/upload.middleware";
+import validationMiddleware from "../../shared/middlewares/validation.middleware";
+import { UserUpdateRequestSchema } from "./user.schema";
+import { db } from "../../config/database";
 
 const userRoutes = Router();
 

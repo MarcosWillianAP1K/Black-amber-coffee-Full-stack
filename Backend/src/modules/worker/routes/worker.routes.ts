@@ -2,18 +2,18 @@ import { Router } from "express";
 import WorkerController from "../worker.controller";
 import WorkerService from "../worker.service";
 import WorkerRepository from "../worker.repository";
-import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import { requireAdmin, requireWorker } from "@/shared/middlewares/permission.middleware";
-import validationMiddleware from "@/shared/middlewares/validation.middleware";
+import { AuthMiddleware } from "../../auth/auth.middleware";
+import { requireAdmin, requireWorker } from "../../../shared/middlewares/permission.middleware";
+import validationMiddleware from "../../../shared/middlewares/validation.middleware";
 import { WorkerUpdateRequestSchema } from "../worker.schema";
-import { registerWorkerSchema, updateWorkerSchema } from "@/modules/admin/admin.shemas";
-import { db } from "@/config/database";
-import authRepository from "@/modules/auth/auth.repository";
-import AdminController from "@/modules/admin/admin.controller";
-import AdminService from "@/modules/admin/admin.service";
-import OrderRepository from "@/modules/order/order.repository";
-import OrderHistoryRepository from "@/modules/order/history/orderHistory.repository";
-import ProductRepository from "@/modules/product/product.repository";
+import { registerWorkerSchema, updateWorkerSchema } from "../../admin/admin.shemas";
+import { db } from "../../../config/database";
+import authRepository from "../../auth/auth.repository";
+import AdminController from "../../admin/admin.controller";
+import AdminService from "../../admin/admin.service";
+import OrderRepository from "../../order/order.repository";
+import OrderHistoryRepository from "../../order/history/orderHistory.repository";
+import ProductRepository from "../../product/product.repository";
 
 // ============================================================
 // Initialize shared dependencies

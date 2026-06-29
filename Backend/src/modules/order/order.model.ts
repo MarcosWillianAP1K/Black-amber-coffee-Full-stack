@@ -1,5 +1,5 @@
-import { OrderStatusType } from "@/core/enuns/orederStatus";
-import { PaymentMethodType } from "@/core/enuns/payment.types";
+import { OrderStatusType } from "../../core/enuns/orederStatus";
+import { PaymentMethodType } from "../../core/enuns/payment.types";
 
 interface Item {
   id: number;

@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { orderStatusHistory } from "@/db/schema";
+import { orderStatusHistory } from "../../../db/schema";
 
 export default class OrderHistoryRepository {
   db: ReturnType<typeof drizzle>;

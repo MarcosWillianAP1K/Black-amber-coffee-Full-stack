@@ -1,6 +1,6 @@
 import multer from "multer";
 import type { Request, Response, NextFunction } from "express";
-import helpers from "@/shared/helpers";
+import helpers from "../helpers";
 
 const storage = multer.memoryStorage();
 
