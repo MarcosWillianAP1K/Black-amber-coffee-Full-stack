@@ -1,5 +1,8 @@
 let app;
 try {
+  // Registra o tratador de caminhos do TypeScript em tempo de execução (resolve os @/)
+  require("tsconfig-paths/register");
+
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   app = require("../src/server").default;
 } catch (error: any) {
