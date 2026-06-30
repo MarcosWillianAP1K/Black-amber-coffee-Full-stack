@@ -5,8 +5,12 @@
 // build time (Vite injects it via import.meta.env). Set it in the root .env:
 //   VITE_API_BASE_URL=http://localhost:3001/v1/api
 
-const _meta = typeof import.meta !== "undefined" ? (import.meta as unknown as { env?: Record<string, string> }) : null;
-const API_BASE: string = _meta?.env?.["VITE_API_BASE_URL"] ?? "http://localhost:3001/v1/api";
+const API_BASE: string = 
+    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) 
+        ? import.meta.env.VITE_API_BASE_URL 
+        : (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASEURL)
+            ? import.meta.env.VITE_API_BASEURL
+            : "http://localhost:3001/v1/api";
 
 
 
@@ -24,7 +28,7 @@ export const API = {
         VerifyCode: `${API_BASE}/auth/forgotpassword/check`,
         ResetPassword: `${API_BASE}/auth/forgotpassword/reset`,
     },
-    AdminWorkers: {    
+    AdminWorkers: {
         Register: `${API_BASE}/workers`,
         List: `${API_BASE}/workers`,
         FindById: (id: string) => `${API_BASE}/workers/${id}`,
