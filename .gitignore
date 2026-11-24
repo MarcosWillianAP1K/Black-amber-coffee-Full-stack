@@ -1,0 +1,15 @@
+# Dependências e builds
+node_modules/
+dist/
+dist-ssr/
+
+# Variáveis de ambiente locais (manter templates .env.example)
+.env
+.env.*
+!.env.example
+
+# Logs e caches locais
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

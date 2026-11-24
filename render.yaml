@@ -23,29 +23,33 @@ services:
         fromDatabase:
           name: black-amber-db
           property: connectionString
-      - key: AUTO_MIGRATE
+      - key: DB_SSL
         value: "true"
       - key: AUTO_SEED
         value: "true"
       - key: JWT_SECRET
         generateValue: true
-      - key: JWT_REFRESH_SECRET
+      - key: JWT_SECRET_REFRESH
         generateValue: true
+      - key: JWT_EXPIRATION
+        value: "15m"
       - key: CORS_ORIGIN
         sync: false
-      - key: R2_ACCOUNT_ID
+      - key: BUCKET_NAME
         sync: false
-      - key: R2_ACCESS_KEY_ID
+      - key: BUCKET_ACCESS_KEY
         sync: false
-      - key: R2_SECRET_ACCESS_KEY
+      - key: BUCKET_SECRET_KEY
         sync: false
-      - key: R2_BUCKET_NAME
+      - key: BUCKET_URL
         sync: false
-      - key: R2_PUBLIC_URL
+      - key: BUCKET_PUBLIC_URL
         sync: false
+      - key: BUCKET_REGION
+        value: us-east-1
       - key: RESEND_API_KEY
         sync: false
-      - key: EMAIL_FROM
+      - key: SYSTEM_MAIL_ADDR
         sync: false
 
   - type: web

@@ -1,0 +1,163 @@
+# =============================================================================
+# GitHub Actions CI/CD — Black Amber Coffee Full-Stack
+# Pipeline de Validação: TypeScript, ESLint, Vitest, Production Builds e Docker
+# =============================================================================
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Backend (Typecheck + Vitest + Build)
+  # ---------------------------------------------------------------------------
+  backend-ci:
+    name: "Backend: Typecheck, Vitest & Build"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Backend
+
+    env:
+      NODE_ENV: test
+      PORT: 3001
+      DATABASE_URL: postgresql://test:test@localhost:5432/black_amber_test
+      JWT_SECRET: test_jwt_secret_at_least_16chars
+      JWT_EXPIRATION: 15m
+      JWT_SECRET_REFRESH: test_refresh_secret_16ch
+      RESEND_API_KEY: re_test_key
+      SYSTEM_MAIL_ADDR: test@blackamber.com
+      BUCKET_NAME: test-bucket
+      BUCKET_ACCESS_KEY: test-access-key
+      BUCKET_SECRET_KEY: test-secret-key
+      BUCKET_URL: http://localhost:9000
+      BUCKET_PUBLIC_URL: https://cdn.test.local
+      BUCKET_REGION: us-east-1
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: Backend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Typecheck (TypeScript estrito)
+        run: npm run typecheck
+
+      - name: Executar testes automatizados (Vitest)
+        run: npm test
+
+      - name: Compilar Backend
+        run: npm run build
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Frontend Client (Lint + Vitest + Build)
+  # ---------------------------------------------------------------------------
+  frontend-client-ci:
+    name: "Frontend Client: Lint, Vitest & Build"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Frontend
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Lint (ESLint Client)
+        run: npm run lint -w client-app
+
+      - name: Executar testes do client (Vitest)
+        run: npm run test -w client-app
+
+      - name: Build de produção (Client)
+        run: npm run build:client
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Frontend Admin (Lint + Vitest + Build)
+  # ---------------------------------------------------------------------------
+  frontend-admin-ci:
+    name: "Frontend Admin: Lint, Vitest & Build"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Frontend
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Lint (ESLint Admin)
+        run: npm run lint -w admin-app
+
+      - name: Executar testes do admin (Vitest)
+        run: npm run test -w admin-app
+
+      - name: Build de produção (Admin)
+        run: npm run build:admin
+
+  # ---------------------------------------------------------------------------
+  # Job 4: Validação de Containers Docker (Database & Backend)
+  # ---------------------------------------------------------------------------
+  docker-validation:
+    name: "Docker: Validação Database & Backend"
+    runs-on: ubuntu-latest
+    needs: [backend-ci, frontend-client-ci, frontend-admin-ci]
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar arquivos de ambiente (.env)
+        run: |
+          cp Database/.env.example Database/.env
+          cp Backend/.env.example Backend/.env
+
+      - name: Validar sintaxe Docker Compose
+        run: |
+          docker compose -f Database/docker-compose.yml config
+          docker compose -f Backend/docker-compose.yml config
+
+      - name: Build das imagens Docker (Database e Backend)
+        run: |
+          docker build -f Database/Dockerfile ./Database
+          docker build -f Backend/dockerfile ./Backend
