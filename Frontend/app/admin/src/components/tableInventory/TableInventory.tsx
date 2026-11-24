@@ -67,9 +67,9 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
     }, []);
 
     const handleSaveEdit = useCallback(
-        (data: InventoryEditData) => {
+        async (data: InventoryEditData) => {
             if (panelState.mode === "edit") {
-                handlers.onEdit(panelState.item.id, data);
+                await handlers.onEdit(panelState.item.id, data);
             }
             setPanelState({ mode: "closed" });
         },
@@ -77,8 +77,8 @@ export function TableInventory({items,handlers,title = "INVENTORY",isLive = true
     );
 
     const handleSaveAdd = useCallback(
-        (data: InventoryAddStockData) => {
-            handlers.onAddStock(data);
+        async (data: InventoryAddStockData) => {
+            await handlers.onAddStock(data);
             setPanelState({ mode: "closed" });
         },
         [handlers]

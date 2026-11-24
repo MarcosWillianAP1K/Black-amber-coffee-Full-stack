@@ -1,11 +1,12 @@
 import { RouterProvider } from "react-router-dom";
+import { API } from "shared-utils/core/APIroutes";
+import { ServerWarmupGate } from "ui-shared/components/ServerWarmupGate";
 import { router } from "./Router";
-import { AuthProvider } from "./context/AuthContext";
 
 export default function App() {
     return (
-        <AuthProvider>
+        <ServerWarmupGate healthUrl={API.Health} appName="Black Amber Coffee">
             <RouterProvider router={router} />
-        </AuthProvider>
+        </ServerWarmupGate>
     );
 }

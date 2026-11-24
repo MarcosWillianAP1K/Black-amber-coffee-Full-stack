@@ -1,26 +1,20 @@
 /**
- * Testes unitários — Admin App (4.3 Testes)
- *
- *  1. APP_ROUTES — contém todas as rotas do admin
- *  2. ADMIN_ROUTES — é subconjunto de APP_ROUTES
- *  3. useAuth — lança erro fora do AuthProvider
- *  4. AuthProvider — isAuthenticated é false sem token
- *  5. AuthProvider — clearError limpa o estado de error
- *  6. AuthProvider — login com sucesso atualiza user e token
- *  7. AuthProvider — login com falha seta error e retorna null
- *  8. AuthProvider — logout limpa user e token
+ * Testes unitários — Admin App (Zustand Stores, Routes & ServerWarmupGate)
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
+import { ServerWarmupGate } from 'ui-shared/components/ServerWarmupGate';
 
 import { APP_ROUTES, ADMIN_ROUTES } from '../utils/Path';
 import { useAuth } from '../hooks/useAuth';
-import { AuthProvider } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
+import { useEmployeeStore } from '../stores/useEmployeeStore';
+import { useCustomerStore } from '../stores/useCustomerStore';
 
 // ── Mocks ──────────────────────────────────────────────────────────────────
 
-vi.mock('../services/authService.ts', () => ({
+vi.mock('../services/authService', () => ({
   loginService: vi.fn(),
   signUpService: vi.fn(),
   logoutService: vi.fn(),
@@ -31,17 +25,30 @@ vi.mock('../services/authService.ts', () => ({
   getStoredRefreshToken: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock('shared-utils/MockBD.js', () => ({
-  MOCK_WORKERS: [],
-  MOCK_NOTIFICATIONS: [],
+vi.mock('../services/employeeService', () => ({
+  fetchEmployees: vi.fn().mockResolvedValue([]),
+  deleteEmployee: vi.fn().mockResolvedValue(undefined),
+  toggleEmployeeStatus: vi.fn(),
+  updateEmployee: vi.fn(),
 }));
 
-import * as authServiceModule from '../services/authService.ts';
+vi.mock('../services/customerService', () => ({
+  fetchCustomers: vi.fn().mockResolvedValue([]),
+  deleteCustomer: vi.fn().mockResolvedValue(undefined),
+  toggleCustomerStatus: vi.fn(),
+  updateCustomer: vi.fn(),
+}));
+
+import * as authServiceModule from '../services/authService';
+import * as employeeServiceModule from '../services/employeeService';
+import * as customerServiceModule from '../services/customerService';
 
 const mockLogin = authServiceModule.loginService as ReturnType<typeof vi.fn>;
 const mockLogout = authServiceModule.logoutService as ReturnType<typeof vi.fn>;
+const mockToggleEmployee = employeeServiceModule.toggleEmployeeStatus as ReturnType<typeof vi.fn>;
+const mockToggleCustomer = customerServiceModule.toggleCustomerStatus as ReturnType<typeof vi.fn>;
 
-// ── Fixture ────────────────────────────────────────────────────────────────
+// ── Fixtures ───────────────────────────────────────────────────────────────
 
 const fakeWorker = {
   publicId: 'w-001',
@@ -57,7 +64,16 @@ const fakeWorker = {
   updatedAt: '2024-01-01',
 };
 
-// ── Helper ─────────────────────────────────────────────────────────────────
+const fakeCustomer = {
+  publicId: 'c-001',
+  email: 'customer@test.com',
+  fullName: 'Customer Test',
+  phone: null,
+  avatarUrl: null,
+  isActive: true,
+  createdAt: '2024-01-01',
+  updatedAt: '2024-01-01',
+};
 
 function AuthConsumer({ onRender }: { onRender: (ctx: ReturnType<typeof useAuth>) => void }) {
   const ctx = useAuth();
@@ -86,53 +102,45 @@ describe('APP_ROUTES (Path.ts)', () => {
   });
 });
 
-describe('useAuth hook', () => {
-  it('deve lançar erro quando usado fora do AuthProvider', () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(<AuthConsumer onRender={() => {}} />)).toThrow(
-      'useAuth must be used within an AuthProvider'
-    );
-    spy.mockRestore();
-  });
-});
-
-describe('AuthProvider (admin)', () => {
-  let capturedCtx: ReturnType<typeof useAuth>;
+describe('useAuth + useAuthStore (Zustand)', () => {
+  let capturedState: ReturnType<typeof useAuth>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthStore.setState({
+      user: null,
+      token: null,
+      refreshToken: null,
+      loading: false,
+      error: null,
+      isAuthenticated: false,
+    });
+    useEmployeeStore.getState().reset();
+    useCustomerStore.getState().reset();
   });
 
-  function renderWithProvider() {
-    render(
-      <AuthProvider>
-        <AuthConsumer onRender={(ctx) => { capturedCtx = ctx; }} />
-      </AuthProvider>
-    );
-  }
-
-  it('isAuthenticated é false sem token armazenado', () => {
-    renderWithProvider();
+  it('funciona diretamente sem Provider e inicia não autenticado sem token', () => {
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
     expect(screen.getByTestId('consumer').textContent).toBe('não autenticado');
-    expect(capturedCtx!.isAuthenticated).toBe(false);
+    expect(capturedState.isAuthenticated).toBe(false);
   });
 
   it('clearError deve limpar o estado de error', async () => {
     mockLogin.mockRejectedValueOnce(new Error('Login failed'));
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
     await act(async () => {
-      await capturedCtx!.login('x@x.com', 'wrong');
+      await capturedState.login('x@x.com', 'wrong');
     });
 
-    expect(capturedCtx!.error).toBe('Login failed');
+    expect(useAuthStore.getState().error).toBe('Login failed');
 
     act(() => {
-      capturedCtx!.clearError();
+      useAuthStore.getState().clearError();
     });
 
-    expect(capturedCtx!.error).toBeNull();
+    expect(useAuthStore.getState().error).toBeNull();
   });
 
   it('login com sucesso deve atualizar user e isAuthenticated', async () => {
@@ -142,28 +150,29 @@ describe('AuthProvider (admin)', () => {
       refreshToken: 'refresh_token',
     });
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
     await act(async () => {
-      await capturedCtx!.login('worker@admin.com', 'Senha123');
+      await capturedState.login('worker@admin.com', 'Senha123');
     });
 
-    expect(capturedCtx!.isAuthenticated).toBe(true);
-    expect(capturedCtx!.user?.email).toBe('worker@admin.com');
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().user?.email).toBe('worker@admin.com');
+    expect(screen.getByTestId('consumer').textContent).toBe('autenticado');
   });
 
   it('login com falha deve setar error e retornar null', async () => {
     mockLogin.mockRejectedValueOnce(new Error('INVALID_CREDENTIALS'));
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
-    let result: Awaited<ReturnType<typeof capturedCtx.login>>;
+    let result: Awaited<ReturnType<typeof capturedState.login>> = null;
     await act(async () => {
-      result = await capturedCtx!.login('x@x.com', 'wrong');
+      result = await capturedState.login('x@x.com', 'wrong');
     });
 
-    expect(result!).toBeNull();
-    expect(capturedCtx!.error).toBe('INVALID_CREDENTIALS');
+    expect(result).toBeNull();
+    expect(useAuthStore.getState().error).toBe('INVALID_CREDENTIALS');
   });
 
   it('logout deve limpar user e token', async () => {
@@ -174,19 +183,65 @@ describe('AuthProvider (admin)', () => {
     });
     mockLogout.mockImplementation(() => {});
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
     await act(async () => {
-      await capturedCtx!.login('worker@admin.com', 'Senha123');
+      await capturedState.login('worker@admin.com', 'Senha123');
     });
 
-    expect(capturedCtx!.isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
 
     await act(async () => {
-      await capturedCtx!.logout();
+      await useAuthStore.getState().logout();
     });
 
-    expect(capturedCtx!.isAuthenticated).toBe(false);
-    expect(capturedCtx!.user).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().user).toBeNull();
+  });
+
+  it('stores de funcionário e cliente alternam isActive ao bloquear/desbloquear', async () => {
+    useEmployeeStore.setState({ employees: [fakeWorker], isLoading: false });
+    useCustomerStore.setState({ customers: [fakeCustomer], isLoading: false });
+
+    mockToggleEmployee.mockResolvedValueOnce({ ...fakeWorker, isActive: false });
+    mockToggleCustomer.mockResolvedValueOnce({ ...fakeCustomer, isActive: false });
+
+    await useEmployeeStore.getState().toggleEmployeeStatus(fakeWorker.publicId);
+    await useCustomerStore.getState().toggleCustomerStatus(fakeCustomer.publicId);
+
+    expect(useEmployeeStore.getState().employees[0]?.isActive).toBe(false);
+    expect(useCustomerStore.getState().customers[0]?.isActive).toBe(false);
+  });
+});
+
+describe('ServerWarmupGate (/health check)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('exibe tela de warmup enquanto /health aguarda e libera app quando retorna 200', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'ok' }), { status: 200 }));
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <ServerWarmupGate healthUrl="http://localhost:3001/v1/api/health" pollIntervalMs={60_000}>
+        <div data-testid="app-ready">Sistema Carregado</div>
+      </ServerWarmupGate>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Acordando o servidor na nuvem/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('app-ready')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Tentar novamente agora/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('app-ready')).toBeInTheDocument();
+    });
   });
 });

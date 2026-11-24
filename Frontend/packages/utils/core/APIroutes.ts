@@ -16,6 +16,7 @@ const API_BASE: string =
 
 export const API = {
     Base: API_BASE,
+    Health: `${API_BASE}/health`,
     Auth: {
         Base: `${API_BASE}/auth`,
         Login: `${API_BASE}/auth/login`,
@@ -33,12 +34,14 @@ export const API = {
         List: `${API_BASE}/workers`,
         FindById: (id: string) => `${API_BASE}/workers/${id}`,
         UpdateById: (id: string) => `${API_BASE}/workers/${id}`,
+        ToggleStatus: (id: string) => `${API_BASE}/workers/${id}/status`,
         DeleteById: (id: string) => `${API_BASE}/workers/${id}`,
     },
     AdminUsers: {
         List: `${API_BASE}/users`,
         FindById: (id: string) => `${API_BASE}/users/${id}`,
         UpdateById: (id: string) => `${API_BASE}/users/${id}`,
+        ToggleStatus: (id: string) => `${API_BASE}/users/${id}/status`,
         DeleteById: (id: string) => `${API_BASE}/users/${id}`,
     },
     AdminOrders: {
@@ -92,7 +95,7 @@ export const API = {
         UptadeMe: `${API_BASE}/workers/me`,
     },
     Analytics: {
-        Dashboard: `${API_BASE}/dashboard`,
+        Dashboard: `${API_BASE}/analytics/dashboard`,
     },
     Cart: {
         Get: `${API_BASE}/cart`,

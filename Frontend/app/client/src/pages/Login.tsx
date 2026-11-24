@@ -45,8 +45,8 @@ export function Login() {
                         <p className="text-(--Negacion) text-[12px] font-secondary font-bold">{error}</p>
                     )}
 
-                    <ButtonPrimary type="submit">
-                        {loading ? "Entrando..." : "Entrar"}
+                    <ButtonPrimary type="submit" isLoading={loading} loadingText="Entrando...">
+                        Entrar
                     </ButtonPrimary>
                 </form>
 

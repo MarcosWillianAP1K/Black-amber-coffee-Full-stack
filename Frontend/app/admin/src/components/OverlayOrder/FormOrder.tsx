@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import type { Product } from "shared-utils/types/product";
 
 import type { PaymentMethod } from "shared-utils/types/order";
@@ -296,9 +297,9 @@ export function FormOrder({ onClose, onSave, products }: FormOrderProps) {
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="px-4 py-2 rounded-md bg-(--Primary) text-(--Text-dark) font-primary font-semibold hover:bg-(--Primary-selected) transition-colors disabled:opacity-50"
+                        className="px-4 py-2 rounded-md bg-(--Primary) text-(--Text-dark) font-primary font-semibold hover:bg-(--Primary-selected) transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                     >
-                        {isSaving ? "Saving..." : "Save Order"}
+                        {isSaving ? <LoadingSpinner size="xs" label="Saving..." /> : "Save Order"}
                     </button>
                 </div>
             </form>

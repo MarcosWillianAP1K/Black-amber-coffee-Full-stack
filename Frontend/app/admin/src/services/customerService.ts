@@ -51,6 +51,22 @@ export async function updateCustomer(publicId: string, updates: Partial<Customer
     return payload.data;
 }
 
+/** Toggle customer active/inactive status */
+export async function toggleCustomerStatus(publicId: string, isActive?: boolean): Promise<Customer> {
+    const response = await authFetch(API.AdminUsers.ToggleStatus(publicId), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(typeof isActive === "boolean" ? { isActive } : {}),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to toggle customer status: ${response.status}`);
+    }
+
+    const payload = (await response.json()) as SingleCustomerResponse;
+    return payload.data;
+}
+
 /** Delete a customer */
 export async function deleteCustomer(publicId: string): Promise<void> {
     const response = await authFetch(API.AdminUsers.DeleteById(publicId), {

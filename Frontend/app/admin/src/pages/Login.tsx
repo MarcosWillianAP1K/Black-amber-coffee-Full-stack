@@ -37,8 +37,8 @@ export function Login() {
                         <p className="text-red-400 text-[12px] font-secondary font-bold">{error}</p>
                     )}
 
-                    <ButtonPrimary type="submit">
-                        {loading ? "Signing in..." : "Sign In"}
+                    <ButtonPrimary type="submit" isLoading={loading} loadingText="Signing in...">
+                        Sign In
                     </ButtonPrimary>
 
                 </form>

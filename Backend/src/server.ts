@@ -1,59 +1,99 @@
-import "dotenv/config";
-import express, { Response } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import cors from "cors";
-import { seed } from "./seed/seed";
-import { env } from "./config/env";
-import router from "./routes/v1.route";
-import sharedHandlers from "./shared/handlers/handles";
-import { secureHeaders, rateLimit, bodySizeLimit, securityLogger } from "./shared/middlewares/security.middleware";
-const app = express();
-const PORT = env.PORT || 8080;
+import { env } from "../core/config/env.js";
+import { runMigrations } from "../core/database/migrator.js";
+import { runSeed } from "../core/database/seeder.js";
+import { globalErrorHandler, logger } from "../core/errors/index.js";
+import {
+  bodySizeLimit,
+  rateLimit,
+  secureHeaders,
+  securityLogger,
+} from "../core/middlewares/security.middleware.js";
+import { setupSwagger } from "../core/swagger/swagger.js";
+import { apiRouter } from "../api/index.js";
+import { HealthController } from "../api/health/controllers/health.controller.js";
 
-app.use(express.json());
-app.use(cors());
+export function createApp(options: { enableRateLimit?: boolean } = {}): Express {
+  const app = express();
+  const { enableRateLimit = true } = options;
 
-// Security middlewares (ASVS)
-app.use(secureHeaders);
-app.use(rateLimit);
-app.use(bodySizeLimit);
-app.use(securityLogger);
+  app.set("trust proxy", 1);
 
-app.use((req, res, next) => {
-  const start = process.hrtime.bigint();
-  const startedAt = new Date().toISOString();
+  app.use(
+    cors({
+      origin: env.corsOrigins,
+      credentials: env.corsOrigins !== "*",
+    }),
+  );
+  app.use(express.json({ limit: "1mb" }));
 
-  res.on("finish", () => {
-    const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
-    console.log(
-      `${startedAt} | ${req.method} ${req.originalUrl} | ${res.statusCode} | ${durationMs.toFixed(2)} ms`,
-    );
+  app.use(secureHeaders);
+  if (enableRateLimit) {
+    app.use(rateLimit);
+  }
+  app.use(bodySizeLimit);
+  app.use(securityLogger);
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const start = process.hrtime.bigint();
+    res.on("finish", () => {
+      if (req.originalUrl === "/" && req.method === "GET") return;
+      const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
+      logger.info(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${durationMs.toFixed(2)}ms)`);
+    });
+    next();
   });
 
-  next();
-});
+  app.get("/", (_req: Request, res: Response) => {
+    res.status(200).json({
+      status: "online",
+      message: "Black Amber Coffee API está rodando com sucesso.",
+      health: "/v1/api/health",
+      docs: "/v1/docs",
+      timestamp: new Date().toISOString(),
+    });
+  });
 
-app.use("/v1", router);
+  app.get("/health", (req: Request, res: Response) => void HealthController.check(req, res));
 
-app.use((_req, _res, next) => {
-  next(new Error("NOT_FOUND"));
-});
+  setupSwagger(app);
 
-app.use(sharedHandlers.error);
+  app.use("/v1/api", apiRouter);
+  app.use("/api", apiRouter);
 
-if (!process.env.VERCEL) {
-  app.listen(PORT, async () => {
-    const publicPort = process.env.PUBLIC_PORT || PORT;
-    console.log(`🚀 Server running internally on PORT ${PORT}`);
-    console.log(`📚 Docs v1 available at http://localhost:${publicPort}/v1/docs`);
+  app.use((_req: Request, _res: Response, next: NextFunction) => {
+    next(new Error("NOT_FOUND"));
+  });
 
-    if (process.env.NODE_ENV !== "production") {
-      try {
-        await seed();
-      } catch (error) {
-        console.error("❌ Erro ao executar seed:", error);
-      }
+  app.use(globalErrorHandler);
+
+  return app;
+}
+
+const app = createApp();
+
+async function bootstrap(): Promise<void> {
+  try {
+    await runMigrations();
+    if (env.AUTO_SEED) {
+      await runSeed();
     }
-  });
+
+    app.listen(env.PORT, () => {
+      const publicPort = env.PUBLIC_PORT ?? env.PORT;
+      console.log(`[Backend] Servidor rodando na porta ${env.PORT}`);
+      console.log(`[Backend] Health Check: http://localhost:${publicPort}/v1/api/health`);
+      console.log(`[Backend] Swagger UI: http://localhost:${publicPort}/v1/docs`);
+    });
+  } catch (error) {
+    console.error("[Backend] Falha fatal ao iniciar o servidor:", error);
+    process.exit(1);
+  }
+}
+
+if (!env.isTest) {
+  void bootstrap();
 }
 
 export default app;

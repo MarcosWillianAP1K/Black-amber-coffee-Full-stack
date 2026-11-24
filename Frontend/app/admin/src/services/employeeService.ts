@@ -156,23 +156,32 @@ export async function updateEmployee(publicId: string, updates: Partial<WorkerUp
 }
 
 /** Toggle employee active/inactive status */
-export async function toggleEmployeeStatus(publicId: string): Promise<Worker> {
+export async function toggleEmployeeStatus(publicId: string, isActive?: boolean): Promise<Worker> {
     if (USE_MOCK) {
         const employee = employees.find((e) => e.publicId === publicId);
         if (!employee) throw new Error(`Employee ${publicId} not found`);
         const now = new Date().toISOString();
+        const nextStatus = typeof isActive === "boolean" ? isActive : !employee.isActive;
         employees = employees.map((e) =>
-            e.publicId === publicId ? { ...e, isActive: !e.isActive, updatedAt: now } : e
+            e.publicId === publicId ? { ...e, isActive: nextStatus, updatedAt: now } : e
         );
         const updated = employees.find((e) => e.publicId === publicId);
         if (!updated) throw new Error(`Employee ${publicId} not found`);
         return updated;
     }
 
-    // ⚠️ Backend does not have a route to activate/deactivate workers.
-    // The PUT /admin/workers/:id body accepts: fullName, email, password, phone, role, salary.
-    // isActive is NOT accepted. When this endpoint is added, implement it here.
-    throw new Error("Bloquear/desbloquear funcionário não está disponível — o backend não possui essa rota.");
+    const response = await authFetch(API.AdminWorkers.ToggleStatus(publicId), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(typeof isActive === "boolean" ? { isActive } : {}),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to toggle employee status: ${response.status}`);
+    }
+
+    const payload = (await response.json()) as AdminWorkerResponseWithMessage;
+    return payload.data;
 }
 
 /** Delete an employee */

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CategoryCarousel } from "ui-shared/components/CategoryCarousel";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import { ProductCard } from "../../components/ProductCard";
 import { DestakCard } from "../../components/DestakCard";
 import { SummaryCart } from "../../components/SummaryCart";
@@ -12,7 +13,7 @@ import { PRODUCT_CATEGORY_LABELS, type ProductCategory } from "shared-utils/type
 export function Menu() {
     const navigate = useNavigate();
     const { products, categories, isLoading, getCategoryLabel } = useMenu();
-    const { count, subtotal, discount, addItem } = useCart();
+    const { count, subtotal, discount, addItem, pendingProductIds } = useCart();
     const [selectedCategory, setSelectedCategory] = useState<string>("");
 
     const categoryLabels = useMemo(
@@ -75,17 +76,25 @@ export function Menu() {
 
                     <button
                         type="button"
-                        onClick={() => addItem(featured)}
-                        className="w-full py-3 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase"
+                        disabled={Boolean(pendingProductIds[featured.id])}
+                        onClick={() => void addItem(featured)}
+                        className="w-full py-3 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Adicionar ao Carrinho
+                        {pendingProductIds[featured.id] ? (
+                            <LoadingSpinner size="sm" label="Adicionando..." />
+                        ) : (
+                            "Adicionar ao Carrinho"
+                        )}
                     </button>
                 </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
                 {isLoading ? (
-                    <p className="col-span-2 text-(--Text-primary-off) text-sm">Carregando...</p>
+                    <div className="col-span-2 flex items-center gap-2 text-(--Text-primary-off) text-sm py-2">
+                        <LoadingSpinner size="sm" className="text-(--Primary)" />
+                        <span>Carregando...</span>
+                    </div>
                 ) : (
                     filtered.map((product) => (
                         <ProductCard
@@ -94,7 +103,8 @@ export function Menu() {
                             itens={product.description ?? getCategoryLabel(product.category)}
                             price={product.price}
                             imageUrl={product.imgUrl ?? undefined}
-                            onClick={() => addItem(product)}
+                            onClick={() => void addItem(product)}
+                            isLoading={Boolean(pendingProductIds[product.id])}
                         />
                     ))
                 )}

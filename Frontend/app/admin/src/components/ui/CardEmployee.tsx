@@ -7,12 +7,14 @@ import { PerfilCard } from "ui-shared/components/ui/PerfilCard";
 import { CompTime } from "ui-shared/components/CompTIme";
 import { OptionsEllipsis } from "ui-shared/components/OptionElipisses";
 import { ConfirmDialog } from "ui-shared/components/ConfirmDialog";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import type { Worker } from "shared-utils/types/worker";
 
 export interface CardEmployeeProps extends Worker {
     onDeleteEmployee: (publicId: string) => void;
     onBlockEmployee: (publicId: string) => void;
     onViewEmployee: (publicId: string) => void;
+    isPending?: boolean;
 }
 
 export function CardEmployee({
@@ -25,11 +27,13 @@ export function CardEmployee({
     onDeleteEmployee,
     onBlockEmployee,
     onViewEmployee,
+    isPending = false,
 }: CardEmployeeProps) {
     const [isProcessing, setIsProcessing] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const busy = isPending || isProcessing;
 
-    const handleAction = async (action: () => void) => {
+    const handleAction = async (action: () => void | Promise<void>) => {
         setIsProcessing(true);
         try {
             await action();
@@ -48,14 +52,20 @@ export function CardEmployee({
                     avatarUrl={avatarUrl ?? undefined}
                 />
 
-                <OptionsEllipsis
-                    disabled={isProcessing}
-                    options={[
-                        { label: "Ver Perfil", action: () => handleAction(() => onViewEmployee(publicId)) },
-                        { label: "Bloquear Funcionário", action: () => handleAction(() => onBlockEmployee(publicId)) },
-                        { label: "Excluir", action: () => setConfirmDelete(true), danger: true },
-                    ]}
-                />
+                <div className="flex items-center gap-2">
+                    {busy ? <LoadingSpinner size="xs" className="text-(--Primary)" /> : null}
+                    <OptionsEllipsis
+                        disabled={busy}
+                        options={[
+                            { label: "Ver Perfil", action: () => void handleAction(() => onViewEmployee(publicId)) },
+                            {
+                                label: isActive ? "Bloquear Funcionário" : "Desbloquear Funcionário",
+                                action: () => void handleAction(() => onBlockEmployee(publicId)),
+                            },
+                            { label: "Excluir", action: () => setConfirmDelete(true), danger: true },
+                        ]}
+                    />
+                </div>
             </div>
 
             <div className="w-full h-fit">

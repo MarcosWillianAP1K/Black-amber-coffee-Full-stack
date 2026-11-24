@@ -13,7 +13,7 @@ export interface AuthResponse {
     user: Worker;
 }
 
-async function mockLogin(email: string, _password: string): Promise<AuthResponse> {
+async function mockLogin(email: string): Promise<AuthResponse> {
     await new Promise((r) => setTimeout(r, 400));
 
     const employee = MOCK_WORKERS.find((e) => e.email === email);
@@ -27,7 +27,7 @@ async function mockLogin(email: string, _password: string): Promise<AuthResponse
     };
 }
 
-async function mockSignUp(name: string, email: string, _password: string): Promise<AuthResponse> {
+async function mockSignUp(name: string, email: string): Promise<AuthResponse> {
     await new Promise((r) => setTimeout(r, 400));
 
     const exists = MOCK_WORKERS.find((e) => e.email === email);
@@ -57,7 +57,7 @@ async function mockSignUp(name: string, email: string, _password: string): Promi
     };
 }
 
-async function mockRefreshToken(_refreshToken: string): Promise<RefreshTokenResponse> {
+async function mockRefreshToken(): Promise<RefreshTokenResponse> {
     await new Promise((r) => setTimeout(r, 200));
     return {
         data: {
@@ -67,7 +67,7 @@ async function mockRefreshToken(_refreshToken: string): Promise<RefreshTokenResp
     };
 }
 
-async function mockLogout(_refreshToken: string, _logoutAllDevices: boolean): Promise<LogoutResponse> {
+async function mockLogout(): Promise<LogoutResponse> {
     await new Promise((r) => setTimeout(r, 150));
     return { data: { success: true } };
 }
@@ -80,7 +80,8 @@ async function apiLogin(email: string, password: string): Promise<AuthResponse> 
     });
 
     if (!response.ok) {
-        throw new Error("Email or password incorrect");
+        const errPayload = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(errPayload?.message || "Email or password incorrect");
     }
 
     const payload = (await response.json()) as LoginResponse;
@@ -176,19 +177,19 @@ function persistSession(data: AuthResponse): void {
 }
 
 export async function loginService(email: string, password: string): Promise<AuthResponse> {
-    const data = USE_MOCK ? await mockLogin(email, password) : await apiLogin(email, password);
+    const data = USE_MOCK ? await mockLogin(email) : await apiLogin(email, password);
     persistSession(data);
     return data;
 }
 
 export async function signUpService(name: string, email: string, password: string): Promise<AuthResponse> {
-    const data = USE_MOCK ? await mockSignUp(name, email, password) : await apiSignUp(name, email, password);
+    const data = USE_MOCK ? await mockSignUp(name, email) : await apiSignUp(name, email, password);
     persistSession(data);
     return data;
 }
 
 export async function refreshTokenService(refreshToken: string): Promise<RefreshTokenResponse> {
-    const data = USE_MOCK ? await mockRefreshToken(refreshToken) : await apiRefreshToken(refreshToken);
+    const data = USE_MOCK ? await mockRefreshToken() : await apiRefreshToken(refreshToken);
     localStorage.setItem("token", data.data.accessToken);
     localStorage.setItem("refreshToken", data.data.refreshToken);
     return data;
@@ -198,7 +199,7 @@ export async function logoutApiService(
     refreshToken: string,
     logoutAllDevices = false,
 ): Promise<LogoutResponse> {
-    return USE_MOCK ? mockLogout(refreshToken, logoutAllDevices) : apiLogout(refreshToken, logoutAllDevices);
+    return USE_MOCK ? mockLogout() : apiLogout(refreshToken, logoutAllDevices);
 }
 
 export function logoutService(): void {

@@ -17,8 +17,8 @@ function Skeleton({ className }: { className?: string }) {
 
 export function Staff() {
     const navigate = useNavigate();
-    const { customers, deleteCustomer, isLoading: customersLoading, refresh: refresh} = useCustomers();
-    const { employees, deleteEmployee, toggleEmployeeStatus, isLoading: employeesLoading, error: employeesError, refresh: refreshEmployees } = useEmployee();
+    const { customers, deleteCustomer, toggleCustomerStatus, pendingCustomerIds, isLoading: customersLoading, refresh: refresh} = useCustomers();
+    const { employees, deleteEmployee, toggleEmployeeStatus, pendingEmployeeIds, isLoading: employeesLoading, error: employeesError, refresh: refreshEmployees } = useEmployee();
     const [showRegisterWorker, setShowRegisterWorker] = useState(false);
     const [showRegisterClient, setShowRegisterClient] = useState(false);
     const activeEmployees = employees.filter((employee) => employee.isActive);
@@ -97,6 +97,7 @@ export function Staff() {
                         onDeleteEmployee={deleteEmployee}
                         onBlockEmployee={toggleEmployeeStatus}
                         onViewEmployee={(publicId) => navigate(buildProfilePath("employee", publicId), { state: { from: "staff" } })}
+                        pendingEmployeeIds={pendingEmployeeIds}
                     />
 
                     <SectionEmployee
@@ -105,14 +106,16 @@ export function Staff() {
                         onDeleteEmployee={deleteEmployee}
                         onBlockEmployee={toggleEmployeeStatus}
                         onViewEmployee={(publicId) => navigate(buildProfilePath("employee", publicId), { state: { from: "staff" } })}
+                        pendingEmployeeIds={pendingEmployeeIds}
                     />
 
                     <SectionCustomers
                         customers={customers}
                         title="Clientes"
                         onDeleteCustomer={deleteCustomer}
-                        onBlockCustomer={(publicId) => console.log("Block customer:", publicId)}
+                        onBlockCustomer={toggleCustomerStatus}
                         onViewCustomer={(publicId) => navigate(buildProfilePath("customer", publicId), { state: { from: "staff" } })}
+                        pendingCustomerIds={pendingCustomerIds}
                     />
                 </div>
 

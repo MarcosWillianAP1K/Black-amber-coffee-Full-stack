@@ -7,13 +7,15 @@ export interface ProductCardProps {
     promotionPrice?: number;
     imageUrl?: string;
     onClick: () => void;
+    isLoading?: boolean;
+    disabled?: boolean;
 }
 
 
 
 
 
-export function ProductCard({ name, itens, price, promotionPrice, imageUrl, onClick }: ProductCardProps) {
+export function ProductCard({ name, itens, price, promotionPrice, imageUrl, onClick, isLoading = false, disabled = false }: ProductCardProps) {
 
     return (
         <div className="w-full h-fit p-4 bg-(--Widget-background) rounded-sm flex flex-col items-center justify-center gap-2 shadow-lg">
@@ -47,7 +49,7 @@ export function ProductCard({ name, itens, price, promotionPrice, imageUrl, onCl
                         </span>
                     </div>
                         
-                    <ButtonAddProduct onClick={onClick} />
+                    <ButtonAddProduct onClick={onClick} isLoading={isLoading} disabled={disabled} />
                 </div>
             </div>
         </div>

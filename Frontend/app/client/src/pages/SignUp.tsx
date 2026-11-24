@@ -76,8 +76,8 @@ export function SignUp() {
                         <p className="text-(--Negacion) text-[12px] font-secondary font-bold">{displayError}</p>
                     )}
 
-                    <ButtonPrimary type="submit">
-                        {loading ? "Cadastrando..." : "Cadastrar"}
+                    <ButtonPrimary type="submit" isLoading={loading} loadingText="Cadastrando...">
+                        Cadastrar
                     </ButtonPrimary>
                 </form>
 

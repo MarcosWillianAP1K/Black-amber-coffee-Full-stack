@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import { ProductCard } from "../../components/ProductCard";
 import { DestakCard } from "../../components/DestakCard";
 import { useMenu } from "../../hooks/useMenu";
@@ -20,7 +21,7 @@ const NEWS_ITEMS = [
 
 export function Home() {
     const { products, isLoading } = useMenu();
-    const { addItem } = useCart();
+    const { addItem, pendingProductIds } = useCart();
     const [newsIndex, setNewsIndex] = useState(0);
 
     const promotions = useMemo(() => products.slice(0, 4), [products]);
@@ -83,7 +84,10 @@ export function Home() {
                 <h2 className="text-(--Text-gray) text-lg font-primary font-bold">Promoções do Dia</h2>
 
                 {isLoading ? (
-                    <p className="text-(--Text-primary-off) text-sm font-secondary">Carregando...</p>
+                    <div className="flex items-center gap-2 text-(--Text-primary-off) text-sm font-secondary py-2">
+                        <LoadingSpinner size="sm" className="text-(--Primary)" />
+                        <span>Carregando...</span>
+                    </div>
                 ) : (
                     <div className="w-full grid grid-cols-2 gap-4">
                         {promotions.map((product) => (
@@ -93,7 +97,8 @@ export function Home() {
                                 itens={product.description ?? PRODUCT_CATEGORY_LABELS[product.category as ProductCategory] ?? product.category}
                                 price={product.price}
                                 imageUrl={product.imgUrl ?? undefined}
-                                onClick={() => addItem(product)}
+                                onClick={() => void addItem(product)}
+                                isLoading={Boolean(pendingProductIds[product.id])}
                             />
                         ))}
                     </div>
@@ -103,10 +108,15 @@ export function Home() {
             {featured && (
                 <button
                     type="button"
-                    onClick={() => addItem(featured)}
-                    className="w-full py-3 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase"
+                    disabled={Boolean(pendingProductIds[featured.id])}
+                    onClick={() => void addItem(featured)}
+                    className="w-full py-3 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                    Adicionar rápido — {featured.name}
+                    {pendingProductIds[featured.id] ? (
+                        <LoadingSpinner size="sm" label={`Adicionando ${featured.name}...`} />
+                    ) : (
+                        `Adicionar rápido — ${featured.name}`
+                    )}
                 </button>
             )}
         </div>

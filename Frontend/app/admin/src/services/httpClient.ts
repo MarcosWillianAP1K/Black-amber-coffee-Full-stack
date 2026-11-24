@@ -41,7 +41,7 @@ export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}
         headers.set("Authorization", `Bearer ${token}`);
     }
 
-    if (init.body && !headers.has("Content-Type")) {
+    if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
         headers.set("Content-Type", "application/json");
     }
 
@@ -70,7 +70,7 @@ export async function authFetch(input: RequestInfo | URL, init: RequestInit = {}
         retryHeaders.set("Authorization", `Bearer ${newToken}`);
     }
 
-    if (init.body && !retryHeaders.has("Content-Type")) {
+    if (init.body && !(init.body instanceof FormData) && !retryHeaders.has("Content-Type")) {
         retryHeaders.set("Content-Type", "application/json");
     }
 

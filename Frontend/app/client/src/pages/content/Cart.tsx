@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TicketPlus } from "lucide-react";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import { ProductCart } from "../../components/ProductCart";
 import { SummaryCart } from "../../components/SummaryCart";
 import { useCart } from "../../hooks/useCart";
@@ -20,6 +21,7 @@ export function Cart() {
         decrement,
         clear,
         isLoading,
+        pendingProductIds,
         error: cartError,
     } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +48,10 @@ export function Cart() {
 
     if (isLoading) {
         return (
-            <p className="text-(--Text-primary-off) text-sm font-secondary">Carregando carrinho...</p>
+            <div className="flex items-center gap-2 text-(--Text-primary-off) text-sm font-secondary py-4">
+                <LoadingSpinner size="sm" className="text-(--Primary)" />
+                <span>Carregando carrinho...</span>
+            </div>
         );
     }
 
@@ -65,8 +70,10 @@ export function Cart() {
                             price={item.price}
                             imageUrl={item.imgUrl ?? undefined}
                             quantity={item.quantity}
-                            onAdd={() => increment(item.productId)}
-                            onRemove={() => decrement(item.productId)}
+                            onAdd={() => void increment(item.productId)}
+                            onRemove={() => void decrement(item.productId)}
+                            isLoading={Boolean(pendingProductIds[item.productId])}
+                            disabled={isSubmitting}
                         />
                     ))}
                 </div>
@@ -109,7 +116,9 @@ export function Cart() {
                 itemsCount={count}
                 subTotal={subtotal}
                 discount={discount}
-                onCompletePurchase={handleCompletePurchase}
+                onCompletePurchase={() => void handleCompletePurchase()}
+                isLoading={isSubmitting}
+                disabled={items.length === 0}
             />
 
             {isSubmitting && (

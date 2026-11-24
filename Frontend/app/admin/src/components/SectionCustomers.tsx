@@ -10,9 +10,10 @@ export interface SectionCustomersProps {
     onDeleteCustomer: (publicId: string) => Promise<void> | void;
     onBlockCustomer: (publicId: string) => Promise<void> | void;
     onViewCustomer: (publicId: string) => void;
+    pendingCustomerIds?: Record<string, boolean>;
 }
 
-export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCustomer, onViewCustomer }: SectionCustomersProps) {
+export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCustomer, onViewCustomer, pendingCustomerIds }: SectionCustomersProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortType, setSortType] = useState<"default" | "name-asc" | "name-desc" | "newest" | "oldest">("default");
 
@@ -106,6 +107,7 @@ export function SectionCustomers({ customers, title, onDeleteCustomer, onBlockCu
                         onDeleteCustomer={onDeleteCustomer}
                         onBlockCustomer={onBlockCustomer}
                         onViewCustomer={onViewCustomer}
+                        isPending={Boolean(pendingCustomerIds?.[customer.publicId])}
                     />
                 ))}
             </div>

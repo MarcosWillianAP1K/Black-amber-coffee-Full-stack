@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import { API } from "shared-utils/core/APIroutes";
 
 interface RegisterClientOverlayProps {
@@ -144,9 +145,9 @@ export function RegisterClientOverlay({ onClose, onSuccess }: RegisterClientOver
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSubmitting ? `${btnDisabled} animate-pulse` : "hover:bg-(--Primary-selected) cursor-pointer"}`}
+                        className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide flex items-center justify-center gap-2 ${isSubmitting ? btnDisabled : "hover:bg-(--Primary-selected) cursor-pointer"}`}
                     >
-                        {isSubmitting ? "Cadastrando..." : "Cadastrar"}
+                        {isSubmitting ? <LoadingSpinner size="xs" label="Cadastrando..." /> : "Cadastrar"}
                     </button>
                 </div>
             </form>

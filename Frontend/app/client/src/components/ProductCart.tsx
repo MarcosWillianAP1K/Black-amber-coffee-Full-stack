@@ -10,10 +10,12 @@ export interface ProductCartProps {
     quantity?: number;
     onAdd: () => void;
     onRemove: () => void;
+    isLoading?: boolean;
+    disabled?: boolean;
 }
 
 
-export function ProductCart({ name, price, promotionPrice, imageUrl, quantity, onAdd, onRemove }: ProductCartProps) {
+export function ProductCart({ name, price, promotionPrice, imageUrl, quantity, onAdd, onRemove, isLoading = false, disabled = false }: ProductCartProps) {
 
 
 
@@ -54,7 +56,7 @@ export function ProductCart({ name, price, promotionPrice, imageUrl, quantity, o
                     </span>
                 </div>
 
-                <AddAndRemove onAdd={onAdd} onRemove={onRemove} quantity={quantity} />
+                <AddAndRemove onAdd={onAdd} onRemove={onRemove} quantity={quantity} isLoading={isLoading} disabled={disabled} />
             </div>
 
         </div>

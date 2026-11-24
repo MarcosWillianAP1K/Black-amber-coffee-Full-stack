@@ -10,6 +10,7 @@
 
 import { useState, useMemo, useRef } from "react";
 import { X, Upload } from "lucide-react";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import type { Product, ProductInput } from "shared-utils/types/product";
 import { PRODUCT_CATEGORIES } from "shared-utils/types/product";
 
@@ -239,9 +240,13 @@ export function MenuItemFormPanel({ editingItem, onSave, onCancel, categories = 
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSaving ? "opacity-50 cursor-not-allowed animate-pulse" : "hover:bg-(--Primary-selected) cursor-pointer"}`}
+                        className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide flex items-center justify-center gap-2 ${isSaving ? "opacity-60 cursor-not-allowed" : "hover:bg-(--Primary-selected) cursor-pointer"}`}
                     >
-                        {isEditing ? "Salvar Alterações" : "Adicionar Item"}
+                        {isSaving ? (
+                            <LoadingSpinner size="xs" label={isEditing ? "Salvando..." : "Adicionando..."} />
+                        ) : (
+                            isEditing ? "Salvar Alterações" : "Adicionar Item"
+                        )}
                     </button>
                 </div>
             </form>

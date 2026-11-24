@@ -1,150 +1,109 @@
-# 🗺️ Mapa Completo de Rotas — Black Amber Coffee API
+# Mapa Completo de Rotas — Black Amber Coffee API
 
-> Base URL: `http://localhost:3000/v1`
-> Docs (Swagger): `http://localhost:3000/v1/docs`
+> Prefixo principal: `/v1/api/*` (com alias `/api/*`)  
+> Health Check raiz e versionado: `GET /health` e `GET /v1/api/health`  
+> Documentação Swagger UI: `GET /v1/docs`
 
 ---
 
-## 🔐 Autenticação (Auth) — `/api/auth/*`
+## Health & Observabilidade (`/v1/api`)
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| POST | `/api/auth/register` | Registrar novo cliente | Público |
-| POST | `/api/auth/login` | Login unificado (cliente OU worker) | Público |
-| POST | `/api/auth/jwt/refresh-token` | Renovar tokens | Autenticado |
-| POST | `/api/auth/logout` | Logout / revogar tokens | Autenticado |
-| POST | `/api/auth/forgotpassword/send` | Enviar código de reset | Público |
-| POST | `/api/auth/forgotpassword/check` | Validar código de reset | Público |
-| POST | `/api/auth/forgotpassword/reset` | Resetar senha | Público |
+| :--- | :--- | :--- | :--- |
+| GET | `/v1/api/health` | Status da API e latência real no PostgreSQL (`200` ou `503`) | Público |
+| GET | `/v1/api/metrics` | Uptime e consumo de memória do processo | Admin |
 
 ---
 
-## 🥤 Pedidos (Orders) — `/api/orders/*`
+## Autenticação (`/v1/api/auth`)
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| GET | `/api/orders` | Listar todos os pedidos | Worker / Admin |
-| POST | `/api/orders` | Criar novo pedido | Worker / Admin |
-| GET | `/api/orders/:publicId` | Buscar pedido por ID | Worker / Admin |
-| PATCH | `/api/orders/:publicId/status` | Atualizar status | Worker / Admin |
-| POST | `/api/orders/:publicId/cancel` | Cancelar pedido | Worker / Admin |
+| :--- | :--- | :--- | :--- |
+| POST | `/v1/api/auth/register` | Registrar novo cliente (`201` ou `409`) | Público |
+| POST | `/v1/api/auth/login` | Login unificado para clientes e workers (`403` se bloqueado) | Público |
+| POST | `/v1/api/auth/jwt/refresh-token` | Renovar par Access/Refresh Token | Público |
+| POST | `/v1/api/auth/logout` | Revogar sessão atual ou todas as sessões | Público |
+| POST | `/v1/api/auth/forgotpassword/send` | Enviar código de redefinição de senha | Público |
+| POST | `/v1/api/auth/forgotpassword/check` | Validar código de redefinição | Público |
+| POST | `/v1/api/auth/forgotpassword/reset` | Redefinir senha com código válido | Público |
 
 ---
 
-## ☕ Produtos (Products) — `/api/products/*`
+## Funcionários / Workers (`/v1/api/workers`)
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| GET | `/api/products` | Listar produtos | Autenticado |
-| GET | `/api/products/categories` | Listar categorias | Autenticado |
-| GET | `/api/products/:publicId` | Buscar produto | Autenticado |
-| GET | `/api/products/:publicId/stock` | Ver estoque | Autenticado |
-| POST | `/api/products` | Criar produto | **Admin** |
-| PUT | `/api/products/:publicId` | Atualizar produto | **Admin** |
-| DELETE | `/api/products/:publicId` | Deletar produto | **Admin** |
-| POST | `/api/products/:publicId/image` | Upload imagem | **Admin** |
-| PATCH | `/api/products/:publicId/activate` | Ativar produto | **Admin** |
-| PATCH | `/api/products/:publicId/deactivate` | Desativar produto | **Admin** |
-| PATCH | `/api/products/:publicId/stock` | Atualizar estoque | **Admin** |
+| :--- | :--- | :--- | :--- |
+| GET | `/v1/api/workers/me` | Dados do worker autenticado | Worker |
+| PATCH | `/v1/api/workers/me` | Atualizar perfil próprio e avatar (WebP) | Worker |
+| GET | `/v1/api/workers` | Listar todos os funcionários | Admin |
+| POST | `/v1/api/workers` | Cadastrar funcionário | Admin |
+| GET | `/v1/api/workers/:publicId` | Detalhar funcionário | Admin |
+| PUT | `/v1/api/workers/:publicId` | Atualizar dados/salário/cargo/status do funcionário | Admin |
+| PATCH | `/v1/api/workers/:publicId/status` | Ativar ou bloquear funcionário (`isActive`) | Admin |
+| DELETE | `/v1/api/workers/:publicId` | Remover funcionário | Admin |
 
 ---
 
-## 👷 Workers — `/api/workers/*`
+## Clientes / Users (`/v1/api/users`)
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| GET | `/api/workers/me` | Perfil próprio | Worker / Admin |
-| PATCH | `/api/workers/me` | Atualizar próprio perfil | Worker / Admin |
-| GET | `/api/workers` | Listar todos workers | **Admin** |
-| POST | `/api/workers` | Registrar novo worker | **Admin** |
-| GET | `/api/workers/:publicId` | Buscar worker | **Admin** |
-| PUT | `/api/workers/:publicId` | Atualizar worker | **Admin** |
-| DELETE | `/api/workers/:publicId` | Deletar worker | **Admin** |
-
-> **Login de worker é feito via `POST /api/auth/login`** (unificado)
+| :--- | :--- | :--- | :--- |
+| GET | `/v1/api/users/me` | Perfil do cliente autenticado | Cliente |
+| PUT | `/v1/api/users/me` | Atualizar perfil próprio e avatar | Cliente |
+| DELETE | `/v1/api/users/me` | Excluir própria conta | Cliente |
+| GET | `/v1/api/users` | Listar todos os clientes | Admin |
+| GET | `/v1/api/users/:publicId` | Detalhar cliente | Admin |
+| PUT | `/v1/api/users/:publicId` | Atualizar dados administrativos do cliente | Admin |
+| PATCH | `/v1/api/users/:publicId/status` | Ativar ou bloquear cliente (`isActive`) | Admin |
+| DELETE | `/v1/api/users/:publicId` | Remover cliente | Admin |
 
 ---
 
-## 👤 Clientes (Users) — `/api/users/*`
+## Cardápio / Products (`/v1/api/products`)
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| GET | `/api/users/me` | Perfil próprio | Cliente autenticado |
-| PUT | `/api/users/me` | Atualizar próprio perfil | Cliente autenticado |
-| DELETE | `/api/users/me` | Deletar própria conta | Cliente autenticado |
-| GET | `/api/users` | Listar todos clientes | **Admin** |
-| GET | `/api/users/:publicId` | Buscar cliente | **Admin** |
-| PUT | `/api/users/:publicId` | Atualizar cliente | **Admin** |
-| DELETE | `/api/users/:publicId` | Deletar cliente | **Admin** |
+| :--- | :--- | :--- | :--- |
+| GET | `/v1/api/products` | Listar produtos | Autenticado |
+| GET | `/v1/api/products/categories` | Listar categorias | Autenticado |
+| GET | `/v1/api/products/:publicId` | Buscar produto por `publicId` | Autenticado |
+| GET | `/v1/api/products/:publicId/stock` | Consultar estoque vinculado | Autenticado |
+| POST | `/v1/api/products` | Cadastrar produto | Admin |
+| PUT | `/v1/api/products/:publicId` | Atualizar produto | Admin |
+| DELETE | `/v1/api/products/:publicId` | Remover produto (soft-delete se vinculado a pedidos) | Admin |
+| POST | `/v1/api/products/:publicId/image` | Upload de imagem (`multipart/form-data` -> WebP) | Admin |
+| PATCH | `/v1/api/products/:publicId/activate` | Ativar produto | Admin |
+| PATCH | `/v1/api/products/:publicId/deactivate` | Desativar produto | Admin |
+| PATCH | `/v1/api/products/:publicId/stock` | Ajustar estoque do produto | Admin |
 
 ---
 
-## 📊 Analytics — `/api/analytics/*`
+## Estoque / Inventory (`/v1/api/inventory`)
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| GET | `/api/analytics/dashboard` | Dashboard com métricas | **Admin** |
+| :--- | :--- | :--- | :--- |
+| GET | `/v1/api/inventory` | Listar itens de estoque | Autenticado |
+| GET | `/v1/api/inventory/:publicId` | Buscar item de estoque | Autenticado |
+| POST | `/v1/api/inventory/create` | Criar novo item de estoque | Admin |
+| POST | `/v1/api/inventory/add-stock` | Adicionar quantidade por código | Admin |
+| PUT | `/v1/api/inventory/:publicId` | Atualizar item de estoque | Admin |
+| DELETE | `/v1/api/inventory/:publicId` | Excluir item de estoque | Admin |
 
 ---
 
-## 🩺 Health — `/api/health`
+## Pedidos, Carrinho, Checkout e Analytics
 
 | Método | Rota | Descrição | Acesso |
-|--------|------|-----------|--------|
-| GET | `/api/health` | Health check | Público |
-
----
-
-## 🔄 Rotas de Compatibilidade Retroativa
-
-> Essas rotas existem para o frontend antigo continuar funcionando.
-> **Preferência:** Use as rotas unificadas acima.
-
-### Worker (estilo antigo)
-| Método | Rota | Equivalente novo |
-|--------|------|-----------------|
-| GET | `/api/worker/get/me` | `GET /api/workers/me` |
-| PATCH | `/api/worker/update/me` | `PATCH /api/workers/me` |
-| POST | `/api/worker/orders` | `POST /api/orders` |
-| GET | `/api/worker/orders` | `GET /api/orders` |
-| GET | `/api/worker/orders/:publicId` | `GET /api/orders/:publicId` |
-| PATCH | `/api/worker/orders/:publicId/status` | `PATCH /api/orders/:publicId/status` |
-| POST | `/api/worker/orders/:publicId/cancel` | `POST /api/orders/:publicId/cancel` |
-
-### User/Cliente (estilo antigo)
-| Método | Rota | Equivalente novo |
-|--------|------|-----------------|
-| GET | `/api/user/me` | `GET /api/users/me` |
-| PUT | `/api/user/me` | `PUT /api/users/me` |
-| DELETE | `/api/user/me` | `DELETE /api/users/me` |
-| POST | `/api/user/orders` | --- (específica do cliente) |
-| GET | `/api/user/orders` | --- (específica do cliente) |
-| POST | `/api/user/orders/:publicId/cancel` | `POST /api/orders/:publicId/cancel` |
-
-### Admin (estilo antigo)
-| Método | Rota | Equivalente novo |
-|--------|------|-----------------|
-| POST | `/api/admin/workers` | `POST /api/workers` |
-| GET | `/api/admin/workers` | `GET /api/workers` |
-| GET | `/api/admin/workers/:publicId` | `GET /api/workers/:publicId` |
-| PUT | `/api/admin/workers/:publicId` | `PUT /api/workers/:publicId` |
-| DELETE | `/api/admin/workers/:publicId` | `DELETE /api/workers/:publicId` |
-| POST | `/api/admin/products` | `POST /api/products` |
-| PUT | `/api/admin/products/:publicId` | `PUT /api/products/:publicId` |
-| DELETE | `/api/admin/products/:publicId` | `DELETE /api/products/:publicId` |
-| POST | `/api/admin/products/:publicId/image` | `POST /api/products/:publicId/image` |
-| PATCH | `/api/admin/products/:publicId/activate` | `PATCH /api/products/:publicId/activate` |
-| PATCH | `/api/admin/products/:publicId/deactivate` | `PATCH /api/products/:publicId/deactivate` |
-| GET | `/api/admin/products/:publicId/stock` | `GET /api/products/:publicId/stock` |
-| PATCH | `/api/admin/products/:publicId/stock` | `PATCH /api/products/:publicId/stock` |
-
----
-
-## 📋 Resumo de Permissões
-
-| Role | Pode acessar |
-|------|-------------|
-| **Público** | Health, Auth (register, login, forgot password) |
-| **Cliente (`user`)** | Próprio perfil (`/users/me`), próprios pedidos (`/user/orders`) |
-| **Worker** | Pedidos, Produtos (visualizar), próprio perfil (`/workers/me`) |
-| **Admin** | TUDO (CRUD workers, users, products, analytics, orders) |
+| :--- | :--- | :--- | :--- |
+| GET | `/v1/api/orders` | Listar pedidos (cliente vê os próprios; worker vê fila completa) | Autenticado |
+| POST | `/v1/api/orders` | Criar pedido | Autenticado |
+| GET | `/v1/api/orders/:publicId` | Buscar detalhes do pedido | Worker |
+| PATCH | `/v1/api/orders/:publicId/status` | Atualizar status (`criado <-> em_preparo -> pronto -> finalizado`) | Worker |
+| POST | `/v1/api/orders/:publicId/cancel` | Cancelar pedido | Autenticado |
+| DELETE | `/v1/api/orders/:publicId` | Excluir pedido | Admin |
+| GET | `/v1/api/cart` | Consultar carrinho ativo | Cliente |
+| POST | `/v1/api/cart/items` | Adicionar item ao carrinho | Cliente |
+| PATCH | `/v1/api/cart/items/:productId` | Atualizar quantidade no carrinho | Cliente |
+| DELETE | `/v1/api/cart/items/:productId` | Remover item do carrinho | Cliente |
+| DELETE | `/v1/api/cart` | Esvaziar carrinho | Cliente |
+| POST | `/v1/api/payments/simulate` | Executar checkout transacional atômico a partir do carrinho | Cliente |
+| GET | `/v1/api/analytics/dashboard` | Indicadores financeiros e métricas do painel | Admin |

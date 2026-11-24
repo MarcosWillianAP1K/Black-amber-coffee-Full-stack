@@ -1,18 +1,25 @@
 
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
+
 interface SummaryCartProps {
   itemsCount: number;
   subTotal: number;
   discount: number;
   onCompletePurchase: () => void;
+  isLoading?: boolean;
+  disabled?: boolean;
 }
 
 export function SummaryCart({
   itemsCount,
   subTotal,
   discount,
-  onCompletePurchase
+  onCompletePurchase,
+  isLoading = false,
+  disabled = false,
 }: SummaryCartProps) {
   const total = subTotal - discount;
+  const isBlocked = isLoading || disabled;
 
   // Função auxiliar para formatar a moeda: símbolo em fonte secundária, números em fonte primária
   const formatCurrency = (value: number, isNegative = false) => {
@@ -66,10 +73,16 @@ export function SummaryCart({
 
       {/* BUTTON */}
       <button
+        type="button"
+        disabled={isBlocked}
         onClick={onCompletePurchase}
-        className="w-full py-3.5 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer hover:brightness-110 transition-all shadow-md text-center flex items-center justify-center"
+        className="w-full py-3.5 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-md text-center flex items-center justify-center gap-2"
       >
-        Complete Purchase
+        {isLoading ? (
+          <LoadingSpinner size="sm" label="Processando..." />
+        ) : (
+          "Complete Purchase"
+        )}
       </button>
 
     </div>

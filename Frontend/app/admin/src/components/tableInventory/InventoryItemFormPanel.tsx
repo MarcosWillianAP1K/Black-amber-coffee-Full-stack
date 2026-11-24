@@ -8,6 +8,7 @@
 
 import { useState, useMemo } from "react";
 import { X } from "lucide-react";
+import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import type { InventoryItem, InventoryAddStockData, InventoryEditData, InventoryUnit } from "shared-utils/types/inventory";
 import { INVENTORY_UNITS, UNIT_LABELS } from "shared-utils/types/inventory";
 
@@ -17,9 +18,9 @@ interface InventoryItemFormPanelProps {
     /** The item to edit. If null, the panel is in "add stock" mode. */
     editingItem: InventoryItem | null;
     /** Called in "edit" mode. */
-    onSaveEdit: (data: InventoryEditData) => void;
+    onSaveEdit: (data: InventoryEditData) => Promise<void> | void;
     /** Called in "add stock" mode. */
-    onSaveAdd: (data: InventoryAddStockData) => void;
+    onSaveAdd: (data: InventoryAddStockData) => Promise<void> | void;
     /** Called when the user cancels / closes the panel. */
     onCancel: () => void;
 }
@@ -56,29 +57,40 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
     }, [editingItem]);
 
     const [formData, setFormData] = useState<FormState>(initialFormData);
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     const handleChange = (field: keyof FormState, value: string | number) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (mode === "edit") {
-            onSaveEdit({
-                name: formData.name,
-                code: formData.code,
-                description: formData.description,
-                amount: formData.amount,
-                unit: formData.unit,
-            });
-        } else {
-            onSaveAdd({
-                name: formData.name,
-                code: formData.code,
-                description: formData.description,
-                amount: formData.amount,
-                unit: formData.unit,
-            });
+        setIsSaving(true);
+        setSaveError(null);
+
+        try {
+            if (mode === "edit") {
+                await onSaveEdit({
+                    name: formData.name,
+                    code: formData.code,
+                    description: formData.description,
+                    amount: formData.amount,
+                    unit: formData.unit,
+                });
+            } else {
+                await onSaveAdd({
+                    name: formData.name,
+                    code: formData.code,
+                    description: formData.description,
+                    amount: formData.amount,
+                    unit: formData.unit,
+                });
+            }
+        } catch (err) {
+            setSaveError(err instanceof Error ? err.message : "Erro ao salvar estoque");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -190,20 +202,30 @@ export function InventoryItemFormPanel({editingItem,onSaveEdit,onSaveAdd,onCance
                     </div>
                 </div>
 
+                {saveError && (
+                    <p className="text-(--Negacion) text-xs font-secondary">{saveError}</p>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-4">
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="flex-1 px-4 py-2.5 bg-(--Button-background) text-(--Text-gray) font-primary font-bold text-sm rounded-md hover:bg-(--Select-background) transition-colors uppercase tracking-wide"
+                        disabled={isSaving}
+                        className="flex-1 px-4 py-2.5 bg-(--Button-background) text-(--Text-gray) font-primary font-bold text-sm rounded-md hover:bg-(--Select-background) disabled:opacity-50 disabled:cursor-not-allowed transition-colors uppercase tracking-wide cursor-pointer"
                     >
                         Cancelar
                     </button>
                     <button
                         type="submit"
-                        className="flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md hover:bg-(--Primary-selected) transition-colors uppercase tracking-wide"
+                        disabled={isSaving}
+                        className="flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md hover:bg-(--Primary-selected) disabled:opacity-60 disabled:cursor-not-allowed transition-colors uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer"
                     >
-                        {mode === "edit" ? "Salvar Alterações" : "Adicionar Estoque"}
+                        {isSaving ? (
+                            <LoadingSpinner size="xs" label={mode === "edit" ? "Salvando..." : "Adicionando..."} />
+                        ) : (
+                            mode === "edit" ? "Salvar Alterações" : "Adicionar Estoque"
+                        )}
                     </button>
                 </div>
             </form>

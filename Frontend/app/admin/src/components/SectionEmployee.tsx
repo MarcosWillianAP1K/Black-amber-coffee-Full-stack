@@ -11,9 +11,10 @@ export interface SectionEmployeeProps {
     onDeleteEmployee: (publicId: string) => void;
     onBlockEmployee: (publicId: string) => void;
     onViewEmployee: (publicId: string) => void;
+    pendingEmployeeIds?: Record<string, boolean>;
 }
 
-export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmployee, onViewEmployee }: SectionEmployeeProps) {
+export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmployee, onViewEmployee, pendingEmployeeIds }: SectionEmployeeProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortType, setSortType] = useState<"default" | "name-asc" | "name-desc" | "role-asc">("default");
     const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
@@ -126,6 +127,7 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
                         onDeleteEmployee={onDeleteEmployee}
                         onBlockEmployee={onBlockEmployee}
                         onViewEmployee={onViewEmployee}
+                        isPending={Boolean(pendingEmployeeIds?.[employee.publicId])}
                     />
                 ))}
             </div>

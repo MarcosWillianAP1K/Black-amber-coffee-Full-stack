@@ -21,10 +21,12 @@ const ORDER_STATUS_COLORS = {
 interface CardOrderProps {
     order: Order;
     onAction?: (orderId: number, action: string) => Promise<void>;
+    isPending?: boolean;
 }
 
-export function CardOrder({ order, onAction }: CardOrderProps) {
+export function CardOrder({ order, onAction, isPending = false }: CardOrderProps) {
     const [isProcessing, setIsProcessing] = useState(false);
+    const busy = isPending || isProcessing;
 
     const handleAction = async (action: string) => {
         setIsProcessing(true);
@@ -76,7 +78,7 @@ export function CardOrder({ order, onAction }: CardOrderProps) {
                 <p className="text-(--Primary) text-[16px] font-bold w-full">
                     {formatPrice(order.totalPrice)}
                 </p>
-                <ButtonOrder status={order.status} onAction={handleAction} disabled={isProcessing} />
+                <ButtonOrder status={order.status} onAction={handleAction} disabled={busy} isLoading={busy} />
             </div>
         </div>
     );

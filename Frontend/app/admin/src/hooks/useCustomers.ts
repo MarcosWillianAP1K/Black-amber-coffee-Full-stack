@@ -1,36 +1,48 @@
-/**
- * useCustomers — Custom hook encapsulating customer state and operations.
- *
- * Provides customers list and handlers ready to plug into SectionCustomers.
- * Now delegates completely to CustomerContext instead of localStorage.
- */
-
 import { useCallback } from "react";
-import { useCustomerContext } from "../context/CustomerContext";
+import { useCustomerStore } from "../stores/useCustomerStore";
+import type {
+    User as Customer,
+    UserUpdateInput as CustomerUpdateInput,
+} from "shared-utils/types/user";
 
 interface UseCustomersReturn {
-    customers: ReturnType<typeof useCustomerContext>["customers"];
-    isLoading: ReturnType<typeof useCustomerContext>["isLoading"];
-    error: ReturnType<typeof useCustomerContext>["error"];
-    refresh: ReturnType<typeof useCustomerContext>["refresh"];
+    customers: Customer[];
+    isLoading: boolean;
+    error: string | null;
+    pendingCustomerIds: Record<string, boolean>;
+    refresh: () => Promise<void>;
+    deleteCustomer: (publicId: string) => Promise<void>;
+    toggleCustomerStatus: (publicId: string) => Promise<void>;
+    updateCustomer: (publicId: string, updates: Partial<CustomerUpdateInput>) => Promise<void>;
     handleOptions: (publicId: string) => void;
-    deleteCustomer: ReturnType<typeof useCustomerContext>["deleteCustomer"];
 }
 
 export function useCustomers(): UseCustomersReturn {
-    const { customers, isLoading, error, refresh, deleteCustomer } = useCustomerContext();
+    const customers = useCustomerStore((s) => s.customers);
+    const isLoading = useCustomerStore((s) => s.isLoading);
+    const error = useCustomerStore((s) => s.error);
+    const pendingCustomerIds = useCustomerStore((s) => s.pendingCustomerIds);
+    const refresh = useCustomerStore((s) => s.refresh);
+    const deleteCustomer = useCustomerStore((s) => s.deleteCustomer);
+    const toggleCustomerStatus = useCustomerStore((s) => s.toggleCustomerStatus);
+    const updateCustomer = useCustomerStore((s) => s.updateCustomer);
 
-    const handleOptions = useCallback((publicId: string) => {
-        // TODO: Open a dropdown/modal with options (edit, ban, delete, etc.)
-        console.log("Options for customer:", publicId);
-    }, []);
+    const handleOptions = useCallback(
+        (publicId: string) => {
+            void toggleCustomerStatus(publicId);
+        },
+        [toggleCustomerStatus],
+    );
 
     return {
         customers,
         isLoading,
         error,
+        pendingCustomerIds,
         refresh,
-        handleOptions,
         deleteCustomer,
+        toggleCustomerStatus,
+        updateCustomer,
+        handleOptions,
     };
 }

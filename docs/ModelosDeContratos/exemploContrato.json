@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BlackAmberEnvelopeContrato",
+  "description": "Modelo canônico de resposta no Envelope Pattern para recursos da API Black Amber Coffee",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "publicId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Identificador público único do recurso"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["criado", "em_preparo", "pronto", "finalizado", "cancelado"],
+          "description": "Estado atual do pedido no ciclo de atendimento"
+        },
+        "totalPrice": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Valor total calculado no servidor"
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicador de atividade do cadastro"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp UTC ISO 8601 de criação"
+        }
+      },
+      "required": ["publicId", "createdAt"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensagem descritiva da operação"
+    }
+  },
+  "required": ["data", "message"],
+  "additionalProperties": false
+}

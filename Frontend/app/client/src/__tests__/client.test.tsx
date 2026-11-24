@@ -1,26 +1,19 @@
 /**
- * Testes unitários — utilitários e hooks do cliente (4.3 Testes)
- *
- * 1. Path.ts          — APP_ROUTES contém todas as rotas esperadas
- * 2. useAuth hook     — lança erro fora do AuthProvider
- * 3. useAuth hook     — retorna contexto dentro do AuthProvider
- * 4. AuthProvider     — isAuthenticated é false sem token
- * 5. AuthProvider     — clearError limpa o estado de erro
- * 6. AuthProvider     — login com sucesso atualiza user e token
- * 7. AuthProvider     — login com falha seta error e retorna null
- * 8. AuthProvider     — logout limpa user e token
+ * Testes unitários — Client App (Zustand Stores, Routes & ServerWarmupGate)
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act, waitFor } from '@testing-library/react';
+import { ServerWarmupGate } from 'ui-shared/components/ServerWarmupGate';
 
 import { APP_ROUTES } from '../utils/Path';
 import { useAuth } from '../hooks/useAuth';
-import { AuthProvider } from '../context/AuthContext';
+import { useAuthStore } from '../stores/useAuthStore';
+import { useCartStore } from '../stores/useCartStore';
 
-// ── Mock das dependências externas ─────────────────────────────────────────
+// ── Mocks ──────────────────────────────────────────────────────────────────
 
-vi.mock('../services/authService.ts', () => ({
+vi.mock('../services/authService', () => ({
   loginService: vi.fn(),
   registerService: vi.fn(),
   logoutService: vi.fn(),
@@ -30,29 +23,50 @@ vi.mock('../services/authService.ts', () => ({
   getStoredRefreshToken: vi.fn().mockReturnValue(null),
 }));
 
+vi.mock('../services/cartService', () => ({
+  fetchCart: vi.fn(),
+  addCartItem: vi.fn(),
+  updateCartItem: vi.fn(),
+  removeCartItem: vi.fn(),
+  clearCart: vi.fn(),
+}));
+
 vi.mock('shared-utils/MockBD.js', () => ({
   MOCK_NOTIFICATIONS: [],
 }));
 
-import * as authServiceModule from '../services/authService.ts';
+import * as authServiceModule from '../services/authService';
+import * as cartServiceModule from '../services/cartService';
 
 const mockLogin = authServiceModule.loginService as ReturnType<typeof vi.fn>;
 const mockLogout = authServiceModule.logoutService as ReturnType<typeof vi.fn>;
+const mockAddCartItem = cartServiceModule.addCartItem as ReturnType<typeof vi.fn>;
 
-// ── Fixtures ──────────────────────────────────────────────────────────────
+// ── Fixtures ───────────────────────────────────────────────────────────────
 
 const fakeUser = {
-  id: 1,
   publicId: 'pub-1',
-  name: 'Test User',
+  fullName: 'Test User',
   email: 'user@test.com',
   phone: null,
   avatarUrl: null,
+  isActive: true,
   createdAt: '2024-01-01',
   updatedAt: '2024-01-01',
 };
 
-// ── Helper: consumidor do hook ─────────────────────────────────────────────
+const fakeProduct = {
+  id: 10,
+  publicId: 'prod-10',
+  name: 'Amber Espresso',
+  description: 'Espresso intenso',
+  category: 'cafe' as const,
+  price: 12.5,
+  imgUrl: null,
+  isActive: true,
+  createdAt: '2024-01-01',
+  updatedAt: '2024-01-01',
+};
 
 function AuthConsumer({ onRender }: { onRender: (ctx: ReturnType<typeof useAuth>) => void }) {
   const ctx = useAuth();
@@ -77,54 +91,44 @@ describe('APP_ROUTES (Path.ts)', () => {
   });
 });
 
-describe('useAuth hook', () => {
-  it('deve lançar erro quando usado fora do AuthProvider', () => {
-    // Suppress the expected console.error from React
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    expect(() => render(<AuthConsumer onRender={() => {}} />)).toThrow(
-      'useAuth must be used within AuthProvider'
-    );
-    spy.mockRestore();
-  });
-});
-
-describe('AuthProvider', () => {
-  let capturedCtx: ReturnType<typeof useAuth>;
+describe('useAuth + useAuthStore (Zustand)', () => {
+  let capturedState: ReturnType<typeof useAuth>;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    useAuthStore.setState({
+      user: null,
+      token: null,
+      refreshToken: null,
+      loading: false,
+      error: null,
+      isAuthenticated: false,
+    });
+    useCartStore.getState().reset();
   });
 
-  function renderWithProvider() {
-    render(
-      <AuthProvider>
-        <AuthConsumer onRender={(ctx) => { capturedCtx = ctx; }} />
-      </AuthProvider>
-    );
-  }
-
-  it('isAuthenticated é false sem token armazenado', () => {
-    renderWithProvider();
+  it('funciona sem Provider e isAuthenticated é false sem token', () => {
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
     expect(screen.getByTestId('consumer').textContent).toBe('não autenticado');
-    expect(capturedCtx!.isAuthenticated).toBe(false);
+    expect(capturedState.isAuthenticated).toBe(false);
   });
 
   it('clearError deve limpar o estado de error', async () => {
     mockLogin.mockRejectedValueOnce(new Error('Falha no login'));
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
     await act(async () => {
-      await capturedCtx!.login('a@a.com', 'wrong');
+      await capturedState.login('a@a.com', 'wrong');
     });
 
-    expect(capturedCtx!.error).toBe('Falha no login');
+    expect(useAuthStore.getState().error).toBe('Falha no login');
 
     act(() => {
-      capturedCtx!.clearError();
+      useAuthStore.getState().clearError();
     });
 
-    expect(capturedCtx!.error).toBeNull();
+    expect(useAuthStore.getState().error).toBeNull();
   });
 
   it('login com sucesso deve atualizar user e isAuthenticated', async () => {
@@ -134,28 +138,28 @@ describe('AuthProvider', () => {
       refreshToken: 'refresh_token',
     });
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
     await act(async () => {
-      await capturedCtx!.login('user@test.com', 'Senha123');
+      await capturedState.login('user@test.com', 'Senha123');
     });
 
-    expect(capturedCtx!.isAuthenticated).toBe(true);
-    expect(capturedCtx!.user?.email).toBe('user@test.com');
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().user?.email).toBe('user@test.com');
   });
 
   it('login com falha deve setar error e retornar null', async () => {
     mockLogin.mockRejectedValueOnce(new Error('INVALID_CREDENTIALS'));
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
-    let result: Awaited<ReturnType<typeof capturedCtx.login>>;
+    let result: Awaited<ReturnType<typeof capturedState.login>> = null;
     await act(async () => {
-      result = await capturedCtx!.login('x@x.com', 'wrong');
+      result = await capturedState.login('x@x.com', 'wrong');
     });
 
-    expect(result!).toBeNull();
-    expect(capturedCtx!.error).toBe('INVALID_CREDENTIALS');
+    expect(result).toBeNull();
+    expect(useAuthStore.getState().error).toBe('INVALID_CREDENTIALS');
   });
 
   it('logout deve limpar user e token', async () => {
@@ -166,19 +170,82 @@ describe('AuthProvider', () => {
     });
     mockLogout.mockImplementation(() => {});
 
-    renderWithProvider();
+    render(<AuthConsumer onRender={(ctx) => { capturedState = ctx; }} />);
 
     await act(async () => {
-      await capturedCtx!.login('user@test.com', 'Senha123');
+      await capturedState.login('user@test.com', 'Senha123');
     });
 
-    expect(capturedCtx!.isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
 
     await act(async () => {
-      await capturedCtx!.logout();
+      await useAuthStore.getState().logout();
     });
 
-    expect(capturedCtx!.isAuthenticated).toBe(false);
-    expect(capturedCtx!.user).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    expect(useAuthStore.getState().user).toBeNull();
+  });
+
+  it('useCartStore deve rastrear pendingProductIds durante addItem', async () => {
+    let resolveAdd!: (value: unknown) => void;
+    mockAddCartItem.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveAdd = resolve;
+        })
+    );
+
+    const pendingPromise = useCartStore.getState().addItem(fakeProduct, 1);
+
+    expect(useCartStore.getState().pendingProductIds[fakeProduct.id]).toBe(true);
+
+    resolveAdd({
+      id: 1,
+      publicId: 'cart-1',
+      items: [
+        {
+          id: 1,
+          productId: fakeProduct.id,
+          name: fakeProduct.name,
+          price: fakeProduct.price,
+          quantity: 1,
+          imgUrl: null,
+          subtotal: fakeProduct.price,
+        },
+      ],
+      itemCount: 1,
+      subtotal: fakeProduct.price,
+    });
+
+    await pendingPromise;
+
+    expect(useCartStore.getState().pendingProductIds[fakeProduct.id]).toBeUndefined();
+    expect(useCartStore.getState().count).toBe(1);
+  });
+});
+
+describe('ServerWarmupGate (/health check)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('exibe tela inicial e libera aplicação quando /health retorna 200', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      new Response(JSON.stringify({ status: 'ok' }), { status: 200 })
+    );
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(
+      <ServerWarmupGate healthUrl="http://localhost:3001/v1/api/health">
+        <div data-testid="client-ready">Cardápio Liberado</div>
+      </ServerWarmupGate>
+    );
+
+    expect(screen.getByText(/Verificando conexão com o servidor/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('client-ready')).toBeInTheDocument();
+    });
   });
 });

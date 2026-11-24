@@ -23,19 +23,20 @@ import { SignUp } from "./pages/SignUp";
 import { Perfil } from "./pages/Perfil";
 import { Settings } from "./pages/Settings";
 import { Support } from "./pages/Support";
-import { logoutService, getStoredToken } from "./services/authService.ts";
+import { getStoredToken } from "./services/authService.ts";
+import { useAuthStore } from "./stores/useAuthStore.ts";
 
 // Componente genérico para as telas não finalizadas
 // eslint-disable-next-line react-refresh/only-export-components
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
-    const token = getStoredToken();
+    const token = useAuthStore((s) => s.token) ?? getStoredToken();
     return token ? children : <Navigate to={APP_ROUTES.LOGIN} replace />;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
 const LogoutRoute = () => {
     useEffect(() => {
-        logoutService();
+        void useAuthStore.getState().logout();
     }, []);
 
     return <Navigate to={APP_ROUTES.LOGIN} replace />;

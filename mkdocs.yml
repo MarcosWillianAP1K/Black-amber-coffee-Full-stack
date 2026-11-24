@@ -1,0 +1,28 @@
+site_name: Black Amber Coffee — Documentação Técnica
+site_description: Arquitetura Clean MVC PostgreSQL, Frontend Zustand, Sprints e Deploy Render
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: amber
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Alternar tema
+    - scheme: default
+      primary: amber
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Alternar tema
+nav:
+  - Início: docs/README.md
+  - Arquitetura: docs/architecture.md
+  - Roteiro de Testes: docs/roteiro-testes.md
+  - Visão Geral: docs/DocsProjeto/01-visao-geral/README.md
+  - Engenharia de Requisitos: docs/DocsProjeto/02-engenharia-requisitos/README.md
+  - Diagramas Arquiteturais: docs/DocsProjeto/03-diagramas-arquiteturais/README.md
+  - Arquitetura e Contratos: docs/DocsProjeto/04-arquitetura-e-contratos/README.md
+  - Sprints e Evolução: docs/DocsProjeto/05-sprints-e-evolucao/README.md
+  - Qualidade e Testes: docs/DocsProjeto/06-qualidade-e-testes/README.md
+  - Gestão de Sprints: docs/DocsSprints/visao_geral.md
