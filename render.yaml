@@ -34,9 +34,9 @@ services:
       - key: JWT_EXPIRATION
         value: "15m"
       - key: CORS_ORIGIN
-        sync: false
+        value: https://black-amber-admin.onrender.com,https://black-amber-client.onrender.com
       - key: BUCKET_NAME
-        sync: false
+        value: imagens
       - key: BUCKET_ACCESS_KEY
         sync: false
       - key: BUCKET_SECRET_KEY
@@ -50,7 +50,7 @@ services:
       - key: RESEND_API_KEY
         sync: false
       - key: SYSTEM_MAIL_ADDR
-        sync: false
+        value: onboarding@resend.dev
 
   - type: web
     name: black-amber-admin
@@ -64,7 +64,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        sync: false
+        value: https://black-amber-api.onrender.com/v1/api
 
   - type: web
     name: black-amber-client
@@ -78,4 +78,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        sync: false
+        value: https://black-amber-api.onrender.com/v1/api
