@@ -11,7 +11,7 @@ services:
     runtime: node
     plan: free
     rootDir: Backend
-    buildCommand: npm ci --no-audit --no-fund && npm run build
+    buildCommand: npm ci --include=dev --no-audit --no-fund && npm run build
     startCommand: npm run start
     healthCheckPath: /v1/api/health
     envVars:
@@ -56,7 +56,7 @@ services:
     name: black-amber-admin
     runtime: static
     rootDir: Frontend
-    buildCommand: npm install --no-audit --no-fund && npm run build:admin
+    buildCommand: npm install --include=dev --no-audit --no-fund && npm run build:admin
     staticPublishPath: app/admin/dist
     routes:
       - type: rewrite
@@ -70,7 +70,7 @@ services:
     name: black-amber-client
     runtime: static
     rootDir: Frontend
-    buildCommand: npm install --no-audit --no-fund && npm run build:client
+    buildCommand: npm install --include=dev --no-audit --no-fund && npm run build:client
     staticPublishPath: app/client/dist
     routes:
       - type: rewrite
