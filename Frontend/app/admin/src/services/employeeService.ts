@@ -121,6 +121,41 @@ export async function createEmployee(data: {
     return payload.data;
 }
 
+/** Update current authenticated worker profile */
+export async function updateMyWorkerProfile(updates: {
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+}): Promise<Worker> {
+    const payloadBody: Record<string, string> = {};
+    if (updates.fullName?.trim()) payloadBody.fullName = updates.fullName.trim();
+    if (updates.email?.trim()) payloadBody.email = updates.email.trim();
+    if (updates.phone?.trim()) payloadBody.phone = updates.phone.trim();
+    if (updates.password?.trim()) payloadBody.password = updates.password.trim();
+
+    const response = await authFetch(API.Workers.UptadeMe, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadBody),
+    });
+
+    if (!response.ok) {
+        let message = `Falha ao atualizar perfil (${response.status}).`;
+        try {
+            const err = (await response.json()) as { error?: { message?: string }; message?: string };
+            message = err.error?.message ?? err.message ?? message;
+        } catch {
+            // keep default
+        }
+        throw new Error(message);
+    }
+
+    const payload = (await response.json()) as AdminWorkerResponseWithMessage;
+    localStorage.setItem("user", JSON.stringify(payload.data));
+    return payload.data;
+}
+
 /** Update an existing employee */
 export async function updateEmployee(publicId: string, updates: Partial<WorkerUpdateInput>): Promise<Worker> {
     if (USE_MOCK) {

@@ -5,6 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { ServerWarmupGate } from 'ui-shared/components/ServerWarmupGate';
+import { ProductThumb } from 'ui-shared/components/ui/ProductThumb';
+import { formatPrice } from 'shared-utils/helpers/currency';
 
 import { APP_ROUTES } from '../utils/Path';
 import { useAuth } from '../hooks/useAuth';
@@ -247,5 +249,19 @@ describe('ServerWarmupGate (/health check)', () => {
     await waitFor(() => {
       expect(screen.getByTestId('client-ready')).toBeInTheDocument();
     });
+  });
+});
+
+describe('UI Design System (ProductThumb & Moeda BRL)', () => {
+  it('ProductThumb renderiza placeholder autoral sem texto NaN quando imageUrl é nulo', () => {
+    render(<ProductThumb name="Café Latte" category="cafe" imageUrl={null} />);
+    expect(screen.queryByText('NaN')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Café Latte')).toBeInTheDocument();
+  });
+
+  it('formatPrice formata valores em Real brasileiro (R$)', () => {
+    const formatted = formatPrice(12.5);
+    expect(formatted).toContain('R$');
+    expect(formatted).toContain('12,50');
   });
 });

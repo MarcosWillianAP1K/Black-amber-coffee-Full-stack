@@ -1,90 +1,78 @@
-
 import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
+import { formatPrice } from "shared-utils/helpers/currency";
 
 interface SummaryCartProps {
-  itemsCount: number;
-  subTotal: number;
-  discount: number;
-  onCompletePurchase: () => void;
-  isLoading?: boolean;
-  disabled?: boolean;
+    itemsCount: number;
+    subTotal: number;
+    discount: number;
+    onCompletePurchase: () => void;
+    ctaLabel?: string;
+    loadingLabel?: string;
+    isLoading?: boolean;
+    disabled?: boolean;
 }
 
 export function SummaryCart({
-  itemsCount,
-  subTotal,
-  discount,
-  onCompletePurchase,
-  isLoading = false,
-  disabled = false,
+    itemsCount,
+    subTotal,
+    discount,
+    onCompletePurchase,
+    ctaLabel = "Finalizar Pedido",
+    loadingLabel = "Processando...",
+    isLoading = false,
+    disabled = false,
 }: SummaryCartProps) {
-  const total = subTotal - discount;
-  const isBlocked = isLoading || disabled;
+    const total = Math.max(0, subTotal - discount);
+    const isBlocked = isLoading || disabled;
 
-  // Função auxiliar para formatar a moeda: símbolo em fonte secundária, números em fonte primária
-  const formatCurrency = (value: number, isNegative = false) => {
-    const formattedValue = Math.abs(value).toFixed(2);
     return (
-      <span className="flex items-center">
-        <span className="font-secondary">{isNegative ? '-$' : '$'}</span>
-        <span className="font-primary ml-0.5">{formattedValue}</span>
-      </span>
+        <div className="w-full bg-(--Widget-background) rounded-xl p-5 sm:p-6 flex flex-col gap-5 border border-(--Border)/60 shadow-xl">
+            <div className="flex justify-between items-center border-b border-(--Border)/50 pb-3">
+                <span className="text-(--Text-primary-off) text-xs font-secondary font-bold uppercase tracking-widest">
+                    Resumo do Pedido
+                </span>
+                <span className="text-(--Primary-off) text-xs font-secondary font-semibold tabular-nums">
+                    {itemsCount} {itemsCount === 1 ? "item" : "itens"}
+                </span>
+            </div>
+
+            <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-center text-sm font-secondary">
+                    <span className="text-(--Text-gray)">Subtotal</span>
+                    <span className="text-(--Text-primary) font-semibold tabular-nums">
+                        {formatPrice(subTotal)}
+                    </span>
+                </div>
+
+                {discount > 0 && (
+                    <div className="flex justify-between items-center text-sm font-secondary">
+                        <span className="text-(--Text-gray)">Desconto</span>
+                        <span className="text-(--Success-text) font-semibold tabular-nums">
+                            - {formatPrice(discount)}
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            <div className="flex justify-between items-baseline border-t border-(--Border)/50 pt-4">
+                <span className="text-(--Text-primary) font-primary text-base font-bold">Total</span>
+                <span className="text-(--Primary) text-2xl font-primary font-extrabold tabular-nums">
+                    {formatPrice(total)}
+                </span>
+            </div>
+
+            <button
+                type="button"
+                disabled={isBlocked}
+                onClick={onCompletePurchase}
+                className="w-full min-h-12 py-3 px-4 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-md font-primary font-extrabold text-sm tracking-wider uppercase cursor-pointer hover:brightness-105 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-md text-center flex items-center justify-center gap-2"
+            >
+                {isLoading ? (
+                    <LoadingSpinner size="sm" label={loadingLabel} />
+                ) : (
+                    ctaLabel
+                )}
+            </button>
+        </div>
     );
-  };
-
-  return (
-    <div className="w-full bg-(--Widget-background) rounded-md p-6 flex flex-col gap-6 border border-(--Border)/30 shadow-lg">
-      
-      {/* HEADER */}
-      <div className="flex justify-between items-center uppercase text-xs font-bold tracking-widest mt-2">
-        <span className="text-(--Text-primary-off) font-secondary">Your Order</span>
-        <div className="text-(--Primary-off) flex items-center gap-1">
-          <span className="font-primary text-sm">{itemsCount}</span>
-          <span className="font-secondary">Items</span>
-        </div>
-      </div>
-
-      {/* ITEMS */}
-      <div className="flex flex-col gap-5 mt-2">
-        {/* Sub Total */}
-        <div className="flex justify-between items-center text-sm font-semibold">
-          <span className="text-(--Text-gray) font-secondary">Sub Total</span>
-          <span className="text-(--Primary-off) text-base">
-            {formatCurrency(subTotal)}
-          </span>
-        </div>
-
-        {/* Discount */}
-        <div className="flex justify-between items-center text-sm font-semibold">
-          <span className="text-(--Text-gray) font-secondary">Discount</span>
-          <span className="text-(--Negacion) text-base">
-            {formatCurrency(discount, discount > 0)}
-          </span>
-        </div>
-      </div>
-
-      {/* TOTAL */}
-      <div className="flex justify-between items-center mt-2 mb-2">
-        <span className="text-(--Text-gray) font-secondary text-xl font-bold">Total</span>
-        <span className="text-(--Primary-off) text-2xl font-bold">
-          {formatCurrency(total)}
-        </span>
-      </div>
-
-      {/* BUTTON */}
-      <button
-        type="button"
-        disabled={isBlocked}
-        onClick={onCompletePurchase}
-        className="w-full py-3.5 bg-[linear-gradient(180deg,var(--Primary-off)_0%,var(--Primary)_100%)] text-(--Text-dark) rounded-sm font-secondary font-bold text-sm tracking-wider uppercase cursor-pointer hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-md text-center flex items-center justify-center gap-2"
-      >
-        {isLoading ? (
-          <LoadingSpinner size="sm" label="Processando..." />
-        ) : (
-          "Complete Purchase"
-        )}
-      </button>
-
-    </div>
-  );
 }

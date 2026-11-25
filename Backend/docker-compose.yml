@@ -1,6 +1,6 @@
 services:
-  black-amber-coffee-api:
-    container_name: black-amber-coffee-api
+  backend:
+    container_name: backend
     restart: unless-stopped
     build:
       context: .

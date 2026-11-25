@@ -10,6 +10,7 @@ import {
     getStoredRefreshToken,
     type AuthResponse,
 } from "../services/authService";
+import { updateMyWorkerProfile } from "../services/employeeService";
 import type { Worker } from "shared-utils/types/worker";
 import { useOrderStore } from "./useOrderStore";
 import { useMenuStore } from "./useMenuStore";
@@ -34,6 +35,7 @@ export interface AuthState {
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<AuthResponse | null>;
     signUp: (name: string, email: string, password: string) => Promise<AuthResponse | null>;
+    updateMyProfile: (updates: { fullName?: string; email?: string; phone?: string; password?: string }) => Promise<Worker>;
     refreshSession: () => Promise<void>;
     logout: (logoutAllDevices?: boolean) => Promise<void>;
     syncTokensFromStorage: () => void;
@@ -92,6 +94,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
                 });
                 return null;
             }
+        },
+
+        updateMyProfile: async (updates) => {
+            const updated = await updateMyWorkerProfile(updates);
+            set({ user: updated });
+            return updated;
         },
 
         refreshSession: async () => {

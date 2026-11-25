@@ -32,11 +32,26 @@ const envSchema = z.object({
   JWT_SECRET_REFRESH: z.string().min(16).optional(),
   REFRESH_SECRET: z.string().min(16).optional(),
 
-  BUCKET_NAME: z.string().default(isTestEnv ? "test-bucket" : ""),
-  BUCKET_ACCESS_KEY: z.string().default(isTestEnv ? "test-access-key" : ""),
-  BUCKET_SECRET_KEY: z.string().default(isTestEnv ? "test-secret-key" : ""),
-  BUCKET_URL: z.string().default(isTestEnv ? "http://localhost:9000" : ""),
-  BUCKET_PUBLIC_URL: z.string().default(""),
+  BUCKET_NAME: z.preprocess(
+    (v) => (isTestEnv ? undefined : v),
+    z.string().default(isTestEnv ? "test-bucket" : ""),
+  ),
+  BUCKET_ACCESS_KEY: z.preprocess(
+    (v) => (isTestEnv ? undefined : v),
+    z.string().default(isTestEnv ? "test-access-key" : ""),
+  ),
+  BUCKET_SECRET_KEY: z.preprocess(
+    (v) => (isTestEnv ? undefined : v),
+    z.string().default(isTestEnv ? "test-secret-key" : ""),
+  ),
+  BUCKET_URL: z.preprocess(
+    (v) => (isTestEnv ? undefined : v),
+    z.string().default(isTestEnv ? "http://localhost:9000" : ""),
+  ),
+  BUCKET_PUBLIC_URL: z.preprocess(
+    (v) => (isTestEnv ? undefined : v),
+    z.string().default(""),
+  ),
   BUCKET_REGION: z.string().default("us-east-1"),
 
   RESEND_API_KEY: z.string().default(isTestEnv ? "re_test_key" : ""),

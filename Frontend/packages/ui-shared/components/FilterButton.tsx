@@ -19,11 +19,11 @@ interface FilterButtonProps {
 
 export function FilterButton({
     options,
-    title = "Filters",
+    title = "Filtros",
     buttonLabel,
     align = "right",
     closeOnSelect = true,
-    emptyLabel = "No filters",
+    emptyLabel = "Sem filtros",
     disabled = false,
 }: FilterButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
@@ -43,16 +43,15 @@ export function FilterButton({
     }, [isOpen]);
 
     return (
-        <div className="relative" ref={menuRef}>
+        <div className="relative shrink-0" ref={menuRef}>
             <button
                 type="button"
                 onClick={() => !disabled && setIsOpen((prev) => !prev)}
-                className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md transition-all duration-200 cursor-pointer
-                    ${disabled
-                        ? "text-(--Text-primary-off)/60 bg-(--Button-background)/50 cursor-not-allowed"
-                        : "text-(--Text-primary-off) hover:text-(--Primary) hover:bg-(--Button-background)"
-                    }
-                `}
+                className={`min-h-10 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-md border transition-all duration-200 cursor-pointer shrink-0 ${
+                    disabled
+                        ? "border-(--Border)/30 text-(--Text-primary-off)/60 bg-(--Button-background)/50 cursor-not-allowed"
+                        : "border-(--Border)/60 bg-(--Select-background) text-(--Text-primary) hover:border-(--Primary)/60 hover:text-(--Primary)"
+                }`}
                 aria-label="Filter"
                 aria-expanded={isOpen}
                 disabled={disabled}

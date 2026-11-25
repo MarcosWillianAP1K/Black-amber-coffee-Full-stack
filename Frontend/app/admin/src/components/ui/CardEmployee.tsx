@@ -1,7 +1,3 @@
-/**
- * CardEmployee — Admin-specific employee card.
- */
-
 import { useState } from "react";
 import { PerfilCard } from "ui-shared/components/ui/PerfilCard";
 import { CompTime } from "ui-shared/components/CompTIme";
@@ -43,21 +39,26 @@ export function CardEmployee({
     };
 
     return (
-        <div className="w-90 h-fit p-4 bg-(--Widget-background) rounded-md border border-(--Border) flex flex-col gap-6">
-            <div className="flex items-start justify-between">
-                <PerfilCard
-                    name={fullName}
-                    email={email}
-                    job={role}
-                    avatarUrl={avatarUrl ?? undefined}
-                />
+        <div className="w-full p-4 bg-(--Page-background) rounded-lg border border-(--Border)/70 flex flex-col justify-between gap-4">
+            <div className="flex items-start justify-between gap-2 min-w-0">
+                <div className="flex-1 min-w-0">
+                    <PerfilCard
+                        name={fullName}
+                        email={email}
+                        job={role}
+                        avatarUrl={avatarUrl ?? undefined}
+                    />
+                </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 shrink-0">
                     {busy ? <LoadingSpinner size="xs" className="text-(--Primary)" /> : null}
                     <OptionsEllipsis
                         disabled={busy}
                         options={[
-                            { label: "Ver Perfil", action: () => void handleAction(() => onViewEmployee(publicId)) },
+                            {
+                                label: "Ver Perfil",
+                                action: () => void handleAction(() => onViewEmployee(publicId)),
+                            },
                             {
                                 label: isActive ? "Bloquear Funcionário" : "Desbloquear Funcionário",
                                 action: () => void handleAction(() => onBlockEmployee(publicId)),
@@ -68,7 +69,7 @@ export function CardEmployee({
                 </div>
             </div>
 
-            <div className="w-full h-fit">
+            <div className="w-full pt-2 border-t border-(--Border)/40">
                 <CompTime active={isActive} />
             </div>
 
@@ -81,7 +82,7 @@ export function CardEmployee({
                 danger
                 onConfirm={() => {
                     setConfirmDelete(false);
-                    handleAction(() => onDeleteEmployee(publicId));
+                    void handleAction(() => onDeleteEmployee(publicId));
                 }}
                 onCancel={() => setConfirmDelete(false)}
             />

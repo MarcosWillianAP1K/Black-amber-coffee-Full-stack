@@ -67,8 +67,11 @@ export const useOrderStore = create<OrderStoreState>((set, get) => ({
         try {
             if (action === "complete") {
                 await orderService.completeOrder(publicId);
+                const now = new Date().toISOString();
                 set((state) => ({
-                    orders: state.orders.filter((o) => o.id !== orderId),
+                    orders: state.orders.map((o) =>
+                        o.id === orderId ? { ...o, status: "finalizado", updatedAt: now } : o,
+                    ),
                 }));
                 void get().refresh();
                 return;

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface ChartAnalyticsProps {
     title?: string;
     data: number[];
@@ -5,112 +7,156 @@ interface ChartAnalyticsProps {
     seriesLabel?: string;
     height?: number;
     accentColor?: string;
+    formatValue?: (value: number) => string;
 }
 
-const DEFAULT_HEIGHT = 220;
+const DEFAULT_HEIGHT = 210;
 const DEFAULT_COLOR = "var(--Primary)";
-const GRID_COLUMNS: Record<number, string> = {
-    4: "grid-cols-4",
-    6: "grid-cols-6",
-    12: "grid-cols-12",
-};
 
 export function ChartAnalytics({
-    title = "Chart",
+    title = "Gráfico",
     data,
     labels,
-    seriesLabel = "Series",
+    seriesLabel = "Série",
     height = DEFAULT_HEIGHT,
     accentColor = DEFAULT_COLOR,
+    formatValue = (v) => String(v),
 }: ChartAnalyticsProps) {
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
     const safeData = data.length > 0 ? data : [0];
-    const min = Math.min(...safeData);
-    const max = Math.max(...safeData);
+    const min = Math.min(0, ...safeData);
+    const max = Math.max(...safeData, 1);
     const range = max - min || 1;
 
-    const width = 640;
-    const chartHeight = 120;
-    const paddingX = 10;
-    const paddingY = 10;
+    const width = 720;
+    const chartHeight = 180;
+    const paddingX = 24;
+    const paddingTop = 20;
+    const paddingBottom = 18;
+    const usableWidth = width - paddingX * 2;
+    const usableHeight = chartHeight - paddingTop - paddingBottom;
 
-    const points = safeData
-        .map((value, index) => {
-            const x =
-                paddingX +
-                (index / Math.max(safeData.length - 1, 1)) *
-                    (width - paddingX * 2);
-            const y =
-                paddingY +
-                (1 - (value - min) / range) *
-                    (chartHeight - paddingY * 2);
-            return `${x},${y}`;
-        })
-        .join(" ");
+    const coords = safeData.map((value, index) => {
+        const x =
+            safeData.length === 1
+                ? width / 2
+                : paddingX + (index / (safeData.length - 1)) * usableWidth;
+        const y =
+            paddingTop + (1 - (value - min) / range) * usableHeight;
+        return { x, y, value, label: labels?.[index] ?? `#${index + 1}` };
+    });
 
-    const labelGridClass = labels ? (GRID_COLUMNS[labels.length] ?? "grid-cols-6") : "";
+    const linePoints = coords.map((p) => `${p.x},${p.y}`).join(" ");
+    const baseLineY = paddingTop + usableHeight;
+    const areaPoints =
+        coords.length > 0
+            ? `${coords[0].x},${baseLineY} ${linePoints} ${coords[coords.length - 1].x},${baseLineY}`
+            : "";
+
+    const activeCoord = hoveredIndex !== null ? coords[hoveredIndex] : null;
 
     return (
-        <div className="w-full h-fit p-4 bg-(--Widget-background) rounded-md border border-(--Border) flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-                <h3 className="text-(--Primary-off) text-sm font-primary font-bold">
+        <div className="w-full p-5 bg-(--Widget-background) rounded-lg border border-(--Border) flex flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="text-(--Primary-off) text-sm sm:text-base font-primary font-bold">
                     {title}
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-(--Text-primary-off) font-secondary">
-                    <span
-                        className="inline-block w-3 h-3 rounded-full"
-                        style={{ background: accentColor }}
-                    />
-                    {seriesLabel}
+                <div className="flex items-center gap-4 text-xs text-(--Text-primary-off) font-secondary">
+                    {activeCoord ? (
+                        <span className="text-(--Primary) font-semibold tabular-nums">
+                            {activeCoord.label}: {formatValue(activeCoord.value)}
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-2">
+                            <span
+                                className="inline-block w-2.5 h-2.5 rounded-full"
+                                style={{ background: accentColor }}
+                            />
+                            {seriesLabel}
+                        </span>
+                    )}
                 </div>
             </div>
 
-            <div className="w-full" style={{ height }}>
+            <div className="w-full" style={{ minHeight: height }}>
                 <svg
                     viewBox={`0 0 ${width} ${chartHeight}`}
-                    className="w-full h-full"
-                    preserveAspectRatio="none"
+                    className="w-full h-auto overflow-visible"
+                    role="img"
+                    aria-label={title}
                 >
-                    <line x1="0" y1="120" x2="640" y2="120" stroke="var(--Border)" />
-                    <line x1="0" y1="80" x2="640" y2="80" stroke="var(--Border)" />
-                    <line x1="0" y1="40" x2="640" y2="40" stroke="var(--Border)" />
+                    <defs>
+                        <linearGradient id="chartAreaAmber" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="var(--Primary)" stopOpacity="0.28" />
+                            <stop offset="100%" stopColor="var(--Primary)" stopOpacity="0.0" />
+                        </linearGradient>
+                    </defs>
+
+                    {[0, 0.33, 0.66, 1].map((ratio) => {
+                        const y = paddingTop + ratio * usableHeight;
+                        return (
+                            <line
+                                key={ratio}
+                                x1={paddingX}
+                                y1={y}
+                                x2={width - paddingX}
+                                y2={y}
+                                stroke="var(--Border)"
+                                strokeOpacity="0.55"
+                                strokeDasharray={ratio === 1 ? undefined : "4 4"}
+                            />
+                        );
+                    })}
+
+                    {areaPoints && (
+                        <polygon points={areaPoints} fill="url(#chartAreaAmber)" />
+                    )}
 
                     <polyline
-                        points={points}
+                        points={linePoints}
                         fill="none"
                         stroke={accentColor}
-                        strokeWidth="2"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                     />
 
-                    {safeData.map((value, index) => {
-                        const x =
-                            paddingX +
-                            (index / Math.max(safeData.length - 1, 1)) *
-                                (width - paddingX * 2);
-                        const y =
-                            paddingY +
-                            (1 - (value - min) / range) *
-                                (chartHeight - paddingY * 2);
+                    {coords.map((coord, index) => {
+                        const isHovered = hoveredIndex === index;
                         return (
-                            <circle
-                                key={`point-${index}`}
-                                cx={x}
-                                cy={y}
-                                r="3"
-                                fill="var(--Primary)"
-                                stroke="var(--Page-background)"
-                                strokeWidth="1"
-                            />
+                            <g
+                                key={`point-${coord.label}-${index}`}
+                                onMouseEnter={() => setHoveredIndex(index)}
+                                onMouseLeave={() => setHoveredIndex(null)}
+                                className="cursor-pointer"
+                            >
+                                <circle cx={coord.x} cy={coord.y} r="14" fill="transparent" />
+                                <circle
+                                    cx={coord.x}
+                                    cy={coord.y}
+                                    r={isHovered ? "5.5" : "3.8"}
+                                    fill={isHovered ? "var(--White)" : "var(--Primary)"}
+                                    stroke="var(--Page-background)"
+                                    strokeWidth="2"
+                                />
+                            </g>
                         );
                     })}
                 </svg>
             </div>
 
             {labels && labels.length > 0 && (
-                <div
-                    className={`grid ${labelGridClass} gap-2 text-[10px] text-(--Text-primary-off) font-secondary`}
-                >
+                <div className="flex items-center justify-between gap-1 px-1 overflow-x-auto">
                     {labels.map((label, index) => (
-                        <span key={`${label}-${index}`} className="text-center">
+                        <span
+                            key={`${label}-${index}`}
+                            className={`text-[11px] font-secondary text-center min-w-0 truncate ${
+                                hoveredIndex === index
+                                    ? "text-(--Primary) font-semibold"
+                                    : "text-(--Text-primary-off)"
+                            }`}
+                        >
                             {label}
                         </span>
                     ))}

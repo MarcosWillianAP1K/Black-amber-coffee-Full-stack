@@ -1,4 +1,6 @@
 import { ButtonAddProduct } from "ui-shared/components/ui/ButtonAddProduct";
+import { ProductThumb } from "ui-shared/components/ui/ProductThumb";
+import { formatPrice } from "shared-utils/helpers/currency";
 
 export interface ProductCardProps {
     name: string;
@@ -6,50 +8,84 @@ export interface ProductCardProps {
     price: number;
     promotionPrice?: number;
     imageUrl?: string;
+    category?: string;
     onClick: () => void;
+    onSelect?: () => void;
     isLoading?: boolean;
     disabled?: boolean;
 }
 
-
-
-
-
-export function ProductCard({ name, itens, price, promotionPrice, imageUrl, onClick, isLoading = false, disabled = false }: ProductCardProps) {
-
+export function ProductCard({
+    name,
+    itens,
+    price,
+    promotionPrice,
+    imageUrl,
+    category = "cafe",
+    onClick,
+    onSelect,
+    isLoading = false,
+    disabled = false,
+}: ProductCardProps) {
     return (
-        <div className="w-full h-fit p-4 bg-(--Widget-background) rounded-sm flex flex-col items-center justify-center gap-2 shadow-lg">
-            {
-                imageUrl ? (
-                    <img
-                        src={imageUrl}
-                        alt={name}
-                        className="w-full aspect-square object-cover rounded-sm overflow-hidden"
-                    />
-                ) : (
-                    <div className="w-full aspect-square bg-gray-300 rounded-sm flex items-center justify-center">
-                        <span className="text-gray-500 text-sm">NaN</span>
-                    </div>
-                )
+        <div
+            onClick={onSelect}
+            role={onSelect ? "button" : undefined}
+            tabIndex={onSelect ? 0 : undefined}
+            onKeyDown={
+                onSelect
+                    ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              onSelect();
+                          }
+                      }
+                    : undefined
             }
+            className={`w-full h-full p-3.5 bg-(--Widget-background) border border-(--Border)/50 rounded-xl flex flex-col gap-3 shadow-md transition-all ${
+                onSelect ? "cursor-pointer hover:border-(--Primary)/60" : ""
+            }`}
+        >
+            <ProductThumb
+                name={name}
+                category={category}
+                imageUrl={imageUrl}
+                iconSize={30}
+                className="w-full aspect-square rounded-lg"
+            />
 
+            <div className="w-full flex-1 flex flex-col justify-between gap-2.5">
+                <div className="flex flex-col gap-1">
+                    <h3 className="text-sm sm:text-base font-primary font-bold text-(--Text-primary) line-clamp-1">
+                        {name}
+                    </h3>
+                    <p className="text-(--Text-primary-off) text-xs font-secondary line-clamp-2 leading-relaxed min-h-8">
+                        {itens}
+                    </p>
+                </div>
 
-            <div className="w-full h-full flex flex-col items-start gap-2">
-
-                <h2 className="w-full overflow-hidden text-ellipsis whitespace-nowrap text-[12px] font-bold text-(--Text-gray)">{name}</h2>
-                <p className="text-(--Primary-off) text-[8px] font-secondary overflow-hidden text-ellipsis line-clamp-2">{itens}</p>
-                
-                <div className="w-full h-fit flex flex-row items-center justify-between gap-0">
-                    <div className=" flex items-center gap-1 whitespace-nowrap">
+                <div className="w-full flex items-center justify-between gap-2 pt-1">
+                    <div className="flex flex-col whitespace-nowrap">
                         {promotionPrice !== undefined && (
-                            <span className="text-[12px] font-bold text-(--Primary)">${promotionPrice.toFixed(2)}</span>
+                            <span className="text-xs font-secondary text-(--Text-primary-off) line-through tabular-nums">
+                                {formatPrice(price)}
+                            </span>
                         )}
-                        <span className={`text-[8px] font-bold ${promotionPrice !== undefined ? 'text-(--Text-gray) line-through' : 'text-(--Primary)'}`}>
-                            ${price.toFixed(2)}
+                        <span className="text-sm sm:text-base font-primary font-extrabold text-(--Primary) tabular-nums">
+                            {formatPrice(promotionPrice ?? price)}
                         </span>
                     </div>
-                        
-                    <ButtonAddProduct onClick={onClick} isLoading={isLoading} disabled={disabled} />
+
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                    >
+                        <ButtonAddProduct
+                            onClick={onClick}
+                            isLoading={isLoading}
+                            disabled={disabled}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

@@ -12,9 +12,9 @@ interface PerfilCardProps {
 
 export function PerfilCard({ name, email, job, avatarUrl }: PerfilCardProps) {
     return (
-        <div className="w-full h-fit flex items-start justify-start gap-4 pe-6">
+        <div className="w-full min-w-0 flex items-start justify-start gap-3.5">
             {/* Avatar */}
-            <div className="w-16 h-16 rounded-lg overflow-hidden bg-(--Button-background) shrink-0">
+            <div className="w-12 h-12 rounded-lg overflow-hidden bg-(--Button-background) border border-(--Border)/40 shrink-0">
                 {avatarUrl ? (
                     <img
                         src={avatarUrl}
@@ -22,23 +22,26 @@ export function PerfilCard({ name, email, job, avatarUrl }: PerfilCardProps) {
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center text-(--Primary) text-xl font-primary font-bold">
+                    <div className="w-full h-full flex items-center justify-center text-(--Primary) text-lg font-primary font-bold">
                         {name.charAt(0).toUpperCase()}
                     </div>
                 )}
             </div>
 
             {/* Name + Email */}
-            <div className="w-full flex flex-col min-w-0 justify-start items-start break-all">
-                <h3 className="text-(--Text-gray) text-[20px] font-primary font-bold">
+            <div className="flex-1 min-w-0 flex flex-col justify-start items-start gap-0.5">
+                <h3 className="text-(--Text-primary) text-base font-primary font-bold leading-snug wrap-break-word w-full">
                     {name}
                 </h3>
-                <p className="text-(--Text-primary-off) text-[12px] font-secondary truncate">
+                <p
+                    className="text-(--Text-primary-off) text-xs font-secondary truncate w-full"
+                    title={email}
+                >
                     {email}
                 </p>
 
                 {job && (
-                    <p className="text-(--Text-gray) text-[12px] font-secondary ">
+                    <p className="text-(--Primary-off) text-xs font-secondary capitalize mt-0.5">
                         {job}
                     </p>
                 )}

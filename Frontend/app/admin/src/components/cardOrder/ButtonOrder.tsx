@@ -1,5 +1,5 @@
 /**
- * ButtonOrder — Action buttons for order cards, varying by order status.
+ * ButtonOrder — Action buttons for KDS order cards.
  */
 
 import type { OrderStatus } from "shared-utils/types/order";
@@ -12,10 +12,16 @@ interface ButtonOrderProps {
     isLoading?: boolean;
 }
 
-const BUTTON_BASE = "w-fit h-6 px-4 py-2 whitespace-nowrap rounded-xs flex items-center justify-center gap-1.5 cursor-pointer";
+const BUTTON_BASE =
+    "min-h-10 px-3.5 py-2 whitespace-nowrap rounded-md flex items-center justify-center gap-1.5 text-xs font-primary font-bold uppercase tracking-wider transition-colors cursor-pointer";
 const BUTTON_DISABLED = "opacity-60 cursor-not-allowed";
 
-export function ButtonOrder({ status, onAction, disabled, isLoading = false }: ButtonOrderProps) {
+export function ButtonOrder({
+    status,
+    onAction,
+    disabled,
+    isLoading = false,
+}: ButtonOrderProps) {
     const isBlocked = Boolean(disabled || isLoading);
 
     const handleClick = (action: string) => () => {
@@ -30,55 +36,72 @@ export function ButtonOrder({ status, onAction, disabled, isLoading = false }: B
     switch (status) {
         case "criado":
             return (
-                <button className={btnClass("bg-(--Button-background)")} onClick={handleClick("start")} disabled={isBlocked}>
+                <button
+                    type="button"
+                    className={btnClass("bg-(--Primary) text-(--Text-dark) hover:bg-(--Primary-selected)")}
+                    onClick={handleClick("start")}
+                    disabled={isBlocked}
+                >
                     {spinner}
-                    <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">START</p>
+                    <span>Iniciar Preparo</span>
                 </button>
             );
 
         case "em_preparo":
             return (
-                <div className="w-fit h-fit flex gap-2">
-                    <button className={btnClass("bg-(--Button-background)")} onClick={handleClick("hold")} disabled={isBlocked}>
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        className={btnClass("bg-(--Button-background) text-(--Text-primary) hover:bg-(--Select-background)")}
+                        onClick={handleClick("hold")}
+                        disabled={isBlocked}
+                    >
                         {spinner}
-                        <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">HOLD</p>
+                        <span>Pausar</span>
                     </button>
-                    <button className={btnClass("bg-(--Primary)")} onClick={handleClick("ready")} disabled={isBlocked}>
+                    <button
+                        type="button"
+                        className={btnClass("bg-(--Primary) text-(--Text-dark) hover:bg-(--Primary-selected)")}
+                        onClick={handleClick("ready")}
+                        disabled={isBlocked}
+                    >
                         {spinner}
-                        <p className="text-(--Text-dark) text-[12px] font-secondary font-bold">READY</p>
+                        <span>Pronto</span>
                     </button>
                 </div>
             );
 
         case "pronto":
             return (
-                <button className={btnClass("bg-[#04DCFF]")} onClick={handleClick("complete")} disabled={isBlocked}>
+                <button
+                    type="button"
+                    className={btnClass("bg-(--Info) text-(--Info-text) hover:brightness-110")}
+                    onClick={handleClick("complete")}
+                    disabled={isBlocked}
+                >
                     {spinner}
-                    <p className="text-[#003640] text-[12px] font-secondary font-bold">COMPLETE</p>
+                    <span>Finalizar</span>
                 </button>
             );
 
         case "finalizado":
             return (
-                <button className={btnClass("bg-[#04DCFF]")} onClick={handleClick("complete")} disabled={isBlocked}>
-                    {spinner}
-                    <p className="text-[#003640] text-[12px] font-secondary font-bold">COMPLETE</p>
-                </button>
+                <span className="text-xs font-secondary font-semibold text-(--Success-text) px-2">
+                    Entregue
+                </span>
             );
 
         case "cancelado":
-            return (
-                <button className={btnClass("bg-(--Negacion-off)")} onClick={handleClick("delete")} disabled={isBlocked}>
-                    {spinner}
-                    <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">DELETE</p>
-                </button>
-            );
-
         default:
             return (
-                <button className={btnClass("bg-(--Negacion-off)")} onClick={handleClick("delete")} disabled={isBlocked}>
+                <button
+                    type="button"
+                    className={btnClass("border border-(--Danger-border) bg-(--Danger-bg) text-(--Danger-text) hover:bg-(--Negacion) hover:text-white")}
+                    onClick={handleClick("delete")}
+                    disabled={isBlocked}
+                >
                     {spinner}
-                    <p className="text-(--Text-gray) text-[12px] font-secondary font-bold">DELETE</p>
+                    <span>Excluir</span>
                 </button>
             );
     }

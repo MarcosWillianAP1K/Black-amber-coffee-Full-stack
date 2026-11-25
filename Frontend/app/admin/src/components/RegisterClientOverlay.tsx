@@ -1,14 +1,8 @@
-/**
- * RegisterClientOverlay — Slide-in panel to register a new client/user.
- *
- * Posts to POST /api/auth/register (public endpoint).
- * Just for testing — creates a regular user account.
- */
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import { API } from "shared-utils/core/APIroutes";
+import { useToastStore } from "shared-utils/stores/useToastStore";
 
 interface RegisterClientOverlayProps {
     onClose: () => void;
@@ -16,18 +10,25 @@ interface RegisterClientOverlayProps {
 }
 
 export function RegisterClientOverlay({ onClose, onSuccess }: RegisterClientOverlayProps) {
+    const showToast = useToastStore((s) => s.showToast);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape" && !isSubmitting) onClose();
+        };
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [isSubmitting, onClose]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         setError(null);
-        setSuccessMessage(null);
 
         try {
             const response = await fetch(API.Auth.Register, {
@@ -37,17 +38,18 @@ export function RegisterClientOverlay({ onClose, onSuccess }: RegisterClientOver
             });
 
             if (!response.ok) {
-                const body = await response.json().catch(() => null);
-                throw new Error(body?.message || `Registration failed: ${response.status}`);
+                const body = (await response.json().catch(() => null)) as {
+                    message?: string;
+                    error?: { message?: string };
+                } | null;
+                throw new Error(
+                    body?.error?.message ?? body?.message ?? `Falha ao cadastrar (${response.status})`,
+                );
             }
 
             await response.json();
-            setSuccessMessage(`Cliente "${name}" cadastrado com sucesso!`);
+            showToast({ variant: "success", title: `Cliente "${name}" cadastrado!` });
             if (onSuccess) onSuccess();
-            // Reset form
-            setName("");
-            setEmail("");
-            setPassword("");
         } catch (err) {
             const message = err instanceof Error ? err.message : "Falha ao cadastrar cliente";
             setError(message);
@@ -56,101 +58,111 @@ export function RegisterClientOverlay({ onClose, onSuccess }: RegisterClientOver
         }
     };
 
-    const inputClass = "w-full bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-gray) text-sm font-secondary placeholder:text-(--Text-primary-off)/40 focus:outline-none focus:border-(--Primary) transition-colors";
-    const labelClass = "text-(--Primary) text-[10px] font-secondary font-bold tracking-wider uppercase mb-1.5 block";
-    const btnDisabled = "opacity-50 cursor-not-allowed";
+    const inputClass =
+        "w-full min-h-10 bg-(--Page-background) border border-(--Border) rounded-md px-3 py-2 text-(--Text-primary) text-sm font-secondary placeholder:text-(--Text-primary-off)/45 focus:outline-none focus:border-(--Primary)";
+    const labelClass =
+        "text-(--Primary) text-xs font-secondary font-bold tracking-wider uppercase mb-1.5 block";
 
     return (
-        <div className="w-90 min-w-90 bg-(--Widget-background) border-l border-(--Border) flex flex-col h-full animate-[slideIn_0.3s_ease-out]">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-(--Border)">
-                <h3 className="text-(--Text-gray) text-lg font-primary font-bold">
-                    Cadastrar Cliente
-                </h3>
-                <button
-                    onClick={onClose}
-                    disabled={isSubmitting}
-                    className={`p-1 rounded-md text-(--Text-primary-off) transition-colors ${isSubmitting ? "opacity-30 cursor-not-allowed" : "hover:text-(--Text-gray) hover:bg-(--Button-background)"}`}
-                    aria-label="Close panel"
-                >
-                    <X size={18} />
-                </button>
-            </div>
+        <div className="fixed inset-0 z-50 flex justify-end">
+            <button
+                type="button"
+                aria-label="Fechar painel"
+                onClick={() => {
+                    if (!isSubmitting) onClose();
+                }}
+                className="fixed inset-0 bg-black/65 backdrop-blur-xs"
+            />
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5 px-6 pb-6 flex-1 overflow-y-auto pt-5">
-                {/* Full Name */}
-                <div>
-                    <label className={labelClass}>Nome Completo</label>
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Digite o nome completo"
-                        required
-                        className={inputClass}
-                    />
-                </div>
-
-                {/* Email */}
-                <div>
-                    <label className={labelClass}>E-mail</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Digite o endereço de e-mail"
-                        required
-                        className={inputClass}
-                    />
-                </div>
-
-                {/* Password */}
-                <div>
-                    <label className={labelClass}>Senha</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Digite a senha"
-                        required
-                        minLength={6}
-                        className={inputClass}
-                    />
-                </div>
-
-                {/* Success / Error */}
-                {successMessage && (
-                    <div className="p-3 rounded-md bg-(--Primary-20)/10 border border-(--Primary-20)/30">
-                        <p className="text-(--Primary) text-xs font-secondary">{successMessage}</p>
-                    </div>
-                )}
-                {error && (
-                    <p className="text-(--Negacion) text-xs font-secondary">{error}</p>
-                )}
-
-                {/* Spacer */}
-                <div className="flex-1" />
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t border-(--Border)">
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="reg-client-title"
+                className="relative z-10 w-full max-w-md bg-(--Widget-background) border-l border-(--Border) flex flex-col h-full shadow-2xl animate-[slideIn_0.2s_ease-out]"
+            >
+                <div className="flex items-center justify-between px-6 py-5 border-b border-(--Border)/60">
+                    <h3 id="reg-client-title" className="text-(--Text-primary) text-lg font-primary font-extrabold">
+                        Cadastrar Cliente
+                    </h3>
                     <button
                         type="button"
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className={`flex-1 px-4 py-2.5 bg-(--Button-background) text-(--Text-gray) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide ${isSubmitting ? btnDisabled : "hover:bg-(--Select-background) cursor-pointer"}`}
+                        className="p-1.5 rounded-md text-(--Text-primary-off) hover:text-(--Text-primary) hover:bg-(--Button-background) cursor-pointer"
+                        aria-label="Fechar painel"
                     >
-                        Cancelar
-                    </button>
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`flex-1 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-bold text-sm rounded-md transition-colors uppercase tracking-wide flex items-center justify-center gap-2 ${isSubmitting ? btnDisabled : "hover:bg-(--Primary-selected) cursor-pointer"}`}
-                    >
-                        {isSubmitting ? <LoadingSpinner size="xs" label="Cadastrando..." /> : "Cadastrar"}
+                        <X size={18} />
                     </button>
                 </div>
-            </form>
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-6 py-5 flex-1 overflow-y-auto">
+                    <div>
+                        <label htmlFor="cli-name" className={labelClass}>Nome Completo</label>
+                        <input
+                            id="cli-name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Digite o nome completo"
+                            required
+                            className={inputClass}
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="cli-email" className={labelClass}>E-mail</label>
+                        <input
+                            id="cli-email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="cliente@email.com"
+                            required
+                            className={inputClass}
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="cli-pass" className={labelClass}>Senha</label>
+                        <input
+                            id="cli-pass"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Mín. 6 chars, 1 maiúscula e 1 número"
+                            required
+                            minLength={6}
+                            className={inputClass}
+                        />
+                    </div>
+
+                    {error && (
+                        <div className="rounded-md border border-(--Danger-border) bg-(--Danger-bg) px-3 py-2 text-xs text-(--Danger-text)">
+                            {error}
+                        </div>
+                    )}
+
+                    <div className="flex-1" />
+
+                    <div className="flex gap-3 pt-4 border-t border-(--Border)/50">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSubmitting}
+                            className="flex-1 min-h-11 px-4 py-2.5 bg-(--Button-background) text-(--Text-primary) font-primary font-bold text-xs rounded-md hover:bg-(--Select-background) disabled:opacity-50 uppercase tracking-wider cursor-pointer"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex-1 min-h-11 px-4 py-2.5 bg-(--Primary) text-(--Text-dark) font-primary font-extrabold text-xs rounded-md hover:bg-(--Primary-selected) disabled:opacity-60 uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                            {isSubmitting ? <LoadingSpinner size="xs" label="Cadastrando..." /> : "Cadastrar"}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

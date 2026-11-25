@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { NavBarTop } from "../layout/NavBarTop";
 import { NavBarLeft } from "../layout/NavBarLeft";
@@ -11,6 +11,7 @@ import { useInventoryStore } from "../stores/useInventoryStore";
 
 export function Template() {
     const { isAuthenticated } = useAuth();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -30,16 +31,26 @@ export function Template() {
         };
     }, [isAuthenticated]);
 
+    useEffect(() => {
+        if (!isMobileMenuOpen) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsMobileMenuOpen(false);
+        };
+        document.addEventListener("keydown", onKeyDown);
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [isMobileMenuOpen]);
+
     return (
-        <div className="overflow-hidden w-full h-screen bg-(--Page-background) flex flex-col">
-            <div className="w-full h-fit">
-                <NavBarTop />
-            </div>
+        <div className="w-full min-h-dvh h-dvh bg-(--Page-background) flex flex-col overflow-hidden">
+            <NavBarTop onToggleMobileMenu={() => setIsMobileMenuOpen((prev) => !prev)} />
 
-            <div className="w-full h-full flex flex-1 overflow-hidden">
-                <NavBarLeft />
+            <div className="w-full flex-1 flex overflow-hidden relative">
+                <NavBarLeft
+                    isMobileOpen={isMobileMenuOpen}
+                    onCloseMobile={() => setIsMobileMenuOpen(false)}
+                />
 
-                <main className="flex-1 overflow-y-auto p-6">
+                <main className="flex-1 min-w-0 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
                     <Outlet />
                 </main>
             </div>

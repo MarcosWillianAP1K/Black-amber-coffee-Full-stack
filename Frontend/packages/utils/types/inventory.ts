@@ -6,16 +6,30 @@
 export const INVENTORY_UNITS = ["kg", "L", "un"] as const;
 export type InventoryUnit = (typeof INVENTORY_UNITS)[number];
 
-/** Display labels for each unit */
+/** Compact display labels for each unit */
 export const UNIT_LABELS: Record<InventoryUnit, string> = {
-    kg: "Kilogram",
-    L: "Liter",
-    un: "Unit",
+    kg: "kg",
+    L: "L",
+    un: "un",
+};
+
+/** Full Portuguese labels for select inputs */
+export const UNIT_FULL_LABELS: Record<InventoryUnit, string> = {
+    kg: "Quilograma (kg)",
+    L: "Litro (L)",
+    un: "Unidade (un)",
 };
 
 /** Stock status derived from amount thresholds */
 export const STOCK_STATUSES = ["In Stock", "Low Stock", "Out of Stock"] as const;
 export type StockStatus = (typeof STOCK_STATUSES)[number];
+
+/** Localized labels for stock statuses */
+export const STOCK_STATUS_LABELS: Record<StockStatus, string> = {
+    "In Stock": "Em Estoque",
+    "Low Stock": "Estoque Baixo",
+    "Out of Stock": "Sem Estoque",
+};
 
 /** Represents a single item in the inventory */
 export interface InventoryItem {

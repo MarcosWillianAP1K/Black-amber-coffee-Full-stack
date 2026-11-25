@@ -4,7 +4,6 @@ import { SearchBar } from "ui-shared/components/ui/SearchBar";
 import { FilterButton, type FilterOption } from "ui-shared/components/FilterButton";
 import type { Worker } from "shared-utils/types/worker";
 
-
 export interface SectionEmployeeProps {
     employees: Worker[];
     title: string;
@@ -14,9 +13,18 @@ export interface SectionEmployeeProps {
     pendingEmployeeIds?: Record<string, boolean>;
 }
 
-export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmployee, onViewEmployee, pendingEmployeeIds }: SectionEmployeeProps) {
+export function SectionEmployee({
+    employees,
+    title,
+    onDeleteEmployee,
+    onBlockEmployee,
+    onViewEmployee,
+    pendingEmployeeIds,
+}: SectionEmployeeProps) {
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortType, setSortType] = useState<"default" | "name-asc" | "name-desc" | "role-asc">("default");
+    const [sortType, setSortType] = useState<"default" | "name-asc" | "name-desc" | "role-asc">(
+        "default",
+    );
     const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
 
     const filteredEmployees = useMemo(() => {
@@ -38,7 +46,8 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
             next = next.filter((employee) => !employee.isActive);
         }
 
-        const nameCompare = (a: string, b: string) => a.localeCompare(b, undefined, { sensitivity: "base" });
+        const nameCompare = (a: string, b: string) =>
+            a.localeCompare(b, undefined, { sensitivity: "base" });
 
         switch (sortType) {
             case "name-asc":
@@ -96,18 +105,24 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
     ];
 
     return (
-        <div className="w-full h-140 flex flex-col px-4 py-2 gap-4 bg-(--Widget-background) rounded-md">
+        <section className="w-full flex flex-col p-5 gap-5 bg-(--Widget-background) rounded-lg border border-(--Border)">
+            <div className="w-full flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-(--Border)/70">
+                <div className="flex items-center gap-2.5 min-w-0">
+                    <h2 className="text-(--Primary-off) text-lg sm:text-xl font-primary font-bold truncate">
+                        {title}
+                    </h2>
+                    <span className="px-2 py-0.5 rounded-full bg-(--Button-background) text-xs font-secondary text-(--Text-primary) tabular-nums">
+                        {filteredEmployees.length}
+                    </span>
+                </div>
 
-            {/* header */}
-            <div className="w-full flex flex-wrap justify-between items-center gap-3 pb-2 border-b border-(--Border)">
-
-                {/* Title */}
-                <h1 className="flex-1 min-w-0 h-fit text-(--Primary-off) text-[24px] font-primary font-bold">
-                    {title}
-                </h1>
-
-                <div className="flex items-center gap-3">
-                    <SearchBar placeholder="Buscar" onChange={setSearchTerm} />
+                <div className="w-full md:w-auto flex items-center justify-between md:justify-end gap-3">
+                    <SearchBar
+                        placeholder="Buscar colaborador..."
+                        value={searchTerm}
+                        onChange={setSearchTerm}
+                        className="flex-1 md:flex-initial md:w-72 lg:w-80"
+                    />
                     <FilterButton
                         title="Filtros de funcionários"
                         buttonLabel="Filtrar"
@@ -115,23 +130,26 @@ export function SectionEmployee({ employees, title, onDeleteEmployee, onBlockEmp
                         align="right"
                     />
                 </div>
-
             </div>
 
-            {/* content */}
-            <div className="w-full h-full flex flex-wrap justify-center gap-6 overflow-y-auto">
-                {filteredEmployees.map((employee) => (
-                    <CardEmployee
-                        key={employee.publicId}
-                        {...employee}
-                        onDeleteEmployee={onDeleteEmployee}
-                        onBlockEmployee={onBlockEmployee}
-                        onViewEmployee={onViewEmployee}
-                        isPending={Boolean(pendingEmployeeIds?.[employee.publicId])}
-                    />
-                ))}
-            </div>
-
-        </div>
+            {filteredEmployees.length === 0 ? (
+                <p className="text-sm font-secondary text-(--Text-primary-off) py-6 text-center">
+                    Nenhum colaborador encontrado para o filtro aplicado.
+                </p>
+            ) : (
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 max-h-[520px] overflow-y-auto pr-1">
+                    {filteredEmployees.map((employee) => (
+                        <CardEmployee
+                            key={employee.publicId}
+                            {...employee}
+                            onDeleteEmployee={onDeleteEmployee}
+                            onBlockEmployee={onBlockEmployee}
+                            onViewEmployee={onViewEmployee}
+                            isPending={Boolean(pendingEmployeeIds?.[employee.publicId])}
+                        />
+                    ))}
+                </div>
+            )}
+        </section>
     );
 }

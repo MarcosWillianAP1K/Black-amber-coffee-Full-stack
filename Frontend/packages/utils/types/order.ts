@@ -64,3 +64,16 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
     finalizado: "FINALIZADO",
     cancelado: "CANCELADO",
 };
+
+/** Localized labels for payment methods */
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+    pix: "PIX",
+    cartao_credito: "Cartão de Crédito",
+    cartao_debito: "Cartão de Débito",
+    dinheiro: "Dinheiro",
+};
+
+export function formatPaymentMethod(method: string | null | undefined): string {
+    if (!method) return "Não informado";
+    return PAYMENT_METHOD_LABELS[method as PaymentMethod] ?? method;
+}

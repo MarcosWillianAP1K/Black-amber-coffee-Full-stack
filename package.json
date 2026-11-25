@@ -1,0 +1,36 @@
+{
+  "name": "black-amber-coffee-monorepo",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Orquestrador Full-Stack do Black Amber Coffee (Database PostgreSQL + Backend Express/TS + Frontend React Admin & Client)",
+  "scripts": {
+    "setup:env": "node scripts/setup-env.mjs",
+    "install:all": "npm install --no-audit --no-fund && npm --prefix Backend install --no-audit --no-fund && npm --prefix Frontend install --no-audit --no-fund",
+    "setup": "npm run setup:env && npm run install:all",
+    "db:up": "npm run setup:env && docker compose up -d --build --wait postgres adminer",
+    "db:down": "docker compose stop postgres adminer",
+    "db:reset": "docker compose down -v && docker compose up -d --build --wait postgres adminer",
+    "dev:backend": "npm --prefix Backend run dev",
+    "dev:frontend": "npm --prefix Frontend run dev:all",
+    "dev:admin": "npm --prefix Frontend run dev:admin",
+    "dev:client": "npm --prefix Frontend run dev:client",
+    "dev": "npm run setup:env && docker compose stop backend funcionario-adm cliente && docker compose up -d --build --wait postgres adminer && concurrently -n \"API,ADMIN,CLIENT\" -c \"green,cyan,yellow\" \"npm run dev:backend\" \"npm run dev:admin\" \"npm run dev:client\"",
+    "start": "npm run dev",
+    "docker:up": "npm run setup:env && docker compose up -d --build",
+    "docker:up:logs": "npm run setup:env && docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v && docker compose up -d --build",
+    "docker:logs": "docker compose logs -f",
+    "docker:logs:backend": "docker compose logs -f backend",
+    "docker:logs:admin": "docker compose logs -f funcionario-adm",
+    "docker:logs:client": "docker compose logs -f cliente",
+    "docker:ps": "docker compose ps",
+    "build": "npm --prefix Backend run build && npm --prefix Frontend run build:admin && npm --prefix Frontend run build:client",
+    "test": "npm --prefix Backend test && npm --prefix Frontend test -w admin-app && npm --prefix Frontend test -w client-app",
+    "typecheck": "npm --prefix Backend run typecheck"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

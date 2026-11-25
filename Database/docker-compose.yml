@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: black-amber-postgres
+    container_name: postgres
     restart: unless-stopped
     env_file:
       - path: ./.env
@@ -27,7 +27,7 @@ services:
 
   adminer:
     image: adminer:latest
-    container_name: black-amber-db-adminer
+    container_name: adminer
     restart: unless-stopped
     ports:
       - "${ADMINER_PORT:-8080}:8080"

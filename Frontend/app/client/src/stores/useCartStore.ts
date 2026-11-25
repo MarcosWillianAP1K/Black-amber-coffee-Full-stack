@@ -16,9 +16,10 @@ export interface CartStoreState {
     error: string | null;
     setObservation: (value: string) => void;
     refresh: () => Promise<void>;
-    addItem: (product: Product, quantity?: number) => Promise<void>;
+    addItem: (product: Product, quantity?: number, observation?: string | null) => Promise<void>;
     increment: (productId: number) => Promise<void>;
     decrement: (productId: number) => Promise<void>;
+    removeItem: (productId: number) => Promise<void>;
     clear: () => Promise<void>;
     reset: () => void;
 }
@@ -67,16 +68,18 @@ export const useCartStore = create<CartStoreState>((set, get) => ({
         }
     },
 
-    addItem: async (product, quantity = 1) => {
+    addItem: async (product, quantity = 1, observation?: string | null) => {
         set((state) => ({
             pendingProductIds: { ...state.pendingProductIds, [product.id]: true },
             error: null,
         }));
 
         try {
+            const trimmedObs = observation?.trim();
             const data = await cartService.addCartItem({
                 productId: product.id,
                 quantity,
+                ...(trimmedObs ? { observation: trimmedObs } : {}),
             });
             set(mapCartState(data));
             dispatchCartUpdated();
@@ -138,6 +141,27 @@ export const useCartStore = create<CartStoreState>((set, get) => ({
             dispatchCartUpdated();
         } catch (err) {
             set({ error: err instanceof Error ? err.message : "Falha ao atualizar item" });
+        } finally {
+            set((state) => {
+                const nextPending = { ...state.pendingProductIds };
+                delete nextPending[productId];
+                return { pendingProductIds: nextPending };
+            });
+        }
+    },
+
+    removeItem: async (productId) => {
+        set((state) => ({
+            pendingProductIds: { ...state.pendingProductIds, [productId]: true },
+            error: null,
+        }));
+
+        try {
+            const data = await cartService.removeCartItem(productId);
+            set(mapCartState(data));
+            dispatchCartUpdated();
+        } catch (err) {
+            set({ error: err instanceof Error ? err.message : "Falha ao remover item" });
         } finally {
             set((state) => {
                 const nextPending = { ...state.pendingProductIds };

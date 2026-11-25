@@ -89,6 +89,15 @@ export function ServerWarmupGate({
                     return;
                 }
 
+                const isSilentAbort =
+                    !didTimeout &&
+                    error instanceof DOMException &&
+                    error.name === "AbortError";
+
+                if (isSilentAbort) {
+                    return;
+                }
+
                 const message = didTimeout
                     ? "Tempo limite excedido aguardando resposta inicial do servidor."
                     : error instanceof Error && error.message
@@ -111,10 +120,15 @@ export function ServerWarmupGate({
 
     useEffect(() => {
         mountedRef.current = true;
-        void checkServerHealth(1);
+        const startTimer = window.setTimeout(() => {
+            if (mountedRef.current) {
+                void checkServerHealth(1);
+            }
+        }, 0);
 
         return () => {
             mountedRef.current = false;
+            window.clearTimeout(startTimer);
             clearPendingTimers();
         };
     }, [checkServerHealth, clearPendingTimers]);
@@ -175,7 +189,7 @@ export function ServerWarmupGate({
                         </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-(--Text-primary-off)">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-(--Text-primary-off)">
                         <span>Tentativa #{attempt}</span>
                         <span>Reconexão automática a cada {Math.round(pollIntervalMs / 1000)}s</span>
                     </div>

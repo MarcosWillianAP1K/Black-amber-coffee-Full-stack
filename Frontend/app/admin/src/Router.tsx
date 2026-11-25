@@ -1,17 +1,10 @@
-import { useEffect, type JSX } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
-// Importando paths
 import { APP_ROUTES } from "./utils/Path";
-
-// Importando o Layout Pai
 import { Template } from "./pages/Template";
-
-// Importando o RouteProtector para proteger as rotas
 import { RouteProtector } from "./components/RouteProtector";
 import { allowedRoles } from "shared-utils/types/worker";
 
-// Importando as Telas Prontas
 import { Dashboard } from "./pages/content/Dashboard";
 import { Menu } from "./pages/content/Menu";
 import { LiveOrders } from "./pages/content/LiveOrders";
@@ -23,15 +16,8 @@ import { SignUp } from "./pages/SignUp";
 import { Perfil } from "./pages/Perfil";
 import { Settings } from "./pages/Settings";
 import { Support } from "./pages/Support";
-import { getStoredToken } from "./services/authService.ts";
+import { useEffect } from "react";
 import { useAuthStore } from "./stores/useAuthStore.ts";
-
-// Componente genérico para as telas não finalizadas
-// eslint-disable-next-line react-refresh/only-export-components
-const RequireAuth = ({ children }: { children: JSX.Element }) => {
-    const token = useAuthStore((s) => s.token) ?? getStoredToken();
-    return token ? children : <Navigate to={APP_ROUTES.LOGIN} replace />;
-};
 
 // eslint-disable-next-line react-refresh/only-export-components
 const LogoutRoute = () => {
@@ -42,10 +28,6 @@ const LogoutRoute = () => {
     return <Navigate to={APP_ROUTES.LOGIN} replace />;
 };
 
-
-
-
-// Mapa central de rotas do sistema
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -57,84 +39,76 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to={APP_ROUTES.LOGIN} replace />
+                element: <Navigate to={APP_ROUTES.DASHBOARD} replace />,
             },
             {
                 path: APP_ROUTES.DASHBOARD,
-                element: <Dashboard />
+                element: <Dashboard />,
             },
             {
                 path: APP_ROUTES.MENU,
-                element: <RouteProtector allowedRoles={allowedRoles}>
-                    <Menu />
-                </RouteProtector>
+                element: (
+                    <RouteProtector allowedRoles={allowedRoles}>
+                        <Menu />
+                    </RouteProtector>
+                ),
             },
             {
                 path: APP_ROUTES.LIVE_ORDERS,
-                element: <LiveOrders />
+                element: <LiveOrders />,
             },
             {
                 path: APP_ROUTES.INVENTORY,
-                element: <RouteProtector allowedRoles={allowedRoles}>
-                    <Inventory />
-                </RouteProtector>
+                element: (
+                    <RouteProtector allowedRoles={allowedRoles}>
+                        <Inventory />
+                    </RouteProtector>
+                ),
             },
             {
                 path: APP_ROUTES.ANALYTICS,
-                element: <RouteProtector allowedRoles={allowedRoles}>
-                    <Analytics />
-                </RouteProtector>
+                element: (
+                    <RouteProtector allowedRoles={allowedRoles}>
+                        <Analytics />
+                    </RouteProtector>
+                ),
             },
             {
                 path: APP_ROUTES.STAFF,
-                element: <RouteProtector allowedRoles={allowedRoles}>
-                    <Staff />
-                </RouteProtector>
-            }
-        ]
-    },
-    {
-        path: APP_ROUTES.SUPPORT,
-        element: (
-            <RequireAuth>
-                <Support />
-            </RequireAuth>
-        )
+                element: (
+                    <RouteProtector allowedRoles={allowedRoles}>
+                        <Staff />
+                    </RouteProtector>
+                ),
+            },
+            {
+                path: APP_ROUTES.SUPPORT,
+                element: <Support />,
+            },
+            {
+                path: APP_ROUTES.SETTINGS,
+                element: <Settings />,
+            },
+            {
+                path: APP_ROUTES.PERFIL,
+                element: <Perfil />,
+            },
+            {
+                path: APP_ROUTES.PERFIL_DETAIL,
+                element: <Perfil />,
+            },
+        ],
     },
     {
         path: APP_ROUTES.LOGOUT,
-        element: <LogoutRoute />
+        element: <LogoutRoute />,
     },
     {
         path: APP_ROUTES.LOGIN,
-        element: <Login />
+        element: <Login />,
     },
     {
         path: APP_ROUTES.SIGNUP,
-        element: <SignUp />
+        element: <SignUp />,
     },
-    {
-        path: APP_ROUTES.SETTINGS,
-        element: (
-            <RequireAuth>
-                <Settings />
-            </RequireAuth>
-        )
-    },
-    {
-        path: APP_ROUTES.PERFIL,
-        element: (
-            <RequireAuth>
-                <Perfil />
-            </RequireAuth>
-        )
-    },
-    {
-        path: APP_ROUTES.PERFIL_DETAIL,
-        element: (
-            <RequireAuth>
-                <Perfil />
-            </RequireAuth>
-        )
-    }
 ]);

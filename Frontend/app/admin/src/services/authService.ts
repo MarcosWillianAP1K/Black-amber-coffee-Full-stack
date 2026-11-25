@@ -80,8 +80,17 @@ async function apiLogin(email: string, password: string): Promise<AuthResponse> 
     });
 
     if (!response.ok) {
-        const errPayload = (await response.json().catch(() => null)) as { message?: string } | null;
-        throw new Error(errPayload?.message || "Email or password incorrect");
+        if (response.status === 429) {
+            throw new Error("Muitas tentativas de login. Aguarde alguns minutos e tente novamente.");
+        }
+        const errPayload = (await response.json().catch(() => null)) as {
+            message?: string;
+            error?: { message?: string };
+        } | null;
+        const msg = errPayload?.error?.message ?? errPayload?.message;
+        if (msg) throw new Error(msg);
+        if (response.status === 403) throw new Error("Conta desativada. Contate o gerente.");
+        throw new Error("E-mail ou senha incorretos.");
     }
 
     const payload = (await response.json()) as LoginResponse;

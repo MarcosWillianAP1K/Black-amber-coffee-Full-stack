@@ -19,7 +19,7 @@ export function CategoryCarousel({ categories, activeCategory, onSelectCategory 
       }}
       className={`
         carousel-container
-        flex gap-3 overflow-x-auto px-4 py-2 
+        flex gap-2.5 overflow-x-auto py-1
         [&::-webkit-scrollbar]:hidden
         ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}
       `}
@@ -35,14 +35,15 @@ export function CategoryCarousel({ categories, activeCategory, onSelectCategory 
         return (
           <button
             key={category}
+            type="button"
             onClick={() => onSelectCategory(category)}
             className={`
-              whitespace-nowrap px-4 py-2 rounded-lg text-[10px] font-
-              semibold uppercase 
-              transition-all duration-300 ease-in-out cursor-pointer
+              whitespace-nowrap min-h-9 px-4 py-2 rounded-lg text-xs font-secondary
+              font-semibold uppercase tracking-wide
+              transition-all duration-200 cursor-pointer shrink-0
               ${isActive
-                ? 'bg-(--Primary) text-(--Text-dark)' // Active state (Yellow)
-                : 'bg-(--Button-background) text-(--Text-primary-off) hover:brightness-110' // Inactive state (Dark Gray)
+                ? 'bg-(--Primary) text-(--Text-dark) shadow-sm'
+                : 'bg-(--Button-background) text-(--Text-primary-off) hover:text-(--Text-primary) hover:bg-(--Select-background)'
               }
             `}
           >

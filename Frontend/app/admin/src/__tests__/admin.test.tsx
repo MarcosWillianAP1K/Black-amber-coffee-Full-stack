@@ -5,6 +5,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
 import { ServerWarmupGate } from 'ui-shared/components/ServerWarmupGate';
+import { ProductThumb } from 'ui-shared/components/ui/ProductThumb';
+import { computeAnalytics } from '../services/analyticsService';
 
 import { APP_ROUTES, ADMIN_ROUTES } from '../utils/Path';
 import { useAuth } from '../hooks/useAuth';
@@ -243,5 +245,40 @@ describe('ServerWarmupGate (/health check)', () => {
     await waitFor(() => {
       expect(screen.getByTestId('app-ready')).toBeInTheDocument();
     });
+  });
+});
+
+describe('Padronização Operacional (Analytics BRL & ProductThumb)', () => {
+  it('computeAnalytics retorna títulos em PT-BR e receita formatada em R$', () => {
+    const analytics = computeAnalytics(
+      [
+        {
+          id: 1,
+          publicId: 'ord-1',
+          code: 'ORD-001',
+          status: 'finalizado',
+          totalPrice: 25.5,
+          paymentMethod: 'pix',
+          observation: null,
+          itens: [],
+          createdAt: '2026-11-25T10:00:00.000Z',
+          updatedAt: '2026-11-25T10:00:00.000Z',
+        },
+      ],
+      [fakeWorker],
+      [],
+      [],
+    );
+
+    const salesCard = analytics.cards.find((c) => c.id === 'sales');
+    expect(salesCard?.title).toBe('Faturamento Concluído');
+    expect(String(salesCard?.value)).toContain('R$');
+    expect(analytics.chart.title).toBe('Pedidos por Mês');
+  });
+
+  it('ProductThumb não renderiza texto IMG ou NaN quando sem foto', () => {
+    render(<ProductThumb name="Croissant" category="lanche" imageUrl={null} />);
+    expect(screen.queryByText('IMG')).not.toBeInTheDocument();
+    expect(screen.queryByText('NaN')).not.toBeInTheDocument();
   });
 });

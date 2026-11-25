@@ -1,14 +1,12 @@
 /**
  * Analytics Service — data layer for analytics widgets.
- *
- * Computes analytics from live data (orders, employees, products, inventory).
- * No API calls needed — all data comes from existing contexts.
  */
 
 import type { Order } from "shared-utils/types/order";
 import type { Worker } from "shared-utils/types/worker";
 import type { Product } from "shared-utils/types/product";
 import type { InventoryItem } from "shared-utils/types/inventory";
+import { formatPrice } from "shared-utils/helpers/currency";
 
 export type TrendDirection = "up" | "down" | "neutral";
 
@@ -43,21 +41,12 @@ export interface AnalyticsData {
     chart: AnalyticsChartData;
 }
 
-// ──────────────────────────────────────────────
-// Helpers
-// ──────────────────────────────────────────────
-
-function formatCurrency(value: number): string {
-    return `$${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
 function formatCompact(value: number): string {
     if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
     if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
     return String(value);
 }
 
-/** Compare two summary snapshots to compute deltas */
 function computeDelta(current: number, previous: number): { delta: string; trend: TrendDirection } | null {
     if (previous === 0) return null;
     const pct = ((current - previous) / previous) * 100;
@@ -68,34 +57,22 @@ function computeDelta(current: number, previous: number): { delta: string; trend
     };
 }
 
-// ──────────────────────────────────────────────
-// Computation functions
-// ──────────────────────────────────────────────
-
-/**
- * Compute analytics cards and chart from live context data.
- * Replaces the old mock-only fetchAnalytics.
- */
 export function computeAnalytics(
     orders: Order[],
     employees: Worker[],
     products: Product[],
     inventoryItems: InventoryItem[],
 ): AnalyticsData {
-    // ── Current values ────────────────────────
-
     const totalOrders = orders.length;
     const totalSales = orders
         .filter((o) => o.status === "finalizado")
         .reduce((sum, o) => sum + o.totalPrice, 0);
     const pendingDeliveries = orders.filter(
-        (o) => o.status === "criado" || o.status === "em_preparo",
+        (o) => o.status === "criado" || o.status === "em_preparo" || o.status === "pronto",
     ).length;
     const activeStaff = employees.filter((e) => e.isActive).length;
     const menuItems = products.length;
     const lowStock = inventoryItems.filter((i) => i.status !== "In Stock").length;
-
-    // ── Previous period (cached in localStorage) ──
 
     const prev = getPreviousSnapshot();
 
@@ -104,7 +81,6 @@ export function computeAnalytics(
     const pendingDelta = prev ? computeDelta(pendingDeliveries, prev.pendingDeliveries) : null;
     const staffDelta = prev ? computeDelta(activeStaff, prev.activeStaff) : null;
 
-    // Save current snapshot for next comparison
     saveSnapshot({
         totalOrders,
         totalSales,
@@ -112,90 +88,84 @@ export function computeAnalytics(
         activeStaff,
     });
 
-    // ── Cards ─────────────────────────────────
-
     const cards: AnalyticsCardData[] = [
         {
             id: "orders",
-            title: "Total Orders",
+            title: "Pedidos Totais",
             value: formatCompact(totalOrders),
             delta: ordersDelta?.delta,
-            deltaLabel: ordersDelta ? "Vs. previous period" : undefined,
+            deltaLabel: ordersDelta ? "vs. período anterior" : undefined,
             trend: ordersDelta?.trend,
             iconKey: "orders",
-            iconBgClassName: "bg-(--Primary)",
+            iconBgClassName: "bg-(--Primary) text-(--Text-dark)",
         },
         {
             id: "sales",
-            title: "Total Sales",
-            value: formatCurrency(totalSales),
+            title: "Faturamento Concluído",
+            value: formatPrice(totalSales),
             delta: salesDelta?.delta,
-            deltaLabel: salesDelta ? "Vs. previous period" : undefined,
+            deltaLabel: salesDelta ? "vs. período anterior" : undefined,
             trend: salesDelta?.trend,
             iconKey: "sales",
-            iconBgClassName: "bg-(--Afirmation)",
+            iconBgClassName: "bg-(--Afirmation) text-white",
         },
         {
             id: "deliveries",
-            title: "Pending Deliveries",
+            title: "Fila em Aberto",
             value: pendingDeliveries,
             delta: pendingDelta?.delta,
-            deltaLabel: pendingDelta ? "Vs. previous period" : undefined,
+            deltaLabel: pendingDelta ? "vs. período anterior" : undefined,
             trend: pendingDelta?.trend,
             iconKey: "deliveries",
-            iconBgClassName: "bg-(--Button-background)",
+            iconBgClassName: "bg-(--Button-background) text-(--Primary)",
         },
         {
             id: "users",
-            title: "Active Staff",
+            title: "Equipe Ativa",
             value: activeStaff,
             delta: staffDelta?.delta,
-            deltaLabel: staffDelta ? "Vs. previous period" : undefined,
+            deltaLabel: staffDelta ? "vs. período anterior" : undefined,
             trend: staffDelta?.trend,
             iconKey: "users",
-            iconBgClassName: "bg-[#8280FF]",
+            iconBgClassName: "bg-[#6366F1] text-white",
         },
         {
             id: "hours",
-            title: "Menu Items",
+            title: "Itens no Cardápio",
             value: menuItems,
             iconKey: "hours",
-            iconBgClassName: "bg-(--Negacion)",
+            iconBgClassName: "bg-(--Primary-20)/25 text-(--Primary)",
         },
         {
             id: "stock",
-            title: "Low / Out of Stock",
+            title: "Alertas de Estoque",
             value: lowStock,
             iconKey: "stock",
-            iconBgClassName: "bg-(--Button-background)",
+            iconBgClassName: lowStock > 0 ? "bg-(--Danger-bg) text-(--Danger-text)" : "bg-(--Button-background) text-(--Text-gray)",
         },
     ];
 
-    // ── Chart (orders per month) ──────────────
-
     const monthLabels = [
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+        "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+        "Jul", "Ago", "Set", "Out", "Nov", "Dez",
     ];
     const perMonth = new Array(12).fill(0);
     orders.forEach((order) => {
         const month = new Date(order.createdAt).getMonth();
-        perMonth[month]++;
+        if (month >= 0 && month < 12) {
+            perMonth[month]++;
+        }
     });
 
     const chart: AnalyticsChartData = {
-        title: "Orders per Month",
+        title: "Pedidos por Mês",
         data: perMonth,
         labels: monthLabels,
-        seriesLabel: "Orders",
+        seriesLabel: "Pedidos",
     };
 
     return { cards, chart };
 }
-
-// ──────────────────────────────────────────────
-// LocalStorage snapshot (for delta comparison)
-// ──────────────────────────────────────────────
 
 interface Snapshot {
     totalOrders: number;
@@ -216,7 +186,9 @@ function getPreviousSnapshot(): Snapshot | null {
 }
 
 function saveSnapshot(data: Snapshot): void {
-    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(data));
+    try {
+        localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(data));
+    } catch {
+        // ignore storage restrictions
+    }
 }
-
-

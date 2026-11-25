@@ -1,122 +1,265 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Download, KeyRound, RotateCcw, UserCog } from "lucide-react";
 import { DestakTitle } from "ui-shared/components/ui/DestakTitle";
+import { FormBoxText } from "ui-shared/components/ui/FormBoxText";
+import { ButtonPrimary } from "ui-shared/components/ui/ButtonPrimary";
+import { useToastStore } from "shared-utils/stores/useToastStore";
+import { useAuthStore } from "../stores/useAuthStore";
+import { useOrders } from "../hooks/useOrders";
+import { useInventoryItems } from "../hooks/useInventoryItems";
+import { APP_ROUTES } from "../utils/Path";
 
-interface SettingsItem {
-    label: string;
-    value: string;
-    action: string;
-    danger?: boolean;
+interface AdminPrefs {
+    kdsUrgencyAlerts: boolean;
+    stockBadgeAlerts: boolean;
 }
 
-interface SettingsSection {
-    title: string;
-    description: string;
-    items: SettingsItem[];
+const PREFS_KEY = "black_amber_admin_prefs";
+
+function loadPrefs(): AdminPrefs {
+    try {
+        const raw = localStorage.getItem(PREFS_KEY);
+        if (!raw) return { kdsUrgencyAlerts: true, stockBadgeAlerts: true };
+        return JSON.parse(raw) as AdminPrefs;
+    } catch {
+        return { kdsUrgencyAlerts: true, stockBadgeAlerts: true };
+    }
 }
 
-const settingsSections: SettingsSection[] = [
-    {
-        title: "Conta",
-        description: "Detalhes do perfil e preferências de identidade.",
-        items: [
-            { label: "Detalhes do perfil", value: "Nome, e-mail, cargo", action: "Editar" },
-            { label: "Avatar", value: "Atualizar foto de perfil", action: "Enviar" },
-            { label: "Idioma", value: "Português (BR)", action: "Alterar" },
-        ],
-    },
-    {
-        title: "Segurança",
-        description: "Senha e controles de acesso.",
-        items: [
-            { label: "Senha", value: "Atualizada há 30 dias", action: "Atualizar" },
-            { label: "Sessões", value: "2 dispositivos ativos", action: "Gerenciar" },
-            { label: "Dois fatores", value: "Desativado", action: "Ativar" },
-        ],
-    },
-    {
-        title: "Notificações",
-        description: "Escolha como receber alertas.",
-        items: [
-            { label: "Alertas de pedidos", value: "Ativado", action: "Alternar" },
-            { label: "Alertas de estoque", value: "Ativado", action: "Alternar" },
-            { label: "Resumo semanal", value: "Desativado", action: "Alternar" },
-        ],
-    },
-    {
-        title: "Sistema",
-        description: "Preferências do aplicativo e controles de dados.",
-        items: [
-            { label: "Tema", value: "Escuro", action: "Alternar" },
-            { label: "Exportar dados", value: "Baixar relatórios", action: "Exportar" },
-            { label: "Redefinir configurações", value: "Restaurar padrões", action: "Redefinir", danger: true },
-        ],
-    },
-];
+function downloadCsv(filename: string, headers: string[], rows: Array<Array<string | number>>) {
+    const escape = (val: string | number) => `"${String(val).replace(/"/g, '""')}"`;
+    const csv = [headers.map(escape).join(","), ...rows.map((r) => r.map(escape).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
 
 export function Settings() {
     const navigate = useNavigate();
+    const showToast = useToastStore((s) => s.showToast);
+    const { orders } = useOrders();
+    const { items: inventoryItems } = useInventoryItems();
+
+    const [prefs, setPrefs] = useState<AdminPrefs>(loadPrefs);
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isUpdatingPass, setIsUpdatingPass] = useState(false);
+
+    const updatePrefs = (next: AdminPrefs) => {
+        setPrefs(next);
+        localStorage.setItem(PREFS_KEY, JSON.stringify(next));
+        showToast({ variant: "success", title: "Preferências salvas" });
+    };
+
+    const handlePasswordUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newPassword.length < 6) {
+            showToast({ variant: "error", title: "A senha deve ter no mínimo 6 caracteres." });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            showToast({ variant: "error", title: "As senhas informadas não conferem." });
+            return;
+        }
+        setIsUpdatingPass(true);
+        try {
+            await useAuthStore.getState().updateMyProfile({ password: newPassword });
+            setNewPassword("");
+            setConfirmPassword("");
+            showToast({ variant: "success", title: "Senha atualizada com sucesso!" });
+        } catch (err) {
+            showToast({
+                variant: "error",
+                title: "Erro ao atualizar senha",
+                description: err instanceof Error ? err.message : undefined,
+            });
+        } finally {
+            setIsUpdatingPass(false);
+        }
+    };
+
+    const handleExportOrders = () => {
+        downloadCsv(
+            `pedidos-black-amber-${new Date().toISOString().slice(0, 10)}.csv`,
+            ["Código", "Status", "Pagamento", "Total (R$)", "Criado Em"],
+            orders.map((o) => [
+                o.code || `#${o.id}`,
+                o.status,
+                o.paymentMethod ?? "N/A",
+                o.totalPrice.toFixed(2),
+                o.createdAt,
+            ]),
+        );
+        showToast({ variant: "success", title: "Relatório CSV de pedidos exportado!" });
+    };
+
+    const handleExportInventory = () => {
+        downloadCsv(
+            `estoque-black-amber-${new Date().toISOString().slice(0, 10)}.csv`,
+            ["Código", "Insumo", "Quantidade", "Unidade", "Status"],
+            inventoryItems.map((i) => [i.code, i.name, i.amount, i.unit, i.status]),
+        );
+        showToast({ variant: "success", title: "Relatório CSV de estoque exportado!" });
+    };
 
     return (
-        <div className="w-full h-fit gap-6 flex flex-col bg-(--Page-background) p-4">
-            <div className="flex flex-wrap items-center gap-4">
-                <div className="min-w-0 flex-1">
-                    <DestakTitle title="Configurações" subtitle="Gerencie suas preferências e segurança" />
-                </div>
+        <div className="w-full flex flex-col gap-6 pb-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <DestakTitle
+                    title="Configurações"
+                    subtitle="Gerencie sua segurança, preferências operacionais e exportação de relatórios"
+                />
                 <button
                     type="button"
                     onClick={() => navigate(-1)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-sm border border-(--Border) text-(--Text-primary-off) text-xs font-secondary font-semibold uppercase tracking-wider hover:border-(--Primary) hover:text-(--Primary) transition-all duration-200"
-                    aria-label="Back"
+                    className="min-h-10 px-4 py-2 rounded-lg border border-(--Border) text-(--Text-primary-off) text-xs font-secondary font-semibold uppercase tracking-wider hover:border-(--Primary) hover:text-(--Primary) transition-colors cursor-pointer"
                 >
                     Voltar
                 </button>
             </div>
 
-            <div className="flex flex-col gap-6">
-                {settingsSections.map((section) => (
-                    <section key={section.title} className="border border-(--Border) rounded-sm bg-(--Widget-background)">
-                        <div className="px-5 py-4 border-b border-(--Border)">
-                            <h2 className="text-(--Primary) text-xs font-primary font-extrabold tracking-[0.3em] uppercase">
-                                {section.title}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Conta & Segurança */}
+                <section className="rounded-xl border border-(--Border) bg-(--Widget-background) p-6 flex flex-col gap-5">
+                    <div className="flex items-center justify-between border-b border-(--Border)/60 pb-3">
+                        <div className="flex items-center gap-2">
+                            <KeyRound size={18} className="text-(--Primary)" />
+                            <h2 className="text-sm font-primary font-extrabold uppercase tracking-wider text-(--Primary)">
+                                Segurança &amp; Conta
                             </h2>
-                            <p className="text-(--Text-primary-off) text-sm font-secondary mt-2">
-                                {section.description}
-                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => navigate(APP_ROUTES.PERFIL)}
+                            className="inline-flex items-center gap-1.5 text-xs font-secondary font-semibold text-(--Primary) hover:underline cursor-pointer"
+                        >
+                            <UserCog size={14} />
+                            Editar Perfil
+                        </button>
+                    </div>
+
+                    <form onSubmit={handlePasswordUpdate} className="flex flex-col gap-4">
+                        <FormBoxText
+                            title="Nova senha"
+                            placeHolder="Mínimo 6 caracteres"
+                            type="password"
+                            value={newPassword}
+                            required
+                            minLength={6}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <FormBoxText
+                            title="Confirmar nova senha"
+                            placeHolder="Repita a nova senha"
+                            type="password"
+                            value={confirmPassword}
+                            required
+                            minLength={6}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                        <ButtonPrimary
+                            type="submit"
+                            isLoading={isUpdatingPass}
+                            loadingText="Atualizando senha..."
+                        >
+                            Atualizar Senha
+                        </ButtonPrimary>
+                    </form>
+                </section>
+
+                {/* Preferências Operacionais & Exportação */}
+                <div className="flex flex-col gap-6">
+                    <section className="rounded-xl border border-(--Border) bg-(--Widget-background) p-6 flex flex-col gap-4">
+                        <div className="border-b border-(--Border)/60 pb-3">
+                            <h2 className="text-sm font-primary font-extrabold uppercase tracking-wider text-(--Primary)">
+                                Preferências do Painel
+                            </h2>
                         </div>
 
-                        <div className="flex flex-col">
-                            {section.items.map((item, index) => (
-                                <div
-                                    key={item.label}
-                                    className={`flex flex-wrap items-center justify-between gap-4 px-5 py-4
-                                        ${index < section.items.length - 1 ? "border-b border-(--Border)" : ""}
-                                    `}
-                                >
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-(--Text-gray) text-sm font-primary font-bold">
-                                            {item.label}
-                                        </span>
-                                        <span className="text-(--Text-primary-off) text-xs font-secondary">
-                                            {item.value}
-                                        </span>
-                                    </div>
+                        <label className="flex items-center justify-between gap-4 cursor-pointer">
+                            <div>
+                                <p className="text-sm font-primary font-bold text-(--Text-primary)">
+                                    Alertas visuais de atraso no KDS
+                                </p>
+                                <p className="text-xs font-secondary text-(--Text-primary-off)">
+                                    Destacar bordas dos pedidos com mais de 10 minutos na fila
+                                </p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={prefs.kdsUrgencyAlerts}
+                                onChange={(e) =>
+                                    updatePrefs({ ...prefs, kdsUrgencyAlerts: e.target.checked })
+                                }
+                                className="w-5 h-5 accent-(--Primary) cursor-pointer"
+                            />
+                        </label>
 
-                                    <button
-                                        type="button"
-                                        className={`px-4 py-2 rounded-sm text-xs font-secondary font-semibold uppercase tracking-wider border transition-all duration-200
-                                            ${item.danger
-                                                ? "border-(--Negacion)/50 text-(--Negacion) hover:border-(--Negacion)"
-                                                : "border-(--Border) text-(--Text-primary-off) hover:border-(--Primary) hover:text-(--Primary)"
-                                            }
-                                        `}
-                                    >
-                                        {item.action}
-                                    </button>
-                                </div>
-                            ))}
+                        <label className="flex items-center justify-between gap-4 cursor-pointer pt-3 border-t border-(--Border)/40">
+                            <div>
+                                <p className="text-sm font-primary font-bold text-(--Text-primary)">
+                                    Indicador de estoque crítico
+                                </p>
+                                <p className="text-xs font-secondary text-(--Text-primary-off)">
+                                    Exibir alertas no sino superior para insumos abaixo do mínimo
+                                </p>
+                            </div>
+                            <input
+                                type="checkbox"
+                                checked={prefs.stockBadgeAlerts}
+                                onChange={(e) =>
+                                    updatePrefs({ ...prefs, stockBadgeAlerts: e.target.checked })
+                                }
+                                className="w-5 h-5 accent-(--Primary) cursor-pointer"
+                            />
+                        </label>
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                updatePrefs({ kdsUrgencyAlerts: true, stockBadgeAlerts: true })
+                            }
+                            className="mt-2 w-fit inline-flex items-center gap-1.5 text-xs font-secondary font-semibold text-(--Text-primary-off) hover:text-(--Primary) cursor-pointer"
+                        >
+                            <RotateCcw size={13} />
+                            Restaurar preferências padrão
+                        </button>
+                    </section>
+
+                    <section className="rounded-xl border border-(--Border) bg-(--Widget-background) p-6 flex flex-col gap-4">
+                        <div className="border-b border-(--Border)/60 pb-3">
+                            <h2 className="text-sm font-primary font-extrabold uppercase tracking-wider text-(--Primary)">
+                                Exportar Dados (CSV)
+                            </h2>
+                        </div>
+
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                type="button"
+                                onClick={handleExportOrders}
+                                className="min-h-10 px-4 py-2 rounded-lg border border-(--Border) hover:border-(--Primary) text-(--Text-primary) hover:text-(--Primary) text-xs font-primary font-bold uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer transition-colors"
+                            >
+                                <Download size={14} />
+                                Baixar Pedidos ({orders.length})
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleExportInventory}
+                                className="min-h-10 px-4 py-2 rounded-lg border border-(--Border) hover:border-(--Primary) text-(--Text-primary) hover:text-(--Primary) text-xs font-primary font-bold uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer transition-colors"
+                            >
+                                <Download size={14} />
+                                Baixar Estoque ({inventoryItems.length})
+                            </button>
                         </div>
                     </section>
-                ))}
+                </div>
             </div>
         </div>
     );

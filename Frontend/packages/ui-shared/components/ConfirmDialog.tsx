@@ -63,12 +63,17 @@ export function ConfirmDialog({
                 onClick={onCancel}
             />
 
-            <div className="relative w-90 max-w-[90vw] rounded-sm border border-(--Border) bg-(--Widget-background) p-5 shadow-lg">
-                <h3 className="text-(--Text-gray) text-base font-primary font-extrabold">
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="confirm-dialog-title"
+                className="relative w-full max-w-sm mx-4 rounded-xl border border-(--Border) bg-(--Widget-background) p-6 shadow-2xl"
+            >
+                <h3 id="confirm-dialog-title" className="text-(--Text-primary) text-base font-primary font-extrabold">
                     {title}
                 </h3>
                 {description ? (
-                    <p className="mt-2 text-(--Text-primary-off) text-sm font-secondary">
+                    <p className="mt-2 text-(--Text-primary-off) text-sm font-secondary leading-relaxed">
                         {description}
                     </p>
                 ) : null}
@@ -77,7 +82,7 @@ export function ConfirmDialog({
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="px-4 py-2 rounded-sm border border-(--Border) text-(--Text-primary-off) text-xs font-secondary font-semibold uppercase tracking-wider hover:border-(--Primary) hover:text-(--Primary) transition-all duration-200"
+                        className="min-h-10 px-4 py-2 rounded-md border border-(--Border) text-(--Text-primary-off) text-xs font-secondary font-semibold uppercase tracking-wider hover:border-(--Primary) hover:text-(--Primary) transition-all duration-200 cursor-pointer"
                     >
                         {cancelLabel}
                     </button>
@@ -85,9 +90,9 @@ export function ConfirmDialog({
                         type="button"
                         onClick={onConfirm}
                         ref={confirmButtonRef}
-                        className={`px-4 py-2 rounded-sm text-xs font-secondary font-semibold uppercase tracking-wider border transition-all duration-200
+                        className={`min-h-10 px-4 py-2 rounded-md text-xs font-secondary font-semibold uppercase tracking-wider border transition-all duration-200 cursor-pointer
                             ${danger
-                                ? "border-(--Negacion)/60 text-(--Negacion) hover:border-(--Negacion)"
+                                ? "border-(--Danger-border) bg-(--Danger-bg) text-(--Danger-text) hover:bg-(--Negacion) hover:text-white"
                                 : "border-(--Border2) text-(--Text-dark) bg-(--Primary) hover:bg-(--Primary-selected)"
                             }
                         `}

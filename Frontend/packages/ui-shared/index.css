@@ -1,27 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* Isso manda o Tailwind rastrear as pastas para gerar os estilos! */
-@source "./"; /* Lê os componentes compartilhados (NavItem, etc) */
+/* Rastreamento das pastas do monorepo pelo Tailwind CSS v4 */
+@source "./";
 @source "../../app/admin/src";
 @source "../../app/client/src";
 
+:root {
+    color-scheme: dark;
+}
 
-
-@theme "dark" {
-
-    /* Cores */
+@theme {
+    /* Paleta Principal */
     --Primary: #FFBF00;
     --Primary-selected: #FFCB2F;
     --Primary-off: #FFDFA0;
     --Primary-20: #D7A30A;
 
-
+    /* Textos */
+    --Text-primary: #F5F1EB;
     --Text-gray: #E5E2E1;
     --Text-dark: #261A00;
     --Text-primary-off: #D4C5AB;
 
-
+    /* Superfícies em Camadas */
     --Page-background: #131313;
     --Widget-background: #1C1B1B;
     --Button-background: #353534;
@@ -29,31 +31,55 @@
     --Select-background: #2A2A2A;
     --Note-background: #0E0E0E;
 
-
+    /* Bordas */
     --Border: #504532;
-    --Border2: #FFE2AB;
+    --Border2: #6B5C43;
 
-
-    --Negacion: #970909;
+    /* Cores Semânticas e Contraste AA */
+    --Negacion: #DC2626;
     --Negacion-off: #93000A;
+    --Danger-text: #FCA5A5;
+    --Danger-bg: rgba(239, 68, 68, 0.14);
+    --Danger-border: rgba(239, 68, 68, 0.45);
     --Neutral-30: #131313;
     --Afirmation: #00B637;
+    --Success-text: #4ADE80;
     --Warning: #F59E0B;
-    --Warning-text: #78350F;
+    --Warning-text: #FCD34D;
     --Info: #04DCFF;
     --Info-text: #003640;
-
 
     --White: #FFFFFF;
     --Gradient: linear-gradient(90deg, #FFFFFF 0%, #FFFFFF 100%);
 
-
-
-    /* amílias de Fonte */
-  --font-primary: 'Manrope', sans-serif;
-  --font-secondary: 'Inter', sans-serif;
+    /* Tipografia */
+    --font-primary: 'Manrope', sans-serif;
+    --font-secondary: 'Inter', sans-serif;
 }
 
+html,
+body {
+    background-color: var(--Page-background);
+    color: var(--Text-gray);
+    font-family: var(--font-secondary);
+    min-height: 100%;
+    overflow-x: hidden;
+}
+
+::selection {
+    background-color: rgba(255, 191, 0, 0.28);
+    color: var(--White);
+}
+
+input,
+textarea,
+select {
+    caret-color: var(--Primary);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
 
 /* Animations */
 @keyframes slideIn {
@@ -67,6 +93,17 @@
     }
 }
 
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Scrollbar styling */
 * {
     scrollbar-width: thin;
@@ -74,8 +111,8 @@
 }
 
 *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
 }
 
 *::-webkit-scrollbar-track {
@@ -85,11 +122,10 @@
 *::-webkit-scrollbar-thumb {
     background-color: var(--Border);
     border-radius: 999px;
-    border: 3px solid transparent;
+    border: 2px solid transparent;
     background-clip: content-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
     background-color: var(--Primary-20);
 }
-

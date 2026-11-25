@@ -9,15 +9,14 @@ import {
     getStoredRefreshToken,
     type AuthResponse,
 } from "../services/authService";
+import { updateMyProfile, type UpdateMyProfileInput } from "../services/userService";
 import type { User } from "shared-utils/types/user";
-import type { NotificationProps } from "ui-shared/components/NotificationBell";
-import { MOCK_NOTIFICATIONS } from "shared-utils/MockBD.js";
 import { useCartStore } from "./useCartStore";
 import { useMenuStore } from "./useMenuStore";
+import { useClientOrderStore } from "./useClientOrderStore";
 
 export interface ClientAuthState {
     user: User | null;
-    notifications: NotificationProps[];
     token: string | null;
     refreshToken: string | null;
     loading: boolean;
@@ -30,23 +29,18 @@ export interface ClientAuthState {
         password: string,
         phone?: string,
     ) => Promise<AuthResponse | null>;
+    updateProfile: (input: UpdateMyProfileInput) => Promise<User>;
     logout: (logoutAllDevices?: boolean) => Promise<void>;
     syncTokensFromStorage: () => void;
     handleSessionExpired: () => void;
     clearError: () => void;
 }
 
-const DEFAULT_NOTIFICATIONS: NotificationProps[] = MOCK_NOTIFICATIONS.map((n) => ({
-    ...n,
-    action: () => undefined,
-}));
-
 export const useAuthStore = create<ClientAuthState>((set, get) => {
     const initialToken = getStoredToken();
 
     return {
         user: getStoredUser(),
-        notifications: DEFAULT_NOTIFICATIONS,
         token: initialToken,
         refreshToken: getStoredRefreshToken(),
         loading: false,
@@ -95,6 +89,12 @@ export const useAuthStore = create<ClientAuthState>((set, get) => {
             }
         },
 
+        updateProfile: async (input) => {
+            const updatedUser = await updateMyProfile(input);
+            set({ user: updatedUser });
+            return updatedUser;
+        },
+
         logout: async (logoutAllDevices = false) => {
             const currentRefreshToken = get().refreshToken;
             if (currentRefreshToken) {
@@ -107,6 +107,7 @@ export const useAuthStore = create<ClientAuthState>((set, get) => {
             logoutService();
             useCartStore.getState().reset();
             useMenuStore.getState().reset();
+            useClientOrderStore.getState().reset();
             set({
                 user: null,
                 token: null,
@@ -129,6 +130,7 @@ export const useAuthStore = create<ClientAuthState>((set, get) => {
         handleSessionExpired: () => {
             useCartStore.getState().reset();
             useMenuStore.getState().reset();
+            useClientOrderStore.getState().reset();
             set({
                 user: null,
                 token: null,

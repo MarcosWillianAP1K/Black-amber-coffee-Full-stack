@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { Product, ProductInput } from "shared-utils/types/product";
+import { useToastStore } from "shared-utils/stores/useToastStore";
 import * as menuService from "../services/menuService";
 
 const POLL_INTERVAL_MS = 35_000;
@@ -14,6 +15,7 @@ export interface MenuStoreState {
     onCreate: (data: ProductInput) => Promise<void>;
     onEdit: (id: number, data: ProductInput) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
+    onToggleActive: (id: number) => Promise<void>;
     startPolling: () => void;
     stopPolling: () => void;
     reset: () => void;
@@ -35,7 +37,7 @@ export const useMenuStore = create<MenuStoreState>((set, get) => ({
             const data = await menuService.fetchMenuItems();
             set({ items: data, isLoading: false });
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Failed to load menu";
+            const message = err instanceof Error ? err.message : "Falha ao carregar cardápio";
             set({ error: message, isLoading: false });
         }
     },
@@ -47,13 +49,21 @@ export const useMenuStore = create<MenuStoreState>((set, get) => ({
             let created = await menuService.createMenuItem(productData);
 
             if (imageFile) {
-                created = await menuService.uploadProductImage(created.publicId, imageFile);
+                try {
+                    created = await menuService.uploadProductImage(created.publicId, imageFile);
+                } catch {
+                    useToastStore.getState().showToast({
+                        variant: "warning",
+                        title: "Produto salvo sem imagem",
+                        description: "Configure as variáveis do Bucket R2 para habilitar upload de fotos.",
+                    });
+                }
             }
 
             set((state) => ({ items: [...state.items, created] }));
             void get().refresh();
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Failed to create menu item";
+            const message = err instanceof Error ? err.message : "Falha ao criar item do cardápio";
             set({ error: message });
             throw err;
         } finally {
@@ -65,13 +75,21 @@ export const useMenuStore = create<MenuStoreState>((set, get) => ({
         set({ isSubmitting: true, error: null });
         try {
             const product = get().items.find((item) => item.id === id);
-            if (!product) throw new Error(`Product ${id} not found`);
+            if (!product) throw new Error(`Produto ${id} não encontrado`);
 
             const { imageFile, ...productData } = data;
             let updated = await menuService.updateMenuItem(product.publicId, productData);
 
             if (imageFile) {
-                updated = await menuService.uploadProductImage(product.publicId, imageFile);
+                try {
+                    updated = await menuService.uploadProductImage(product.publicId, imageFile);
+                } catch {
+                    useToastStore.getState().showToast({
+                        variant: "warning",
+                        title: "Dados salvos sem alterar imagem",
+                        description: "Configure as variáveis do Bucket R2 para habilitar upload de fotos.",
+                    });
+                }
             }
 
             set((state) => ({
@@ -79,7 +97,7 @@ export const useMenuStore = create<MenuStoreState>((set, get) => ({
             }));
             void get().refresh();
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Failed to update menu item";
+            const message = err instanceof Error ? err.message : "Falha ao atualizar item";
             set({ error: message });
             throw err;
         } finally {
@@ -99,11 +117,31 @@ export const useMenuStore = create<MenuStoreState>((set, get) => ({
             }));
             void get().refresh();
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Failed to delete menu item";
+            const message = err instanceof Error ? err.message : "Falha ao remover item";
             set({ error: message });
             throw err;
         } finally {
             set({ deletingId: null });
+        }
+    },
+
+    onToggleActive: async (id) => {
+        const product = get().items.find((item) => item.id === id);
+        if (!product) return;
+
+        set({ error: null });
+        try {
+            const updated = product.isActive
+                ? await menuService.deactivateProduct(product.publicId)
+                : await menuService.activateProduct(product.publicId);
+
+            set((state) => ({
+                items: state.items.map((item) => (item.id === id ? updated : item)),
+            }));
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Falha ao alterar status";
+            set({ error: message });
+            throw err;
         }
     },
 

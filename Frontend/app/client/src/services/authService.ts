@@ -8,16 +8,42 @@ export interface AuthResponse {
     user: User;
 }
 
+interface ApiErrorPayload {
+    message?: string;
+    error?: {
+        code?: string;
+        message?: string;
+    };
+}
+
+async function extractErrorMessage(response: Response, fallback: string): Promise<string> {
+    if (response.status === 429) {
+        return "Muitas tentativas de login. Aguarde alguns minutos e tente novamente.";
+    }
+    try {
+        const body = (await response.json()) as ApiErrorPayload;
+        const msg = body?.error?.message ?? body?.message;
+        if (msg && msg.trim().length > 0) {
+            return msg;
+        }
+    } catch {
+        // ignore JSON parse failure
+    }
+    if (response.status === 401) return "E-mail ou senha incorretos.";
+    if (response.status === 403) return "Esta conta está desativada. Procure o atendimento.";
+    return fallback;
+}
+
 async function apiGetMe(accessToken?: string): Promise<User> {
     const token = accessToken ?? getStoredToken();
-    if (!token) throw new Error("Access token missing");
+    if (!token) throw new Error("Token de acesso ausente.");
 
     const response = await fetch(API.Users.GetMe, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (!response.ok) throw new Error("Failed to load profile");
+    if (!response.ok) throw new Error("Falha ao carregar os dados do perfil.");
     const payload = (await response.json()) as GetUserResponse;
     return payload.data;
 }
@@ -29,13 +55,16 @@ async function apiLogin(email: string, password: string): Promise<AuthResponse> 
         body: JSON.stringify({ email, password }),
     });
 
-    if (!response.ok) throw new Error("E-mail ou senha incorretos");
+    if (!response.ok) {
+        const message = await extractErrorMessage(response, "E-mail ou senha incorretos.");
+        throw new Error(message);
+    }
 
     const payload = (await response.json()) as LoginResponse;
     const { accessToken, refreshToken, user } = payload.data;
 
     if (user.userType !== "user") {
-        throw new Error("Use o painel administrativo para acessar como funcionário.");
+        throw new Error("Use o painel operacional para acessar como funcionário.");
     }
 
     const profile = await apiGetMe(accessToken);
@@ -51,8 +80,9 @@ async function apiRegister(name: string, email: string, password: string, phone?
     });
 
     if (!response.ok) {
-        if (response.status === 409) throw new Error("E-mail já cadastrado");
-        throw new Error("Falha ao criar conta");
+        if (response.status === 409) throw new Error("Este e-mail já está cadastrado.");
+        const message = await extractErrorMessage(response, "Falha ao criar conta. Confira os dados informados.");
+        throw new Error(message);
     }
 
     const payload = (await response.json()) as RegisterResponse;
@@ -105,7 +135,7 @@ export async function refreshTokenService(refreshToken: string): Promise<Refresh
         body: JSON.stringify({ refreshToken }),
     });
 
-    if (!response.ok) throw new Error("Refresh token failed");
+    if (!response.ok) throw new Error("Falha ao renovar sessão.");
 
     const data = (await response.json()) as RefreshTokenResponse;
     localStorage.setItem("token", data.data.accessToken);
@@ -123,7 +153,7 @@ export async function logoutApiService(
         body: JSON.stringify({ refreshToken, logoutAllDevices }),
     });
 
-    if (!response.ok) throw new Error("Logout failed");
+    if (!response.ok) throw new Error("Falha ao encerrar sessão.");
     return response.json();
 }
 

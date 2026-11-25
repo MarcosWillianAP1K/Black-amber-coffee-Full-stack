@@ -1,7 +1,3 @@
-/**
- * CardCustomer — Admin-specific customer card.
- */
-
 import { useState } from "react";
 import { PerfilCard } from "ui-shared/components/ui/PerfilCard";
 import { OptionsEllipsis } from "ui-shared/components/OptionElipisses";
@@ -11,8 +7,8 @@ import { LoadingSpinner } from "ui-shared/components/ui/LoadingSpinner";
 import type { User as Customer } from "shared-utils/types/user";
 
 const CUSTOMER_STATUS_COLORS: StatusColorMap = {
-    active: { bg: "bg-(--Afirmation)/20", text: "text-(--Afirmation)" },
-    blocked: { bg: "bg-(--Negacion)/20", text: "text-(--Negacion)" },
+    active: { bg: "bg-(--Afirmation)/20", text: "text-(--Success-text)" },
+    blocked: { bg: "bg-(--Danger-bg)", text: "text-(--Danger-text)" },
 };
 
 export interface CardCustomerProps extends Customer {
@@ -48,15 +44,17 @@ export function CardCustomer({
     };
 
     return (
-        <div className="w-90 h-fit p-4 bg-(--Widget-background) rounded-md border border-(--Border) flex flex-col gap-6">
-            <div className="flex items-start justify-between">
-                <PerfilCard
-                    name={fullName}
-                    email={email}
-                    avatarUrl={avatarUrl ?? undefined}
-                />
+        <div className="w-full p-4 bg-(--Page-background) rounded-lg border border-(--Border)/70 flex flex-col justify-between gap-4">
+            <div className="flex items-start justify-between gap-2 min-w-0">
+                <div className="flex-1 min-w-0">
+                    <PerfilCard
+                        name={fullName}
+                        email={email}
+                        avatarUrl={avatarUrl ?? undefined}
+                    />
+                </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 shrink-0">
                     {busy ? <LoadingSpinner size="xs" className="text-(--Primary)" /> : null}
                     <OptionsEllipsis
                         disabled={busy}
@@ -72,7 +70,7 @@ export function CardCustomer({
                 </div>
             </div>
 
-            <div className="w-full h-fit flex items-center justify-between gap-2">
+            <div className="w-full flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-(--Border)/40">
                 <p className="text-(--Text-primary-off) text-xs font-secondary">
                     Membro desde {new Date(createdAt).toLocaleDateString("pt-BR")}
                 </p>

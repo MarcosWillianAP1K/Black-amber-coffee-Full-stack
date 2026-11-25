@@ -1,10 +1,6 @@
-/**
- * TableMenuRow — A single row in the menu table.
- * Displays item image, name, description, category, price, and action buttons (edit / delete).
- */
-
-import { Pencil, Trash2 } from "lucide-react";
-import type { Product } from "shared-utils/types/product";
+import { Pencil, Power, Trash2 } from "lucide-react";
+import { ProductThumb } from "ui-shared/components/ui/ProductThumb";
+import { PRODUCT_CATEGORY_LABELS, type Product, type ProductCategory } from "shared-utils/types/product";
 import { formatPrice } from "shared-utils/helpers/currency";
 
 interface TableMenuRowProps {
@@ -12,70 +8,104 @@ interface TableMenuRowProps {
     isSelected?: boolean;
     onEdit: (item: Product) => void;
     onDelete: (id: number) => void;
+    onToggleActive?: (id: number) => void;
 }
 
-export function TableMenuRow({ item, isSelected = false, onEdit, onDelete, }: TableMenuRowProps) {
+export function TableMenuRow({
+    item,
+    isSelected = false,
+    onEdit,
+    onDelete,
+    onToggleActive,
+}: TableMenuRowProps) {
+    const categoryLabel =
+        PRODUCT_CATEGORY_LABELS[item.category as ProductCategory] ?? item.category;
+
     return (
-        <tr className= {`transition-colors duration-200 ${isSelected ? "bg-(--Select-background)" : "hover:bg-(--Select-background)"}`}>
-            {/* Item: Image + Name + Description */}
+        <tr
+            className={`border-b border-(--Border)/30 transition-colors duration-200 ${
+                isSelected ? "bg-(--Select-background)" : "hover:bg-(--Select-background)/70"
+            }`}
+        >
             <td className="py-3 pr-4">
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-md overflow-hidden bg-(--Button-background) shrink-0">
-                        {item.imgUrl ? (
-                            <img
-                                src={item.imgUrl}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-(--Text-primary-off) text-xs">
-                                IMG
-                            </div>
-                        )}
-                    </div>
+                    <ProductThumb
+                        name={item.name}
+                        category={item.category}
+                        imageUrl={item.imgUrl}
+                        iconSize={18}
+                        className="w-12 h-12 rounded-lg shrink-0"
+                    />
 
                     <div className="flex flex-col min-w-0">
-                        <span className="text-(--Primary-off) text-sm font-primary font-bold truncate">
+                        <span className="text-(--Text-primary) text-sm font-primary font-bold truncate">
                             {item.name}
                         </span>
-                        <span className="text-(--Text-primary-off) text-xs font-secondary truncate max-w-[200px]">
-                            {item.description}
+                        <span className="text-(--Text-primary-off) text-xs font-secondary truncate max-w-xs">
+                            {item.description || "Sem descrição"}
                         </span>
                     </div>
                 </div>
             </td>
 
-            {/* Category */}
-            <td className="py-4 px-4">
+            <td className="py-3 px-4">
                 <span className="text-(--Text-gray) text-sm font-secondary">
-                    {item.category}
+                    {categoryLabel}
                 </span>
             </td>
 
-            {/* Price */}
-            <td className="py-4 px-4">
-                <span className="text-(--Primary) text-sm font-secondary font-bold">
+            <td className="py-3 px-4">
+                <span className="text-(--Primary) text-sm font-primary font-bold tabular-nums">
                     {formatPrice(item.price)}
                 </span>
             </td>
 
-            {/* Actions */}
-            <td className="py-4 pl-4">
-                <div className="flex items-center gap-3">
+            <td className="py-3 px-4">
+                <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-secondary font-bold ${
+                        item.isActive
+                            ? "bg-(--Afirmation)/20 text-(--Success-text)"
+                            : "bg-(--Danger-bg) text-(--Danger-text)"
+                    }`}
+                >
+                    {item.isActive ? "Ativo" : "Inativo"}
+                </span>
+            </td>
+
+            <td className="py-3 pl-4">
+                <div className="flex items-center gap-2">
+                    {onToggleActive && (
+                        <button
+                            type="button"
+                            onClick={() => onToggleActive(item.id)}
+                            className={`p-2 rounded-md transition-colors cursor-pointer ${
+                                item.isActive
+                                    ? "text-(--Success-text) hover:bg-(--Button-background)"
+                                    : "text-(--Text-primary-off) hover:text-(--Primary) hover:bg-(--Button-background)"
+                            }`}
+                            aria-label={item.isActive ? `Desativar ${item.name}` : `Ativar ${item.name}`}
+                            title={item.isActive ? "Desativar item" : "Ativar item"}
+                        >
+                            <Power size={16} />
+                        </button>
+                    )}
+
                     <button
+                        type="button"
                         onClick={() => onEdit(item)}
-                        className="p-1.5 rounded-md text-(--Text-primary-off) hover:text-(--Primary) hover:bg-(--Button-background) transition-all duration-200"
-                        aria-label={`Edit ${item.name}`}
-                        title="Edit item"
+                        className="p-2 rounded-md text-(--Text-primary-off) hover:text-(--Primary) hover:bg-(--Button-background) transition-all duration-200 cursor-pointer"
+                        aria-label={`Editar ${item.name}`}
+                        title="Editar item"
                     >
                         <Pencil size={16} />
                     </button>
 
                     <button
+                        type="button"
                         onClick={() => onDelete(item.id)}
-                        className="p-1.5 rounded-md text-(--Text-primary-off) hover:text-(--Negacion) hover:bg-(--Button-background) transition-all duration-200"
-                        aria-label={`Delete ${item.name}`}
-                        title="Delete item"
+                        className="p-2 rounded-md text-(--Text-primary-off) hover:text-(--Danger-text) hover:bg-(--Danger-bg) transition-all duration-200 cursor-pointer"
+                        aria-label={`Excluir ${item.name}`}
+                        title="Excluir item"
                     >
                         <Trash2 size={16} />
                     </button>
