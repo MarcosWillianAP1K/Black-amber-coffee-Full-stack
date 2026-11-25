@@ -15,40 +15,72 @@ services:
     startCommand: npm run start
     healthCheckPath: /v1/api/health
     envVars:
+      # Ambiente e Servidor
       - key: NODE_ENV
         value: production
       - key: PORT
         value: "3001"
+      - key: PUBLIC_PORT
+        value: "3001"
+      - key: CORS_ORIGIN
+        value: https://black-amber-admin.onrender.com,https://black-amber-client.onrender.com
+
+      # Banco de Dados PostgreSQL (Render Managed)
       - key: DATABASE_URL
         fromDatabase:
           name: black-amber-db
           property: connectionString
+      - key: DB_HOST
+        fromDatabase:
+          name: black-amber-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: black-amber-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: black-amber-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: black-amber-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: black-amber-db
+          property: database
       - key: DB_SSL
         value: "true"
       - key: AUTO_SEED
         value: "true"
+
+      # Autenticação JWT
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_SECRET_REFRESH
         generateValue: true
       - key: JWT_EXPIRATION
         value: "15m"
-      - key: CORS_ORIGIN
-        value: https://black-amber-admin.onrender.com,https://black-amber-client.onrender.com
+
+      # Armazenamento de Imagens S3 / Cloudflare R2
+      # Obs.: Quando preencher chaves reais no painel da Render, troque `value: ""` por `sync: false` para futuros syncs não zerarem os segredos.
       - key: BUCKET_NAME
         value: imagens
       - key: BUCKET_ACCESS_KEY
-        sync: false
+        value: ""
       - key: BUCKET_SECRET_KEY
-        sync: false
+        value: ""
       - key: BUCKET_URL
-        sync: false
+        value: ""
       - key: BUCKET_PUBLIC_URL
-        sync: false
+        value: ""
       - key: BUCKET_REGION
         value: us-east-1
+
+      # Envio de E-mails Transacionais (Resend)
       - key: RESEND_API_KEY
-        sync: false
+        value: ""
       - key: SYSTEM_MAIL_ADDR
         value: onboarding@resend.dev
 
@@ -63,6 +95,7 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      # Backend API
       - key: VITE_API_BASE_URL
         value: https://black-amber-api.onrender.com/v1/api
 
@@ -77,5 +110,6 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      # Backend API
       - key: VITE_API_BASE_URL
         value: https://black-amber-api.onrender.com/v1/api
